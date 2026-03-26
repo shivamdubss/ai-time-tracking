@@ -1,15 +1,21 @@
 import json
+import logging
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pathlib import Path
 
 from .database import init_db, prune_old_sessions
 from .tracker.session_manager import SessionManager
 from .routes import sessions, status
+from .auth import AuthMiddleware, get_auth_token
+from .permissions import check_all_permissions
+
+logger = logging.getLogger("timetrack")
 
 # WebSocket connections
 ws_connections: set[WebSocket] = set()
@@ -33,12 +39,17 @@ async def lifespan(app: FastAPI):
     init_db()
     prune_old_sessions()
     SessionManager.cleanup_stale()
+
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        logger.warning("ANTHROPIC_API_KEY not set — session summarization will fail")
+
     yield
-    # Shutdown
-    pass
 
 
 app = FastAPI(title="TimeTrack", lifespan=lifespan)
+
+# Auth middleware (before CORS so preflight works)
+app.add_middleware(AuthMiddleware)
 
 # CORS for dev
 app.add_middleware(
@@ -54,13 +65,32 @@ app.include_router(sessions.router)
 app.include_router(status.router)
 
 
+@app.get("/api/init")
+async def init_endpoint():
+    """Bootstrap endpoint — returns auth token to the frontend.
+    Only accessible from localhost by design (server binds to 127.0.0.1)."""
+    return {"token": get_auth_token()}
+
+
+@app.get("/api/permissions")
+async def permissions_endpoint():
+    """Check macOS permission status."""
+    return check_all_permissions()
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(ws: WebSocket):
+    # Validate token for WebSocket
+    token = ws.query_params.get("token", "")
+    expected = get_auth_token()
+    if expected and token != expected:
+        await ws.close(code=4001, reason="Unauthorized")
+        return
+
     await ws.accept()
     ws_connections.add(ws)
     try:
         while True:
-            # Keep connection alive, listen for pings
             data = await ws.receive_text()
             if data == "ping":
                 await ws.send_text(json.dumps({"type": "pong"}))

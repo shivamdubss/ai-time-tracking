@@ -1,8 +1,11 @@
+import os
 import time
 import json
 import threading
 from datetime import datetime
 from pathlib import Path
+
+WINDOW_INTERVAL = float(os.getenv("TIMETRACK_WINDOW_INTERVAL", "3"))
 
 try:
     from AppKit import NSWorkspace
@@ -20,7 +23,7 @@ except ImportError:
 
 
 class WindowTracker:
-    def __init__(self, temp_dir: Path, interval: float = 3.0):
+    def __init__(self, temp_dir: Path, interval: float = WINDOW_INTERVAL):
         self.temp_dir = temp_dir
         self.interval = interval
         self.entries: list[dict] = []

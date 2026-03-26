@@ -2,9 +2,31 @@ import type { Session, TrackingStatus } from './types'
 
 const API_BASE = '/api'
 
+// Auth token — fetched once from /api/init on startup
+let authToken: string = ''
+
+export async function initAuth(): Promise<string> {
+  try {
+    const res = await fetch(`${API_BASE}/init`)
+    const data = await res.json()
+    authToken = data.token || ''
+  } catch {
+    // Auth not available — proceed without
+  }
+  return authToken
+}
+
+function authHeaders(): Record<string, string> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (authToken) {
+    headers['Authorization'] = `Bearer ${authToken}`
+  }
+  return headers
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     ...options,
   })
   if (!res.ok) {
@@ -15,17 +37,26 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  getStatus: () => request<{ status: TrackingStatus; elapsed_seconds: number; session_id: string | null }>('/status'),
+  getStatus: () =>
+    request<{ status: TrackingStatus; elapsed_seconds: number; session_id: string | null }>('/status'),
 
-  startSession: () => request<{ id: string; start_time: string; status: string }>('/sessions/start', { method: 'POST' }),
+  startSession: () =>
+    request<{ id: string; start_time: string; status: string }>('/sessions/start', { method: 'POST' }),
 
-  stopSession: () => request<{ id: string; status: string }>('/sessions/stop', { method: 'POST' }),
+  stopSession: () =>
+    request<{ id: string; status: string }>('/sessions/stop', { method: 'POST' }),
 
-  getSessions: (date: string) => request<Session[]>(`/sessions?date=${date}`),
+  getSessions: (date: string) =>
+    request<Session[]>(`/sessions?date=${date}`),
 
-  getSession: (id: string) => request<Session>(`/sessions/${id}`),
+  getSession: (id: string) =>
+    request<Session>(`/sessions/${id}`),
 
-  deleteSession: (id: string) => request<{ deleted: boolean }>(`/sessions/${id}`, { method: 'DELETE' }),
+  deleteSession: (id: string) =>
+    request<{ deleted: boolean }>(`/sessions/${id}`, { method: 'DELETE' }),
+
+  getPermissions: () =>
+    request<{ accessibility: boolean; screen_recording: boolean; platform_supported: boolean }>('/permissions'),
 }
 
 
@@ -36,7 +67,8 @@ export class TimeTrackWebSocket {
 
   connect() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    this.ws = new WebSocket(`${protocol}//${window.location.host}/ws`)
+    const tokenParam = authToken ? `?token=${authToken}` : ''
+    this.ws = new WebSocket(`${protocol}//${window.location.host}/ws${tokenParam}`)
 
     this.ws.onmessage = (event) => {
       try {

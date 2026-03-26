@@ -1,8 +1,11 @@
 import base64
 import json
+import os
 from pathlib import Path
 
 import anthropic
+
+MODEL = os.getenv("TIMETRACK_MODEL", "claude-sonnet-4-20250514")
 
 
 SYSTEM_PROMPT = """You are an AI assistant that analyzes work sessions. Given a chronological log of window activity and optional screenshots, produce a structured JSON summary.
@@ -125,7 +128,7 @@ async def summarize_session(
         })
 
     message = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model=MODEL,
         max_tokens=2048,
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": content}],

@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
-DB_DIR = Path.home() / "Library" / "Application Support" / "TimeTrack"
+_db_dir_env = os.getenv("TIMETRACK_DB_DIR", "")
+DB_DIR = Path(_db_dir_env).expanduser() if _db_dir_env else Path.home() / "Library" / "Application Support" / "TimeTrack"
 DB_PATH = DB_DIR / "timetrack.db"
 
 

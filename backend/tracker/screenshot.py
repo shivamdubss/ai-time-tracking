@@ -1,7 +1,10 @@
+import os
 import threading
 import time
 from datetime import datetime
 from pathlib import Path
+
+SCREENSHOT_INTERVAL = float(os.getenv("TIMETRACK_SCREENSHOT_INTERVAL", "30"))
 
 try:
     from Quartz import (
@@ -25,7 +28,7 @@ except ImportError:
 
 
 class ScreenshotCapture:
-    def __init__(self, temp_dir: Path, interval: float = 30.0):
+    def __init__(self, temp_dir: Path, interval: float = SCREENSHOT_INTERVAL):
         self.temp_dir = temp_dir
         self.interval = interval
         self.screenshots: list[Path] = []

@@ -1,11 +1,20 @@
+import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { SessionsPage } from '@/pages/SessionsPage'
 import { PlaceholderPage } from '@/pages/PlaceholderPage'
 import { useTheme } from '@/hooks/useTheme'
+import { initAuth } from '@/lib/api'
 
 export default function App() {
   const { theme, toggleTheme } = useTheme()
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    initAuth().then(() => setReady(true))
+  }, [])
+
+  if (!ready) return null
 
   return (
     <div className="flex h-screen overflow-hidden bg-page">

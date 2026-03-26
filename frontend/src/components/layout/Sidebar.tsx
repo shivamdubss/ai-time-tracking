@@ -18,9 +18,7 @@ export function Sidebar({ theme, onToggleTheme }: SidebarProps) {
   return (
     <aside className="w-[220px] h-screen bg-sidebar border-r border-border flex flex-col p-4 shrink-0">
       <div className="px-2 mb-8">
-        <h1 className="font-display font-black text-lg tracking-tight text-text-primary">
-          TimeTrack
-        </h1>
+        <img src="/donna-logo.png" alt="Donna" className="h-7 dark:invert" />
       </div>
 
       <nav className="flex flex-col gap-0.5 flex-1">

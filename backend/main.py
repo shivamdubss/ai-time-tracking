@@ -32,7 +32,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="TimeTrack", lifespan=lifespan)
+app = FastAPI(title="Donna", lifespan=lifespan)
 
 # Auth middleware (before CORS so preflight works)
 app.add_middleware(AuthMiddleware)

@@ -13,4 +13,4 @@ async def broadcast_ws(data: dict):
             await ws.send_text(message)
         except Exception:
             disconnected.add(ws)
-    ws_connections -= disconnected
+    ws_connections.difference_update(disconnected)

@@ -23,7 +23,7 @@ export function PermissionGuide({
         <div>
           <h2 className="font-display font-bold text-lg text-text-primary">Permissions Required</h2>
           <p className="text-sm text-text-muted">
-            TimeTrack needs macOS permissions to track your activity.
+            Donna needs macOS permissions to track your activity.
           </p>
         </div>
       </div>
@@ -50,8 +50,8 @@ export function PermissionGuide({
           <li>Go to <strong>Privacy & Security</strong></li>
           <li>Click <strong>Accessibility</strong> (or <strong>Screen Recording</strong>)</li>
           <li>Click the <strong>+</strong> button</li>
-          <li>Add <strong>Terminal</strong> (or whichever app runs TimeTrack)</li>
-          <li>Restart TimeTrack after granting permissions</li>
+          <li>Add <strong>Terminal</strong> (or whichever app runs Donna)</li>
+          <li>Restart Donna after granting permissions</li>
         </ol>
       </div>
 

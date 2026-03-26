@@ -80,7 +80,7 @@ if __name__ == "__main__":
     )
     processes.append(frontend)
 
-    print("\n  TimeTrack is running!")
+    print("\n  Donna is running!")
     print(f"  Frontend: http://localhost:5173")
     print(f"  Backend:  http://localhost:{port}")
     print(f"  Auth:     {token[:8]}...")

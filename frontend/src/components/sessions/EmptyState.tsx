@@ -10,7 +10,7 @@ export function EmptyState() {
         No sessions recorded
       </h3>
       <p className="text-[13px] text-text-muted max-w-[280px]">
-        Click "Start Tracking" to begin recording your work session. TimeTrack will capture your
+        Click "Start Tracking" to begin recording your work session. Donna will capture your
         activity in the background.
       </p>
     </div>

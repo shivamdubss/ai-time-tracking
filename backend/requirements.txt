@@ -1,0 +1,7 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+websockets==15.0.1
+anthropic==0.52.0
+Pillow==11.2.1
+pyobjc-framework-Cocoa==11.0.1
+pyobjc-framework-Quartz==11.0.1

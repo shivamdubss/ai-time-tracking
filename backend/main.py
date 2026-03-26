@@ -1,0 +1,84 @@
+import json
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from pathlib import Path
+
+from .database import init_db, prune_old_sessions
+from .tracker.session_manager import SessionManager
+from .routes import sessions, status
+
+# WebSocket connections
+ws_connections: set[WebSocket] = set()
+
+
+async def broadcast_ws(data: dict):
+    """Broadcast a message to all connected WebSocket clients."""
+    message = json.dumps(data)
+    disconnected = set()
+    for ws in ws_connections:
+        try:
+            await ws.send_text(message)
+        except Exception:
+            disconnected.add(ws)
+    ws_connections -= disconnected
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    init_db()
+    prune_old_sessions()
+    SessionManager.cleanup_stale()
+    yield
+    # Shutdown
+    pass
+
+
+app = FastAPI(title="TimeTrack", lifespan=lifespan)
+
+# CORS for dev
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# API routes
+app.include_router(sessions.router)
+app.include_router(status.router)
+
+
+@app.websocket("/ws")
+async def websocket_endpoint(ws: WebSocket):
+    await ws.accept()
+    ws_connections.add(ws)
+    try:
+        while True:
+            # Keep connection alive, listen for pings
+            data = await ws.receive_text()
+            if data == "ping":
+                await ws.send_text(json.dumps({"type": "pong"}))
+    except WebSocketDisconnect:
+        ws_connections.discard(ws)
+    except Exception:
+        ws_connections.discard(ws)
+
+
+# Serve frontend in production
+FRONTEND_DIST = Path(__file__).parent.parent / "frontend" / "dist"
+
+if FRONTEND_DIST.exists():
+    app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIST / "assets")), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        file_path = FRONTEND_DIST / full_path
+        if file_path.exists() and file_path.is_file():
+            return FileResponse(str(file_path))
+        return FileResponse(str(FRONTEND_DIST / "index.html"))

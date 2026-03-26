@@ -1,6 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { Toggle } from '@/components/ui/Toggle'
 import { formatDateLabel, formatTime } from '@/lib/utils'
 import type { TrackingStatus } from '@/lib/types'
 
@@ -13,8 +12,6 @@ interface HeaderProps {
   elapsed: number
   onStartTracking: () => void
   onStopTracking: () => void
-  autoCapture: boolean
-  onToggleAutoCapture: (v: boolean) => void
 }
 
 export function Header({
@@ -26,14 +23,10 @@ export function Header({
   elapsed,
   onStartTracking,
   onStopTracking,
-  autoCapture,
-  onToggleAutoCapture,
 }: HeaderProps) {
   return (
     <header className="flex items-center justify-between">
       <div className="flex items-center gap-4">
-        <Toggle checked={autoCapture} onChange={onToggleAutoCapture} label="Auto Capture" />
-
         <div className="flex items-center gap-2">
           <button
             onClick={onGoBack}

@@ -11,26 +11,12 @@ from pathlib import Path
 
 from .database import init_db, prune_old_sessions
 from .tracker.session_manager import SessionManager
-from .routes import sessions, status
+from .ws import ws_connections
 from .auth import AuthMiddleware, get_auth_token
 from .permissions import check_all_permissions
+from .routes import sessions, status
 
 logger = logging.getLogger("timetrack")
-
-# WebSocket connections
-ws_connections: set[WebSocket] = set()
-
-
-async def broadcast_ws(data: dict):
-    """Broadcast a message to all connected WebSocket clients."""
-    message = json.dumps(data)
-    disconnected = set()
-    for ws in ws_connections:
-        try:
-            await ws.send_text(message)
-        except Exception:
-            disconnected.add(ws)
-    ws_connections -= disconnected
 
 
 @asynccontextmanager

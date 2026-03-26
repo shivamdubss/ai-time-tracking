@@ -19,8 +19,8 @@ export function useTimer() {
     }
   }, [isRunning])
 
-  const start = useCallback(() => {
-    setElapsed(0)
+  const start = useCallback((fromSeconds?: number) => {
+    setElapsed(fromSeconds ?? 0)
     setIsRunning(true)
   }, [])
 

@@ -1,5 +1,6 @@
 import type { Activity, CategoryName } from '@/lib/types'
 import { CATEGORY_BAR_COLORS } from '@/lib/types'
+import { formatDuration } from '@/lib/format'
 
 interface ActivityRowProps {
   activity: Activity
@@ -34,7 +35,7 @@ function getAppAbbrev(app: string): string {
 export function ActivityRow({ activity, isLast }: ActivityRowProps) {
   const category = getAppCategory(activity.app)
   const color = CATEGORY_BAR_COLORS[category]
-  const hours = (activity.minutes / 60).toFixed(1)
+  const hours = formatDuration(activity.minutes)
 
   return (
     <div

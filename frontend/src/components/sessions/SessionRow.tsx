@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import type { Session, CategoryName } from '@/lib/types'
 import { formatTimeRange, cn } from '@/lib/utils'
+import { formatSessionHours } from '@/lib/format'
 import { CategoryBar } from '@/components/ui/CategoryBar'
 import { CategoryPill } from '@/components/ui/CategoryPill'
 import { ActivityRow } from './ActivityRow'
@@ -12,10 +13,7 @@ interface SessionRowProps {
 
 export function SessionRow({ session }: SessionRowProps) {
   const [expanded, setExpanded] = useState(false)
-  const hours = (
-    (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) /
-    (1000 * 60 * 60)
-  ).toFixed(1)
+  const hours = formatSessionHours(session.startTime, session.endTime)
 
   const topCategories = session.categories.slice(0, 3)
 

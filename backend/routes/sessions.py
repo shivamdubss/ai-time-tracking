@@ -76,7 +76,7 @@ async def _summarize_and_cleanup(
     temp_dir: str,
 ):
     """Summarize session with Claude, store result, clean up temp data."""
-    from ..main import broadcast_ws
+    from ..ws import broadcast_ws
 
     try:
         summary_data = await summarize_session(

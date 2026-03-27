@@ -1,7 +1,9 @@
 import { useState, useRef } from 'react'
+import { Trash2, Pencil } from 'lucide-react'
 import type { Activity, Matter } from '@/lib/types'
-import { getCategoryBarColor } from '@/lib/types'
-import { formatDuration } from '@/lib/format'
+import { LEGAL_CATEGORIES, getCategoryBarColor } from '@/lib/types'
+import { formatDuration, roundToDecimalHours } from '@/lib/format'
+import { UTBMS_CODE_LIST } from '@/lib/utbms'
 import { api } from '@/lib/api'
 
 interface ActivityRowProps {
@@ -9,6 +11,7 @@ interface ActivityRowProps {
   isLast: boolean
   matters?: Matter[]
   onActivityUpdated?: (activity: Activity) => void
+  onActivityDeleted?: (activityId: string) => void
 }
 
 function getAppAbbrev(app: string): string {
@@ -26,13 +29,14 @@ function getAppAbbrev(app: string): string {
   return app.slice(0, 2)
 }
 
-export function ActivityRow({ activity, isLast, matters, onActivityUpdated }: ActivityRowProps) {
+export function ActivityRow({ activity, isLast, matters, onActivityUpdated, onActivityDeleted }: ActivityRowProps) {
   const category = activity.category || 'Administrative'
   const color = getCategoryBarColor(category)
   const hours = formatDuration(activity.minutes)
   const [isEditingNarrative, setIsEditingNarrative] = useState(false)
   const [narrativeValue, setNarrativeValue] = useState(activity.narrative)
   const [saveError, setSaveError] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const matterName = activity.matter_id
@@ -40,23 +44,20 @@ export function ActivityRow({ activity, isLast, matters, onActivityUpdated }: Ac
     : null
 
   const billableValue = activity.effective_rate != null && activity.minutes > 0
-    ? `$${((activity.minutes / 60) * activity.effective_rate).toFixed(0)}`
+    ? `$${(roundToDecimalHours(activity.minutes) * activity.effective_rate).toFixed(0)}`
     : null
 
   async function handleNarrativeSave() {
     setIsEditingNarrative(false)
     if (narrativeValue === activity.narrative) return
-    if (!activity.id) {
-      // Legacy activity from JSON blob — no ID to update
-      return
-    }
+    if (!activity.id) return
     try {
       setSaveError(false)
       const updated = await api.updateActivity(activity.id, { narrative: narrativeValue })
       onActivityUpdated?.(updated)
     } catch {
       setSaveError(true)
-      setNarrativeValue(activity.narrative) // Revert on error
+      setNarrativeValue(activity.narrative)
       setTimeout(() => setSaveError(false), 3000)
     }
   }
@@ -67,17 +68,53 @@ export function ActivityRow({ activity, isLast, matters, onActivityUpdated }: Ac
     try {
       const updated = await api.updateActivity(activity.id, { matter_id: newMatterId })
       onActivityUpdated?.(updated)
-    } catch {
-      // Silently fail — matter dropdown reverts on next render
-    }
+    } catch {}
+  }
+
+  async function handleCategoryChange(newCategory: string) {
+    if (!activity.id) return
+    try {
+      const updated = await api.updateActivity(activity.id, { category: newCategory })
+      onActivityUpdated?.(updated)
+    } catch {}
+  }
+
+  async function handleActivityCodeChange(code: string) {
+    if (!activity.id) return
+    try {
+      const updated = await api.updateActivity(activity.id, { activity_code: code || undefined })
+      onActivityUpdated?.(updated)
+    } catch {}
+  }
+
+  async function handleDelete() {
+    if (!activity.id) return
+    if (!window.confirm('Delete this activity?')) return
+    try {
+      await api.deleteActivity(activity.id)
+      onActivityDeleted?.(activity.id)
+    } catch {}
   }
 
   return (
     <div
-      className={`grid grid-cols-[1fr_80px_1.2fr] gap-4 py-3 text-[13px] ${
+      className={`relative grid grid-cols-[1fr_80px_1.2fr] gap-4 py-3 text-[13px] ${
         !isLast ? 'border-b border-border-subtle' : ''
       }`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Delete button - top right on hover */}
+      {isHovered && activity.id && onActivityDeleted && (
+        <button
+          onClick={handleDelete}
+          className="absolute top-2 right-2 p-1 rounded text-text-faint hover:text-red-500 hover:bg-red-50 transition-colors"
+          title="Delete activity"
+        >
+          <Trash2 size={13} />
+        </button>
+      )}
+
       <div>
         <div className="flex items-center gap-2 font-semibold text-text-primary">
           <div
@@ -87,8 +124,42 @@ export function ActivityRow({ activity, isLast, matters, onActivityUpdated }: Ac
             {getAppAbbrev(activity.app)}
           </div>
           {activity.app}
+          {activity.activity_code && (
+            <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-bg-inset text-text-muted">
+              {activity.activity_code}
+            </span>
+          )}
         </div>
         <div className="text-xs text-text-muted mt-0.5 pl-7">{activity.context}</div>
+
+        {/* Category dropdown */}
+        {activity.id && (
+          <div className="mt-1 pl-7">
+            <select
+              className="text-xs bg-transparent border border-border-subtle rounded px-1.5 py-0.5 text-text-muted cursor-pointer hover:border-border-default transition-colors"
+              value={category}
+              onChange={(e) => handleCategoryChange(e.target.value)}
+            >
+              {LEGAL_CATEGORIES.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+
+            {/* Activity code dropdown */}
+            <select
+              className="text-xs bg-transparent border border-border-subtle rounded px-1.5 py-0.5 text-text-muted cursor-pointer hover:border-border-default transition-colors ml-1"
+              value={activity.activity_code || ''}
+              onChange={(e) => handleActivityCodeChange(e.target.value)}
+            >
+              <option value="">No code</option>
+              {UTBMS_CODE_LIST.map(({ code, label }) => (
+                <option key={code} value={code}>{label}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Matter dropdown */}
         {matters && matters.length > 0 && (() => {
           const active = matters.filter(m => m.status === 'active')
           const billableMatters = active.filter(m => m.billing_type !== 'non-billable')
@@ -142,17 +213,23 @@ export function ActivityRow({ activity, isLast, matters, onActivityUpdated }: Ac
             value={narrativeValue}
             onChange={(e) => setNarrativeValue(e.target.value)}
             onBlur={handleNarrativeSave}
-            onKeyDown={(e) => { if (e.key === 'Escape') { setNarrativeValue(activity.narrative); setIsEditingNarrative(false) } }}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') { setNarrativeValue(activity.narrative); setIsEditingNarrative(false) }
+              if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleNarrativeSave() }
+            }}
             rows={2}
             autoFocus
           />
         ) : (
           <div
-            className="cursor-pointer hover:bg-bg-surface-hover rounded px-1 -mx-1 transition-colors"
+            className="group cursor-pointer hover:bg-bg-surface-hover rounded px-1 -mx-1 transition-colors flex items-start gap-1"
             onClick={() => setIsEditingNarrative(true)}
             title="Click to edit"
           >
-            {activity.narrative || <span className="italic text-text-faint">Click to add narrative</span>}
+            <span className="flex-1">
+              {activity.narrative || <span className="italic text-text-faint">Click to add narrative</span>}
+            </span>
+            <Pencil size={11} className="mt-1 shrink-0 text-text-faint opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
         )}
         {saveError && (

@@ -1,11 +1,15 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Header } from '@/components/layout/Header'
 import { SessionTable } from '@/components/sessions/SessionTable'
-import { ProcessingState } from '@/components/sessions/ProcessingState'
+import { MatterGroupView } from '@/components/sessions/MatterGroupView'
 import { useSelectedDate } from '@/hooks/useSelectedDate'
 import { useTimer } from '@/hooks/useTimer'
 import { api, TimeTrackWebSocket } from '@/lib/api'
-import type { Session, TrackingStatus, Matter } from '@/lib/types'
+import { roundToDecimalHours } from '@/lib/format'
+import type { Session, TrackingStatus, Matter, Client, Activity } from '@/lib/types'
+import { cn } from '@/lib/utils'
+
+type ViewMode = 'timeline' | 'by-matter'
 
 export function SessionsPage() {
   const { selectedDate, goBack, goForward, isToday } = useSelectedDate()
@@ -13,18 +17,23 @@ export function SessionsPage() {
   const [status, setStatus] = useState<TrackingStatus>('idle')
   const [sessions, setSessions] = useState<Session[]>([])
   const [matters, setMatters] = useState<Matter[]>([])
+  const [clients, setClients] = useState<Client[]>([])
+  const [viewMode, setViewMode] = useState<ViewMode>('timeline')
 
-  // Fetch matters once on mount
+  const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
+
+  // Fetch matters and clients once on mount
   useEffect(() => {
-    api.getMatters({ status: 'active' }).then(setMatters).catch(() => {})
+    Promise.all([
+      api.getMatters({ status: 'active' }).then(setMatters),
+      api.getClients().then(setClients),
+    ]).catch(() => {})
   }, [])
 
   // Fetch sessions for selected date
   const fetchSessions = useCallback(async () => {
     try {
-      const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
       const data = await api.getSessions(dateStr)
-      // Map snake_case from API to camelCase
       const mapped = data.map((s: any) => ({
         id: s.id,
         startTime: s.start_time || s.startTime,
@@ -39,7 +48,7 @@ export function SessionsPage() {
     } catch {
       setSessions([])
     }
-  }, [selectedDate])
+  }, [dateStr])
 
   useEffect(() => {
     fetchSessions()
@@ -98,17 +107,15 @@ export function SessionsPage() {
 
   const totalActivities = sessions.reduce((acc, s) => acc + (s.activities?.length || 0), 0)
 
-  // Compute total billable value across all sessions
   const totalBillableValue = sessions.reduce((sessionSum, s) => {
     return sessionSum + (s.activities || []).reduce((actSum, act) => {
       if (act.effective_rate != null && act.minutes > 0) {
-        return actSum + (act.minutes / 60) * act.effective_rate
+        return actSum + roundToDecimalHours(act.minutes) * act.effective_rate
       }
       return actSum
     }, 0)
   }, 0)
 
-  // Compute billable vs non-billable minute totals
   const totalNonBillableMinutes = sessions.reduce((sum, s) =>
     sum + (s.activities || []).reduce((actSum, act) =>
       actSum + (act.billable === false ? act.minutes : 0), 0), 0)
@@ -150,6 +157,24 @@ export function SessionsPage() {
     setSessions(prev => prev.map(s => s.id === updatedSession.id ? updatedSession : s))
   }
 
+  function handleMatterActivityUpdated(updatedActivity: Activity) {
+    setSessions(prev => prev.map(s => ({
+      ...s,
+      activities: s.activities.map(a => a.id === updatedActivity.id ? updatedActivity : a),
+    })))
+  }
+
+  async function handleApproveAll() {
+    try {
+      await api.approveAllActivities(dateStr)
+      fetchSessions()
+    } catch {}
+  }
+
+  function handleExport() {
+    api.exportTimesheet(dateStr)
+  }
+
   return (
     <div className="flex flex-col gap-6 p-6 flex-1 min-h-0">
       <Header
@@ -163,9 +188,51 @@ export function SessionsPage() {
         onStopTracking={handleStop}
       />
 
-      {status === 'processing' ? (
-        <ProcessingState />
-      ) : (
+      {/* View toggle + action buttons */}
+      <div className="flex items-center justify-between">
+        <div className="flex gap-0.5 bg-bg-inset rounded-[var(--radius-sm)] p-0.5">
+          <button
+            className={cn(
+              'px-3 py-1.5 text-sm font-medium rounded-[var(--radius-sm)] transition-colors',
+              viewMode === 'timeline'
+                ? 'bg-surface text-text-primary shadow-sm'
+                : 'text-text-muted hover:text-text-secondary',
+            )}
+            onClick={() => setViewMode('timeline')}
+          >
+            Timeline View
+          </button>
+          <button
+            className={cn(
+              'px-3 py-1.5 text-sm font-medium rounded-[var(--radius-sm)] transition-colors',
+              viewMode === 'by-matter'
+                ? 'bg-surface text-text-primary shadow-sm'
+                : 'text-text-muted hover:text-text-secondary',
+            )}
+            onClick={() => setViewMode('by-matter')}
+          >
+            By Matter
+          </button>
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            onClick={handleApproveAll}
+            className="px-3 py-1.5 text-sm font-medium bg-surface border border-border rounded-[var(--radius-sm)] text-text-primary hover:bg-surface-hover transition-colors"
+          >
+            Approve All Pending
+          </button>
+          <button
+            onClick={handleExport}
+            className="px-3 py-1.5 text-sm font-medium bg-accent text-inverse rounded-[var(--radius-sm)] hover:opacity-90 transition-opacity"
+          >
+            Export Timesheet &rarr;
+          </button>
+        </div>
+      </div>
+
+      {/* Content */}
+      {viewMode === 'timeline' ? (
         <SessionTable
           sessions={sessions}
           totalHours={totalHours}
@@ -174,6 +241,14 @@ export function SessionsPage() {
           totalNonBillableMinutes={totalNonBillableMinutes}
           matters={matters}
           onSessionUpdated={handleSessionUpdated}
+          isProcessing={status === 'processing'}
+        />
+      ) : (
+        <MatterGroupView
+          sessions={sessions}
+          matters={matters}
+          clients={clients}
+          onActivityUpdated={handleMatterActivityUpdated}
         />
       )}
     </div>

@@ -105,8 +105,38 @@ export const api = {
   getActivities: (sessionId: string) =>
     request<Activity[]>(`/sessions/${sessionId}/activities`),
 
-  updateActivity: (id: string, data: { matter_id?: string | null; narrative?: string; billable?: boolean }) =>
+  createActivity: (sessionId: string, data: {
+    app?: string; context?: string; minutes?: number; narrative?: string;
+    category?: string; matter_id?: string | null;
+    start_time?: string; end_time?: string; activity_code?: string;
+  }) =>
+    request<Activity>(`/sessions/${sessionId}/activities`, { method: 'POST', body: JSON.stringify(data) }),
+
+  updateActivity: (id: string, data: {
+    matter_id?: string | null; narrative?: string; billable?: boolean;
+    category?: string; minutes?: number; activity_code?: string;
+    approval_status?: string; start_time?: string; end_time?: string;
+  }) =>
     request<Activity>(`/activities/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+
+  deleteActivity: (id: string) =>
+    request<{ deleted: boolean }>(`/activities/${id}`, { method: 'DELETE' }),
+
+  approveAllActivities: (date: string) =>
+    request<{ approved_count: number }>('/activities/approve-all', { method: 'POST', body: JSON.stringify({ date }) }),
+
+  exportTimesheet: async (date: string) => {
+    const res = await fetch(`${API_BASE}/export?date=${date}&format=csv`, {
+      headers: authHeaders(),
+    })
+    const blob = await res.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `timesheet-${date}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  },
 }
 
 

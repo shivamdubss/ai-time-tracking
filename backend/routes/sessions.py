@@ -121,6 +121,17 @@ async def _summarize_and_cleanup(
         raw_activities = summary_data.get("activities", [])
         matched_activities = match_activities_to_matters(raw_activities, active_matters)
 
+        # Category-based fallback: unmatched activities with "Administrative"
+        # category auto-assign to the internal Administrative matter
+        from ..database import INTERNAL_CLIENT_ID
+        _category_fallback = {"Administrative": "nb-admin"}
+        internal_matter_ids = {m["id"] for m in active_matters if m.get("client_id") == INTERNAL_CLIENT_ID}
+        for act in matched_activities:
+            if not act.get("matter_id"):
+                fallback_id = _category_fallback.get(act.get("category"))
+                if fallback_id and fallback_id in internal_matter_ids:
+                    act["matter_id"] = fallback_id
+
         # Insert activities into the normalized table with rate snapshots
         for i, act in enumerate(matched_activities):
             matter_id = act.get("matter_id")
@@ -144,6 +155,9 @@ async def _summarize_and_cleanup(
                 billable=billable,
                 effective_rate=effective_rate,
                 sort_order=i,
+                start_time=act.get("start_time"),
+                end_time=act.get("end_time"),
+                activity_code=act.get("activity_code"),
             )
 
         # Update session (keep legacy JSON for backward compat during transition)

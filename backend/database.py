@@ -116,6 +116,25 @@ def init_db():
     except sqlite3.OperationalError:
         conn.execute("ALTER TABLE clients ADD COLUMN is_internal INTEGER DEFAULT 0")
 
+    # Add start_time/end_time columns to activities if missing
+    for col in ("start_time", "end_time"):
+        try:
+            conn.execute(f"SELECT {col} FROM activities LIMIT 1")
+        except sqlite3.OperationalError:
+            conn.execute(f"ALTER TABLE activities ADD COLUMN {col} TEXT")
+
+    # Add approval_status column to activities if missing
+    try:
+        conn.execute("SELECT approval_status FROM activities LIMIT 1")
+    except sqlite3.OperationalError:
+        conn.execute("ALTER TABLE activities ADD COLUMN approval_status TEXT DEFAULT 'pending'")
+
+    # Add activity_code column to activities if missing
+    try:
+        conn.execute("SELECT activity_code FROM activities LIMIT 1")
+    except sqlite3.OperationalError:
+        conn.execute("ALTER TABLE activities ADD COLUMN activity_code TEXT")
+
     conn.commit()
 
     # Migrate existing activities from JSON to activities table
@@ -274,7 +293,7 @@ def get_session(session_id: str) -> Optional[dict]:
 def get_sessions_by_date(date_str: str) -> list[dict]:
     conn = get_db()
     rows = conn.execute(
-        "SELECT * FROM sessions WHERE start_time LIKE ? ORDER BY start_time ASC",
+        "SELECT * FROM sessions WHERE start_time LIKE ? ORDER BY start_time DESC",
         (f"{date_str}%",),
     ).fetchall()
 
@@ -550,28 +569,34 @@ def get_activities_for_session(session_id: str) -> list[dict]:
 def insert_activity(session_id: str, app: str, context: str = None, minutes: int = 0,
                     narrative: str = None, category: str = None, matter_id: str = None,
                     billable: bool = True, effective_rate: float = None,
-                    sort_order: int = 0) -> dict:
+                    sort_order: int = 0, start_time: str = None, end_time: str = None,
+                    activity_code: str = None, approval_status: str = "pending") -> dict:
     activity_id = str(uuid.uuid4())[:8]
     now = datetime.now().isoformat()
     conn = get_db()
     conn.execute(
         """INSERT INTO activities (id, session_id, matter_id, app, context, minutes, narrative,
-           category, billable, effective_rate, sort_order, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+           category, billable, effective_rate, sort_order, created_at,
+           start_time, end_time, activity_code, approval_status)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (activity_id, session_id, matter_id, app, context, minutes, narrative,
-         category, 1 if billable else 0, effective_rate, sort_order, now),
+         category, 1 if billable else 0, effective_rate, sort_order, now,
+         start_time, end_time, activity_code, approval_status),
     )
     conn.commit()
     conn.close()
     return {"id": activity_id, "session_id": session_id, "matter_id": matter_id,
             "app": app, "context": context, "minutes": minutes, "narrative": narrative,
             "category": category, "billable": billable, "effective_rate": effective_rate,
-            "sort_order": sort_order, "created_at": now}
+            "sort_order": sort_order, "created_at": now,
+            "start_time": start_time, "end_time": end_time,
+            "activity_code": activity_code, "approval_status": approval_status}
 
 
 def update_activity(activity_id: str, **kwargs) -> Optional[dict]:
     conn = get_db()
-    allowed = {"matter_id", "narrative", "billable", "effective_rate", "category"}
+    allowed = {"matter_id", "narrative", "billable", "effective_rate", "category",
+                "minutes", "activity_code", "approval_status", "start_time", "end_time"}
     sets = []
     values = []
     for key, val in kwargs.items():
@@ -608,6 +633,57 @@ def _activity_row_to_dict(row: sqlite3.Row) -> dict:
     d = dict(row)
     d["billable"] = bool(d.get("billable", 1))
     return d
+
+
+def delete_activity(activity_id: str) -> bool:
+    conn = get_db()
+    cursor = conn.execute("DELETE FROM activities WHERE id = ?", (activity_id,))
+    conn.commit()
+    conn.close()
+    return cursor.rowcount > 0
+
+
+def get_next_sort_order(session_id: str) -> int:
+    conn = get_db()
+    row = conn.execute(
+        "SELECT COALESCE(MAX(sort_order), -1) + 1 as next_order FROM activities WHERE session_id = ?",
+        (session_id,),
+    ).fetchone()
+    conn.close()
+    return row["next_order"]
+
+
+def approve_all_activities_for_date(date_str: str) -> int:
+    conn = get_db()
+    cursor = conn.execute(
+        """UPDATE activities SET approval_status = 'approved'
+           WHERE approval_status = 'pending'
+           AND session_id IN (SELECT id FROM sessions WHERE start_time LIKE ?)""",
+        (f"{date_str}%",),
+    )
+    count = cursor.rowcount
+    conn.commit()
+    conn.close()
+    return count
+
+
+def get_activities_for_export(date_str: str) -> list[dict]:
+    """Get activities joined with matter and client info for CSV export."""
+    conn = get_db()
+    rows = conn.execute(
+        """SELECT a.*, s.start_time as session_start_time,
+           m.name as matter_name, m.matter_number, m.practice_area, m.billing_type,
+           c.name as client_name
+           FROM activities a
+           JOIN sessions s ON a.session_id = s.id
+           LEFT JOIN matters m ON a.matter_id = m.id
+           LEFT JOIN clients c ON m.client_id = c.id
+           WHERE s.start_time LIKE ?
+           ORDER BY a.start_time, a.sort_order""",
+        (f"{date_str}%",),
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
 
 
 # ---------------------------------------------------------------------------

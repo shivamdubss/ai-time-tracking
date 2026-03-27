@@ -24,7 +24,20 @@ export interface Activity {
   billable?: boolean
   effective_rate?: number | null
   sort_order?: number
+  start_time?: string | null
+  end_time?: string | null
+  approval_status?: 'pending' | 'approved'
+  activity_code?: string | null
 }
+
+export const LEGAL_CATEGORIES: CategoryName[] = [
+  'Legal Research',
+  'Document Drafting',
+  'Client Communication',
+  'Court & Hearings',
+  'Case Review',
+  'Administrative',
+]
 
 export interface Session {
   id: string

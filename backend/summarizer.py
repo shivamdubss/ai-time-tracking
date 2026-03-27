@@ -23,7 +23,11 @@ Return ONLY valid JSON with this exact schema:
       "app": "Microsoft Word",
       "context": "Smith v Jones - Motion to Compel.docx",
       "minutes": 40,
-      "narrative": "Drafted and revised motion to compel discovery responses in Smith v. Jones"
+      "start_time": "2026-03-26T09:15:00",
+      "end_time": "2026-03-26T09:55:00",
+      "narrative": "Drafted and revised motion to compel discovery responses in Smith v. Jones",
+      "category": "Document Drafting",
+      "activity_code": "L160"
     }
   ]
 }
@@ -38,11 +42,47 @@ Rules:
 - Administrative: Calendar, billing, firm management, non-case browsing, general admin
 - Percentages must sum to 100
 - Minutes should be approximate based on the time spent in each app
+- start_time and end_time must be ISO 8601 timestamps derived from the window activity timeline
 - Narratives should follow legal billing format: action verb + what + why/for whom
 - Narratives should be specific and descriptive, not vague (avoid "worked on case")
 - Context should include the most relevant detail from window titles (document name, case reference, client name)
 - Group related activities by app (e.g., multiple Word windows = one activity)
-- Summary should be 1-2 sentences, specific about what was accomplished"""
+- Summary should be 1-2 sentences, specific about what was accomplished
+- Each activity MUST include a category field matching one of the six categories above
+- Each activity MUST include an activity_code from the UTBMS Litigation Code Set:
+  L100: Case Assessment, Development and Administration
+  L110: Fact Investigation/Development
+  L120: Analysis/Strategy
+  L130: Experts/Consultants
+  L140: Document/File Management
+  L150: Budgeting
+  L160: Settlement/Non-Binding ADR
+  L190: Other Case Assessment
+  L200: Pre-Trial Pleadings and Motions
+  L210: Pleadings
+  L220: Preliminary Injunctions/Provisional Remedies
+  L230: Court Mandated Conferences
+  L240: Dispositive Motions
+  L250: Other Written Motions and Submissions
+  L300: Discovery
+  L310: Written Discovery
+  L320: Document Production
+  L330: Depositions
+  L340: Expert Discovery
+  L400: Trial Preparation and Trial
+  L410: Fact Witnesses
+  L420: Expert Witnesses
+  L430: Written Motions and Submissions
+  L440: Hearing/Trial Attendance
+  L500: Appeal
+  L510: Appellate Briefs and Written Motions
+  L520: Appellate Court Attendance
+  A101: Plan and Prepare for, and Attend, Meeting
+  A102: Communicate (includes Telephone Calls, Emails, Letters)
+  A103: Draft/Revise
+  A104: Review/Analyze
+  A106: File/Serve
+  Choose the most specific applicable code. Default to L140 for file management, A102 for communication, A103 for drafting, A104 for review/analysis."""
 
 
 def build_timeline(window_entries: list[dict], idle_threshold_seconds: float = 300) -> str:

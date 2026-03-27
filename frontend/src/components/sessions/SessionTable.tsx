@@ -1,6 +1,8 @@
 import type { Session, Matter } from '@/lib/types'
+import { formatDuration } from '@/lib/format'
 import { SessionRow } from './SessionRow'
 import { EmptyState } from './EmptyState'
+import { InlineProcessingRow } from './InlineProcessingRow'
 
 interface SessionTableProps {
   sessions: Session[]
@@ -10,10 +12,11 @@ interface SessionTableProps {
   totalNonBillableMinutes?: number
   matters?: Matter[]
   onSessionUpdated?: (session: Session) => void
+  isProcessing?: boolean
 }
 
-export function SessionTable({ sessions, totalHours, totalActivities, totalBillableValue, totalNonBillableMinutes, matters, onSessionUpdated }: SessionTableProps) {
-  if (sessions.length === 0) {
+export function SessionTable({ sessions, totalHours, totalActivities, totalBillableValue, totalNonBillableMinutes, matters, onSessionUpdated, isProcessing }: SessionTableProps) {
+  if (sessions.length === 0 && !isProcessing) {
     return <EmptyState />
   }
 
@@ -25,6 +28,9 @@ export function SessionTable({ sessions, totalHours, totalActivities, totalBilla
         <div>Hours</div>
         <div>Narrative</div>
       </div>
+
+      {/* Processing row (inline, at top) */}
+      {isProcessing && <InlineProcessingRow />}
 
       {/* Rows */}
       {sessions.map((session) => (
@@ -45,7 +51,7 @@ export function SessionTable({ sessions, totalHours, totalActivities, totalBilla
         <span className="flex items-center gap-3">
           {totalNonBillableMinutes != null && totalNonBillableMinutes > 0 && (
             <span className="text-xs text-text-faint">
-              <span className="font-mono tabular-nums">{(totalNonBillableMinutes / 60).toFixed(1)}h</span> non-billable
+              <span className="font-mono tabular-nums">{formatDuration(totalNonBillableMinutes)}</span> non-billable
             </span>
           )}
           {totalBillableValue != null && totalBillableValue > 0 && (
@@ -56,7 +62,7 @@ export function SessionTable({ sessions, totalHours, totalActivities, totalBilla
           <span>
             Total:{' '}
             <span className="font-mono font-semibold text-text-primary tabular-nums">
-              {totalHours.toFixed(1)} hours
+              {totalHours.toFixed(1)} hrs
             </span>
           </span>
         </span>

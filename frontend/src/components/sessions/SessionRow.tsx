@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Plus } from 'lucide-react'
 import type { Session, Matter, Activity } from '@/lib/types'
 import { formatTimeRange, cn } from '@/lib/utils'
-import { formatSessionHours } from '@/lib/format'
+import { formatSessionHours, roundToDecimalHours } from '@/lib/format'
 import { CategoryBar } from '@/components/ui/CategoryBar'
 import { CategoryPill } from '@/components/ui/CategoryPill'
 import { ActivityRow } from './ActivityRow'
+import { AddActivityForm } from './AddActivityForm'
 
 interface SessionRowProps {
   session: Session
@@ -15,6 +16,7 @@ interface SessionRowProps {
 
 export function SessionRow({ session, matters, onSessionUpdated }: SessionRowProps) {
   const [expanded, setExpanded] = useState(false)
+  const [isAddingActivity, setIsAddingActivity] = useState(false)
   const hours = formatSessionHours(session.startTime, session.endTime)
 
   const topCategories = session.categories.slice(0, 3)
@@ -22,7 +24,7 @@ export function SessionRow({ session, matters, onSessionUpdated }: SessionRowPro
   // Compute total billable value from activities
   const totalBillableValue = session.activities.reduce((sum, act) => {
     if (act.effective_rate != null && act.minutes > 0) {
-      return sum + (act.minutes / 60) * act.effective_rate
+      return sum + roundToDecimalHours(act.minutes) * act.effective_rate
     }
     return sum
   }, 0)
@@ -33,6 +35,18 @@ export function SessionRow({ session, matters, onSessionUpdated }: SessionRowPro
       a.id === updatedActivity.id ? updatedActivity : a
     )
     onSessionUpdated({ ...session, activities: updatedActivities })
+  }
+
+  function handleActivityDeleted(activityId: string) {
+    if (!onSessionUpdated) return
+    const updatedActivities = session.activities.filter(a => a.id !== activityId)
+    onSessionUpdated({ ...session, activities: updatedActivities })
+  }
+
+  function handleActivityAdded(activity: Activity) {
+    if (!onSessionUpdated) return
+    onSessionUpdated({ ...session, activities: [...session.activities, activity] })
+    setIsAddingActivity(false)
   }
 
   return (
@@ -88,11 +102,29 @@ export function SessionRow({ session, matters, onSessionUpdated }: SessionRowPro
             <ActivityRow
               key={activity.id || i}
               activity={activity}
-              isLast={i === session.activities.length - 1}
+              isLast={i === session.activities.length - 1 && !isAddingActivity}
               matters={matters}
               onActivityUpdated={handleActivityUpdated}
+              onActivityDeleted={handleActivityDeleted}
             />
           ))}
+
+          {isAddingActivity ? (
+            <AddActivityForm
+              sessionId={session.id}
+              matters={matters}
+              onActivityAdded={handleActivityAdded}
+              onCancel={() => setIsAddingActivity(false)}
+            />
+          ) : (
+            <button
+              onClick={() => setIsAddingActivity(true)}
+              className="flex items-center gap-1 mt-2 text-xs text-text-muted hover:text-text-primary transition-colors"
+            >
+              <Plus size={13} />
+              Add Entry
+            </button>
+          )}
         </div>
       )}
     </div>

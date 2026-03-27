@@ -125,7 +125,6 @@ export function ActivityRow({ activity, isLast, matters, clients, selected, onSe
             </span>
           )}
         </div>
-        <div className="text-xs text-text-muted mt-0.5 pl-7">{activity.context}</div>
 
         {/* Matter dropdown */}
         {matters && matters.length > 0 && (() => {

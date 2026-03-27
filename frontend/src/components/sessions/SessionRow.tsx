@@ -1,12 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
-import { ChevronDown, Plus } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import type { Session, Matter, Client, Activity } from '@/lib/types'
 import { formatTimeRange, cn } from '@/lib/utils'
 import { formatSessionHours } from '@/lib/format'
 import { CategoryBar } from '@/components/ui/CategoryBar'
 import { CategoryPill } from '@/components/ui/CategoryPill'
 import { ActivityRow } from './ActivityRow'
-import { AddActivityForm } from './AddActivityForm'
 
 interface SessionRowProps {
   session: Session
@@ -20,7 +19,6 @@ interface SessionRowProps {
 
 export function SessionRow({ session, matters, clients, selectedActivities, onSelectToggle, onSessionUpdated, onSelectSession }: SessionRowProps) {
   const [expanded, setExpanded] = useState(false)
-  const [isAddingActivity, setIsAddingActivity] = useState(false)
   const hours = formatSessionHours(session.startTime, session.endTime)
   const checkboxRef = useRef<HTMLInputElement>(null)
 
@@ -49,12 +47,6 @@ export function SessionRow({ session, matters, clients, selectedActivities, onSe
     if (!onSessionUpdated) return
     const updatedActivities = session.activities.filter(a => a.id !== activityId)
     onSessionUpdated({ ...session, activities: updatedActivities })
-  }
-
-  function handleActivityAdded(activity: Activity) {
-    if (!onSessionUpdated) return
-    onSessionUpdated({ ...session, activities: [...session.activities, activity] })
-    setIsAddingActivity(false)
   }
 
   return (
@@ -123,7 +115,7 @@ export function SessionRow({ session, matters, clients, selectedActivities, onSe
             <ActivityRow
               key={activity.id || i}
               activity={activity}
-              isLast={i === session.activities.length - 1 && !isAddingActivity}
+              isLast={i === session.activities.length - 1}
               matters={matters}
               clients={clients}
               selected={activity.id ? selectedActivities?.has(activity.id) : false}
@@ -132,23 +124,6 @@ export function SessionRow({ session, matters, clients, selectedActivities, onSe
               onActivityDeleted={handleActivityDeleted}
             />
           ))}
-
-          {isAddingActivity ? (
-            <AddActivityForm
-              sessionId={session.id}
-              matters={matters}
-              onActivityAdded={handleActivityAdded}
-              onCancel={() => setIsAddingActivity(false)}
-            />
-          ) : (
-            <button
-              onClick={() => setIsAddingActivity(true)}
-              className="flex items-center gap-1 mt-2 text-xs text-text-muted hover:text-text-primary transition-colors"
-            >
-              <Plus size={13} />
-              Add Entry
-            </button>
-          )}
         </div>
       )}
     </div>

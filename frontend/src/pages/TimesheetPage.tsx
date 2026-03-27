@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom'
 import { Header } from '@/components/layout/Header'
 import { TimesheetMatterList } from '@/components/sessions/TimesheetMatterList'
 import { SummaryStats } from '@/components/sessions/SummaryStats'
@@ -9,14 +8,13 @@ import { api } from '@/lib/api'
 import { Download, CheckCircle2, Undo2 } from 'lucide-react'
 
 export function TimesheetPage() {
-  const { selectedDate, dateStr, isToday, goBack, goForward, status, elapsed, handleStart, handleStop, workHoursBlocked } = useTracking()
+  const { selectedDate, dateStr, isToday, goBack, goForward, status, elapsed, handleStart, handleStop, workHoursBlocked, refreshSessions } = useTracking()
   const {
     sessions, matters, clients,
     totalHours, totalBillableValue, totalBillableMinutes, totalNonBillableMinutes,
     handleActivityUpdated, handleActivityDeleted,
   } = useSessionData()
   const { isReleased, release, unrelease } = useTimesheetStatus(dateStr)
-  const navigate = useNavigate()
 
   function handleExport() {
     api.exportTimesheet(dateStr)
@@ -86,9 +84,10 @@ export function TimesheetPage() {
         sessions={sessions}
         matters={matters}
         clients={clients}
-        onSwitchToTimeline={() => navigate('/')}
+        dateStr={dateStr}
         onActivityUpdated={handleActivityUpdated}
         onActivityDeleted={handleActivityDeleted}
+        onEntryAdded={refreshSessions}
       />
     </div>
   )

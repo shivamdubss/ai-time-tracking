@@ -15,6 +15,7 @@ export interface Category {
 
 export interface Activity {
   id: string
+  session_id?: string
   app: string
   context: string
   minutes: number

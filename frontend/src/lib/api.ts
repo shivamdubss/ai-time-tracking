@@ -112,6 +112,13 @@ export const api = {
   }) =>
     request<Activity>(`/sessions/${sessionId}/activities`, { method: 'POST', body: JSON.stringify(data) }),
 
+  createManualEntry: (data: {
+    date: string; app?: string; context?: string; minutes?: number;
+    narrative?: string; category?: string; matter_id?: string | null;
+    activity_code?: string;
+  }) =>
+    request<Activity>('/manual-entry', { method: 'POST', body: JSON.stringify(data) }),
+
   updateActivity: (id: string, data: {
     matter_id?: string | null; narrative?: string; billable?: boolean;
     category?: string; minutes?: number; activity_code?: string;

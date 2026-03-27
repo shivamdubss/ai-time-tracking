@@ -1,16 +1,19 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import type { Session, Matter, Client, Activity } from '@/lib/types'
 import { formatDuration } from '@/lib/format'
 import { TimesheetMatterCard } from './TimesheetMatterCard'
+import { TimesheetAddEntryForm } from './TimesheetAddEntryForm'
+import { Button } from '@/components/ui/Button'
 import { Plus } from 'lucide-react'
 
 interface TimesheetMatterListProps {
   sessions: Session[]
   matters: Matter[]
   clients: Client[]
-  onSwitchToTimeline?: () => void
+  dateStr: string
   onActivityUpdated: (activity: Activity) => void
   onActivityDeleted: (activityId: string) => void
+  onEntryAdded: () => void
 }
 
 interface MatterGroup {
@@ -21,7 +24,8 @@ interface MatterGroup {
   totalMinutes: number
 }
 
-export function TimesheetMatterList({ sessions, matters, clients, onSwitchToTimeline, onActivityUpdated, onActivityDeleted }: TimesheetMatterListProps) {
+export function TimesheetMatterList({ sessions, matters, clients, dateStr, onActivityUpdated, onActivityDeleted, onEntryAdded }: TimesheetMatterListProps) {
+  const [isAddingEntry, setIsAddingEntry] = useState(false)
   const clientMap = useMemo(
     () => new Map(clients.map(c => [c.id, c])),
     [clients],
@@ -73,16 +77,46 @@ export function TimesheetMatterList({ sessions, matters, clients, onSwitchToTime
   const totalEntries = matterGroups.reduce((sum, mg) => sum + mg.activities.length, 0)
   const totalMinutes = matterGroups.reduce((sum, mg) => sum + mg.totalMinutes, 0)
 
-  if (matterGroups.length === 0) {
-    return (
-      <div className="bg-surface border border-border rounded-[var(--radius-md)] py-12 text-center text-text-muted text-sm">
-        No activities to display.
-      </div>
-    )
-  }
-
   return (
     <div className="bg-surface border border-border rounded-[var(--radius-md)] overflow-hidden">
+      {/* Header with Add Entry CTA */}
+      <div className="flex items-center justify-between px-5 py-3 border-b border-border-subtle">
+        <span className="text-sm text-text-muted">
+          {matterGroups.length > 0
+            ? `${matterGroups.length} ${matterGroups.length === 1 ? 'matter' : 'matters'} · ${totalEntries} ${totalEntries === 1 ? 'entry' : 'entries'}`
+            : 'No entries yet'}
+        </span>
+        {!isAddingEntry && (
+          <Button
+            variant="primary"
+            onClick={() => setIsAddingEntry(true)}
+            className="px-3 py-1.5 text-xs"
+          >
+            <Plus size={14} />
+            Add Entry
+          </Button>
+        )}
+      </div>
+
+      {/* Inline add entry form */}
+      {isAddingEntry && (
+        <TimesheetAddEntryForm
+          dateStr={dateStr}
+          matters={matters}
+          onEntryAdded={() => {
+            onEntryAdded()
+            setIsAddingEntry(false)
+          }}
+          onCancel={() => setIsAddingEntry(false)}
+        />
+      )}
+
+      {matterGroups.length === 0 && !isAddingEntry && (
+        <div className="py-10 text-center text-text-muted text-sm">
+          No activities to display.
+        </div>
+      )}
+
       {matterGroups.map((mg, i) => (
         <TimesheetMatterCard
           key={mg.matterId || '__unassigned__'}
@@ -97,27 +131,17 @@ export function TimesheetMatterList({ sessions, matters, clients, onSwitchToTime
         />
       ))}
 
-      {/* Add Entry link */}
-      {onSwitchToTimeline && (
-        <button
-          onClick={onSwitchToTimeline}
-          className="flex items-center gap-1 px-5 py-2 text-xs text-text-muted hover:text-text-primary transition-colors cursor-pointer border-t border-border-subtle w-full"
-        >
-          <Plus size={13} />
-          Add Entry
-        </button>
-      )}
-
       {/* Footer */}
-      <div className="flex justify-between items-center px-5 py-3 border-t border-border text-[13px] text-text-muted">
-        <span>
-          {matterGroups.length} {matterGroups.length === 1 ? 'matter' : 'matters'} &middot;{' '}
-          {totalEntries} {totalEntries === 1 ? 'entry' : 'entries'}
-        </span>
-        <span className="font-mono tabular-nums font-semibold text-text-primary">
-          {formatDuration(totalMinutes)}
-        </span>
-      </div>
+      {matterGroups.length > 0 && (
+        <div className="flex justify-between items-center px-5 py-3 border-t border-border text-[13px] text-text-muted">
+          <span>
+            {formatDuration(totalMinutes)} total
+          </span>
+          <span className="font-mono tabular-nums font-semibold text-text-primary">
+            {formatDuration(totalMinutes)}
+          </span>
+        </div>
+      )}
     </div>
   )
 }

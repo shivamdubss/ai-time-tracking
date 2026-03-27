@@ -29,6 +29,7 @@ interface TrackingContextValue {
   handleSessionUpdated: (session: Session) => void
   handleActivityUpdated: (activity: Activity) => void
   handleActivityDeleted: (activityId: string) => void
+  refreshSessions: () => void
   workHoursBlocked: boolean
 }
 
@@ -136,6 +137,10 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
       activities: s.activities.filter(a => a.id !== activityId),
     })))
   }
+
+  const refreshSessions = useCallback(() => {
+    setRefreshKey(k => k + 1)
+  }, [])
 
   const goBack = useCallback(() => {
     setSelectedDate((prev) => {
@@ -256,6 +261,7 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
         handleSessionUpdated,
         handleActivityUpdated,
         handleActivityDeleted,
+        refreshSessions,
         workHoursBlocked,
       }}
     >

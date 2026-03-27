@@ -1,5 +1,6 @@
 import csv
 import io
+import uuid
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -9,6 +10,7 @@ from ..database import (
     get_activities_for_session, update_activity, get_activity, get_session,
     resolve_rate, get_matter, insert_activity, delete_activity,
     get_next_sort_order, get_activities_for_export,
+    get_sessions_by_date, create_session, update_session,
 )
 
 router = APIRouter(tags=["activities"])
@@ -66,6 +68,58 @@ class CreateActivityRequest(BaseModel):
     start_time: Optional[str] = None
     end_time: Optional[str] = None
     activity_code: Optional[str] = None
+
+
+class ManualEntryRequest(BaseModel):
+    date: str  # YYYY-MM-DD
+    app: str = "Manual Entry"
+    context: str = "Offline work"
+    minutes: int = 6
+    narrative: str = ""
+    category: str = "Administrative"
+    matter_id: Optional[str] = None
+    activity_code: Optional[str] = None
+
+
+@router.post("/api/manual-entry")
+async def create_manual_entry(req: ManualEntryRequest):
+    """Create a manual time entry for a given date, auto-creating a session if needed."""
+    sessions = get_sessions_by_date(req.date)
+    if sessions:
+        session_id = sessions[0]["id"]
+    else:
+        session_id = str(uuid.uuid4())[:8]
+        start_time = f"{req.date}T09:00:00"
+        create_session(session_id, start_time)
+        update_session(session_id, end_time=start_time, status="completed", summary="Manual entries")
+
+    sort_order = get_next_sort_order(session_id)
+
+    billable = True
+    effective_rate = None
+    if req.matter_id:
+        matter = get_matter(req.matter_id)
+        if matter and matter.get("billing_type") == "non-billable":
+            billable = False
+        else:
+            effective_rate = resolve_rate(req.matter_id)
+
+    category = utbms_to_category(req.activity_code) if req.activity_code else req.category
+
+    result = insert_activity(
+        session_id=session_id,
+        app=req.app,
+        context=req.context,
+        minutes=req.minutes,
+        narrative=req.narrative,
+        category=category,
+        matter_id=req.matter_id,
+        billable=billable,
+        effective_rate=effective_rate,
+        sort_order=sort_order,
+        activity_code=req.activity_code,
+    )
+    return result
 
 
 @router.get("/api/sessions/{session_id}/activities")

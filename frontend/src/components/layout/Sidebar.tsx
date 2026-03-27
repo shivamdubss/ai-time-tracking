@@ -55,7 +55,7 @@ export function Sidebar({ theme, onToggleTheme }: SidebarProps) {
           </div>
           <div>
             <div className="text-[13px] font-semibold text-text-primary">Shivam</div>
-            <div className="text-[11px] text-text-muted">shivam@mesh.so</div>
+            <div className="text-xs text-text-muted">shivam@mesh.so</div>
           </div>
         </div>
       </div>

@@ -23,7 +23,7 @@ export function SessionTable({ sessions, totalHours, totalActivities, totalBilla
   return (
     <div className="bg-surface border border-border rounded-[var(--radius-md)] overflow-hidden">
       {/* Header */}
-      <div className="grid grid-cols-[1fr_80px_1.2fr] gap-4 px-5 py-2.5 border-b border-border text-[11px] font-bold tracking-wider uppercase text-text-muted">
+      <div className="grid grid-cols-[1fr_80px_1.2fr] gap-4 px-5 py-2.5 border-b border-border text-xs font-bold tracking-wider uppercase text-text-muted">
         <div>Activity</div>
         <div>Hours</div>
         <div>Narrative</div>

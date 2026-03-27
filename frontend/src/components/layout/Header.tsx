@@ -63,7 +63,7 @@ export function Header({
             <span className="font-mono text-[13px] font-medium text-warning tabular-nums">
               {formatTime(elapsed)}
             </span>
-            <span className="text-[11px] font-medium text-warning/70 ml-0.5">PAUSED</span>
+            <span className="text-xs font-medium text-warning/70 ml-0.5">PAUSED</span>
           </div>
         )}
 

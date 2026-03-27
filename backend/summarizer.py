@@ -21,7 +21,7 @@ Return ONLY valid JSON with this exact schema:
   "activities": [
     {
       "app": "Microsoft Word",
-      "context": "Smith v Jones - Motion to Compel.docx",
+      "context": "Drafting motion to compel",
       "minutes": 40,
       "start_time": "2026-03-26T09:15:00",
       "end_time": "2026-03-26T09:55:00",
@@ -45,7 +45,7 @@ Rules:
 - start_time and end_time must be ISO 8601 timestamps derived from the window activity timeline
 - Narratives should follow legal billing format: action verb + what + why/for whom
 - Narratives should be specific and descriptive, not vague (avoid "worked on case")
-- Context should include the most relevant detail from window titles (document name, case reference, client name)
+- Context should briefly describe the work being performed (e.g., "drafting motion to compel", "researching case law", "email correspondence"), NOT the specific document name, file path, or case reference
 - Group related activities by app (e.g., multiple Word windows = one activity)
 - Summary should be 1-2 sentences, specific about what was accomplished
 - Each activity MUST include a category field matching one of the six categories above

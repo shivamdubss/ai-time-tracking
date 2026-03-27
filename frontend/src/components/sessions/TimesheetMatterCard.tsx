@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import type { Activity, Matter, Client } from '@/lib/types'
-import { formatDuration, joinNarratives } from '@/lib/format'
+import { formatDuration, formatTimeRange, joinNarratives } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { api } from '@/lib/api'
-import { Pencil, Trash2 } from 'lucide-react'
+import { ChevronDown, Pencil, Trash2 } from 'lucide-react'
 import { DropdownMenu } from '@/components/ui/DropdownMenu'
 
 interface TimesheetMatterCardProps {
@@ -30,6 +30,7 @@ export function TimesheetMatterCard({
   const [narrativeValue, setNarrativeValue] = useState(narrative)
   const [isEditingHours, setIsEditingHours] = useState(false)
   const [hoursValue, setHoursValue] = useState(formatDuration(totalMinutes))
+  const [expanded, setExpanded] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const narrativeRef = useRef<HTMLTextAreaElement>(null)
@@ -237,9 +238,20 @@ export function TimesheetMatterCard({
           )}
         </div>
         <div className="flex items-center gap-3 shrink-0">
-          <span className="text-xs text-text-muted">
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="flex items-center gap-1 text-xs text-text-muted hover:text-text-primary transition-colors cursor-pointer"
+            aria-expanded={expanded}
+          >
+            <ChevronDown
+              size={12}
+              className={cn(
+                'text-text-faint transition-transform duration-200',
+                expanded && 'rotate-180',
+              )}
+            />
             {activities.length} {activities.length === 1 ? 'entry' : 'entries'}
-          </span>
+          </button>
           {isEditingHours ? (
             <input
               type="number"
@@ -312,6 +324,40 @@ export function TimesheetMatterCard({
       {/* Error message */}
       {saveError && (
         <div className="ml-4 mt-1 text-xs text-error">{saveError}</div>
+      )}
+
+      {/* Expanded activity audit list */}
+      {expanded && (
+        <div className="ml-4 mt-2 animate-in fade-in duration-200">
+          <div className="border-t border-border-subtle pt-2">
+            {[...activities]
+              .sort((a, b) => {
+                if (!a.start_time || !b.start_time) return 0
+                return new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+              })
+              .map((activity, i) => (
+                <div
+                  key={activity.id || i}
+                  className={cn(
+                    'flex items-baseline gap-3 py-1.5 text-[13px]',
+                    i > 0 && 'border-t border-border-subtle',
+                  )}
+                >
+                  <span className="font-mono text-text-muted tabular-nums shrink-0 text-xs">
+                    {activity.start_time && activity.end_time
+                      ? formatTimeRange(activity.start_time, activity.end_time)
+                      : '---'}
+                  </span>
+                  <span className="font-mono text-text-primary tabular-nums shrink-0 text-xs font-semibold">
+                    {formatDuration(activity.minutes)}
+                  </span>
+                  <span className="text-text-secondary truncate text-xs">
+                    {activity.narrative || activity.app}
+                  </span>
+                </div>
+              ))}
+          </div>
+        </div>
       )}
     </div>
   )

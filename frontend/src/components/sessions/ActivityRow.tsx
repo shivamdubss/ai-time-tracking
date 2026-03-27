@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import type { Activity, Matter, Client } from '@/lib/types'
+import type { Activity, Matter } from '@/lib/types'
 import { getCategoryBarColor } from '@/lib/types'
 import { formatDuration } from '@/lib/format'
 import { api } from '@/lib/api'
@@ -46,10 +46,6 @@ export function ActivityRow({ activity, isLast, matters, clients, selected, onSe
       setHoursValue(formatDuration(activity.minutes))
     }
   }, [activity.minutes, isEditingHours])
-
-  const matter = activity.matter_id ? matters?.find(m => m.id === activity.matter_id) : null
-  const matterName = matter?.name || (activity.matter_id ? 'Unknown' : null)
-  const clientName = matter?.client_id ? clients?.find(c => c.id === matter.client_id)?.name : null
 
   async function handleNarrativeSave() {
     setIsEditingNarrative(false)
@@ -192,11 +188,6 @@ export function ActivityRow({ activity, isLast, matters, clients, selected, onSe
       </div>
 
       <div className="text-[13px] leading-relaxed text-text-secondary">
-        {(clientName || matterName) && (
-          <div className="text-xs text-text-muted mb-1 font-medium">
-            {clientName && matterName ? `${clientName} — ${matterName}` : (clientName || matterName)}
-          </div>
-        )}
         {isEditingNarrative ? (
           <textarea
             ref={inputRef}

@@ -26,6 +26,17 @@ export function TimelinePage() {
     })
   }
 
+  function handleSelectSession(activityIds: string[], select: boolean) {
+    setSelectedActivities(prev => {
+      const next = new Set(prev)
+      for (const id of activityIds) {
+        if (select) next.add(id)
+        else next.delete(id)
+      }
+      return next
+    })
+  }
+
   async function handleDeleteSelected() {
     if (selectedActivities.size === 0) return
     if (!window.confirm(`Delete ${selectedActivities.size} selected ${selectedActivities.size === 1 ? 'activity' : 'activities'}?`)) return
@@ -94,6 +105,7 @@ export function TimelinePage() {
         clients={clients}
         selectedActivities={selectedActivities}
         onSelectToggle={handleSelectToggle}
+        onSelectSession={handleSelectSession}
         onSessionUpdated={handleSessionUpdated}
         isProcessing={status === 'processing'}
       />

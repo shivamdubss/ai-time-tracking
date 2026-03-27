@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { ChevronDown, Plus } from 'lucide-react'
 import type { Session, Matter, Client, Activity } from '@/lib/types'
 import { formatTimeRange, cn } from '@/lib/utils'
@@ -15,12 +15,25 @@ interface SessionRowProps {
   selectedActivities?: Set<string>
   onSelectToggle?: (activityId: string) => void
   onSessionUpdated?: (session: Session) => void
+  onSelectSession?: (activityIds: string[], select: boolean) => void
 }
 
-export function SessionRow({ session, matters, clients, selectedActivities, onSelectToggle, onSessionUpdated }: SessionRowProps) {
+export function SessionRow({ session, matters, clients, selectedActivities, onSelectToggle, onSessionUpdated, onSelectSession }: SessionRowProps) {
   const [expanded, setExpanded] = useState(false)
   const [isAddingActivity, setIsAddingActivity] = useState(false)
   const hours = formatSessionHours(session.startTime, session.endTime)
+  const checkboxRef = useRef<HTMLInputElement>(null)
+
+  const activityIds = session.activities.map(a => a.id).filter(Boolean) as string[]
+  const selectedCount = activityIds.filter(id => selectedActivities?.has(id)).length
+  const allSelected = activityIds.length > 0 && selectedCount === activityIds.length
+  const someSelected = selectedCount > 0 && !allSelected
+
+  useEffect(() => {
+    if (checkboxRef.current) {
+      checkboxRef.current.indeterminate = someSelected
+    }
+  }, [someSelected])
 
   const topCategories = session.categories.slice(0, 3)
 
@@ -56,7 +69,21 @@ export function SessionRow({ session, matters, clients, selectedActivities, onSe
           expanded ? 'bg-surface-hover' : 'hover:bg-surface-hover',
         )}
       >
-        <div className="hidden md:block" />
+        <div className="hidden md:flex items-center justify-center">
+          {onSelectSession && activityIds.length > 0 && (
+            <input
+              ref={checkboxRef}
+              type="checkbox"
+              checked={allSelected}
+              onChange={(e) => {
+                e.stopPropagation()
+                onSelectSession(activityIds, !allSelected)
+              }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-3.5 h-3.5 rounded border-border accent-accent cursor-pointer"
+            />
+          )}
+        </div>
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="font-display font-semibold text-sm text-text-primary">

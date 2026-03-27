@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { SessionsPage } from '@/pages/SessionsPage'
 import { ClientsMattersPage } from '@/pages/ClientsMattersPage'
@@ -38,12 +39,11 @@ export default function App() {
         />
       )}
 
-      {/* Sidebar */}
-      <div className={`
-        fixed inset-y-0 left-0 z-40 transform transition-transform duration-200 ease-out
-        md:relative md:translate-x-0
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
+      {/* Sidebar — hidden off-screen on mobile, static on md+ */}
+      <div className={cn(
+        'fixed inset-y-0 left-0 z-40 transition-transform duration-200 ease-out md:relative md:translate-x-0',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+      )}>
         <Sidebar theme={theme} onToggleTheme={toggleTheme} />
       </div>
 

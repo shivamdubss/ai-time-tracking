@@ -14,8 +14,11 @@ export function formatDuration(minutes: number): string {
  * Format hours from start/end timestamps as decimal hours.
  */
 export function formatSessionHours(startTime: string, endTime: string): string {
-  const ms = new Date(endTime).getTime() - new Date(startTime).getTime()
-  const minutes = ms / (1000 * 60)
+  if (!startTime || !endTime) return '0.0'
+  const start = new Date(startTime).getTime()
+  const end = new Date(endTime).getTime()
+  if (isNaN(start) || isNaN(end)) return '0.0'
+  const minutes = (end - start) / (1000 * 60)
   return formatDuration(minutes)
 }
 
@@ -23,8 +26,10 @@ export function formatSessionHours(startTime: string, endTime: string): string {
  * Format a time range for display (e.g. "8:12 AM – 9:45 AM").
  */
 export function formatTimeRange(start: string, end: string): string {
-  const fmt = (d: Date) =>
-    d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+  const fmt = (d: Date) => {
+    if (isNaN(d.getTime())) return '—'
+    return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+  }
   return `${fmt(new Date(start))} – ${fmt(new Date(end))}`
 }
 

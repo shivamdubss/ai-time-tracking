@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import type { Session, Matter, Client, Activity } from '@/lib/types'
-import { MatterGroupCard } from './MatterGroupCard'
+import { formatDuration } from '@/lib/format'
+import { ClientGroupCard } from './ClientGroupCard'
 
 interface MatterGroupViewProps {
   sessions: Session[]
@@ -9,16 +10,23 @@ interface MatterGroupViewProps {
   selectedActivities?: Set<string>
   onSelectToggle?: (activityId: string) => void
   onActivityUpdated?: (activity: Activity) => void
+  onSwitchToTimeline?: () => void
 }
 
 interface MatterGroup {
   matterId: string | null
   matter: Matter | null
-  client: Client | null
   activities: Activity[]
 }
 
-export function MatterGroupView({ sessions, matters, clients, selectedActivities, onSelectToggle, onActivityUpdated }: MatterGroupViewProps) {
+interface ClientGroup {
+  clientId: string | null
+  client: Client | null
+  matters: MatterGroup[]
+  totalMinutes: number
+}
+
+export function MatterGroupView({ sessions, matters, clients, selectedActivities, onSelectToggle, onActivityUpdated, onSwitchToTimeline }: MatterGroupViewProps) {
   const clientMap = useMemo(
     () => new Map(clients.map(c => [c.id, c])),
     [clients],
@@ -28,7 +36,7 @@ export function MatterGroupView({ sessions, matters, clients, selectedActivities
     [matters],
   )
 
-  const groups = useMemo(() => {
+  const clientGroups = useMemo(() => {
     // Flatten all activities from all sessions
     const allActivities: Activity[] = []
     for (const session of sessions) {
@@ -38,38 +46,63 @@ export function MatterGroupView({ sessions, matters, clients, selectedActivities
     }
 
     // Group by matter_id
-    const groupMap = new Map<string, Activity[]>()
+    const matterGroupMap = new Map<string, Activity[]>()
     for (const act of allActivities) {
       const key = act.matter_id || '__unassigned__'
-      if (!groupMap.has(key)) groupMap.set(key, [])
-      groupMap.get(key)!.push(act)
+      if (!matterGroupMap.has(key)) matterGroupMap.set(key, [])
+      matterGroupMap.get(key)!.push(act)
     }
 
-    // Build group objects
-    const result: MatterGroup[] = []
-    for (const [key, activities] of groupMap) {
+    // Build matter groups and group by client
+    const clientGroupMap = new Map<string, MatterGroup[]>()
+    for (const [key, activities] of matterGroupMap) {
       const matterId = key === '__unassigned__' ? null : key
       const matter = matterId ? matterMap.get(matterId) || null : null
-      const client = matter ? clientMap.get(matter.client_id) || null : null
-      result.push({ matterId, matter, client, activities })
+      const clientId = matter ? matter.client_id : null
+      const clientKey = clientId || '__unassigned__'
+
+      if (!clientGroupMap.has(clientKey)) clientGroupMap.set(clientKey, [])
+      clientGroupMap.get(clientKey)!.push({ matterId, matter, activities })
     }
 
-    // Sort: by client name, then matter name. Unassigned last.
+    // Build client groups
+    const result: ClientGroup[] = []
+    for (const [key, matterGroups] of clientGroupMap) {
+      const clientId = key === '__unassigned__' ? null : key
+      const client = clientId ? clientMap.get(clientId) || null : null
+      const totalMinutes = matterGroups.reduce(
+        (sum, mg) => sum + mg.activities.reduce((s, a) => s + a.minutes, 0), 0,
+      )
+
+      // Sort matters within client alphabetically
+      matterGroups.sort((a, b) => {
+        const nameA = a.matter?.name || ''
+        const nameB = b.matter?.name || ''
+        return nameA.localeCompare(nameB)
+      })
+
+      result.push({ clientId, client, matters: matterGroups, totalMinutes })
+    }
+
+    // Sort clients: unassigned last, then alphabetically
     result.sort((a, b) => {
-      if (!a.matter && b.matter) return 1
-      if (a.matter && !b.matter) return -1
-      const clientA = a.client?.name || ''
-      const clientB = b.client?.name || ''
-      if (clientA !== clientB) return clientA.localeCompare(clientB)
-      const matterA = a.matter?.name || ''
-      const matterB = b.matter?.name || ''
-      return matterA.localeCompare(matterB)
+      if (!a.client && b.client) return 1
+      if (a.client && !b.client) return -1
+      const nameA = a.client?.name || ''
+      const nameB = b.client?.name || ''
+      return nameA.localeCompare(nameB)
     })
 
     return result
   }, [sessions, matterMap, clientMap])
 
-  if (groups.length === 0) {
+  const totalMatters = clientGroups.reduce((sum, cg) => sum + cg.matters.length, 0)
+  const totalActivities = clientGroups.reduce(
+    (sum, cg) => sum + cg.matters.reduce((s, mg) => s + mg.activities.length, 0), 0,
+  )
+  const totalMinutes = clientGroups.reduce((sum, cg) => sum + cg.totalMinutes, 0)
+
+  if (clientGroups.length === 0) {
     return (
       <div className="bg-surface border border-border rounded-[var(--radius-md)] py-12 text-center text-text-muted text-sm">
         No activities to display.
@@ -78,18 +111,34 @@ export function MatterGroupView({ sessions, matters, clients, selectedActivities
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      {groups.map((group) => (
-        <MatterGroupCard
-          key={group.matterId || '__unassigned__'}
-          matter={group.matter}
-          client={group.client}
-          activities={group.activities}
+    <div className="bg-surface border border-border rounded-[var(--radius-md)] overflow-hidden">
+      {/* Client groups */}
+      {clientGroups.map((cg, i) => (
+        <ClientGroupCard
+          key={cg.clientId || '__unassigned__'}
+          clientId={cg.clientId}
+          client={cg.client}
+          matters={cg.matters}
+          totalMinutes={cg.totalMinutes}
+          isFirst={i === 0}
           selectedActivities={selectedActivities}
           onSelectToggle={onSelectToggle}
           onActivityUpdated={onActivityUpdated}
+          onSwitchToTimeline={onSwitchToTimeline}
         />
       ))}
+
+      {/* Footer */}
+      <div className="flex justify-between items-center px-5 py-3 border-t border-border text-[13px] text-text-muted">
+        <span>
+          {clientGroups.length} {clientGroups.length === 1 ? 'client' : 'clients'} &middot;{' '}
+          {totalMatters} {totalMatters === 1 ? 'matter' : 'matters'} &middot;{' '}
+          {totalActivities} {totalActivities === 1 ? 'entry' : 'entries'}
+        </span>
+        <span className="font-mono tabular-nums font-semibold text-text-primary">
+          {formatDuration(totalMinutes)}
+        </span>
+      </div>
     </div>
   )
 }

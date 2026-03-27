@@ -14,6 +14,37 @@ from ..database import (
 router = APIRouter(tags=["activities"])
 
 
+def utbms_to_category(code: str | None) -> str:
+    """Derive a legal category from a UTBMS code."""
+    if not code:
+        return "Administrative"
+    prefix = code[0]
+    try:
+        num = int(code[1:])
+    except ValueError:
+        return "Administrative"
+    if prefix == "L":
+        if 100 <= num <= 190:
+            return "Case Review"
+        if 200 <= num <= 250:
+            return "Document Drafting"
+        if 300 <= num <= 340:
+            return "Case Review"
+        if 400 <= num <= 440:
+            return "Court & Hearings"
+        if 500 <= num <= 520:
+            return "Court & Hearings"
+    if prefix == "A":
+        return {
+            "A101": "Court & Hearings",
+            "A102": "Client Communication",
+            "A103": "Document Drafting",
+            "A104": "Legal Research",
+            "A106": "Administrative",
+        }.get(code, "Administrative")
+    return "Administrative"
+
+
 class UpdateActivityRequest(BaseModel):
     matter_id: Optional[str] = None
     narrative: Optional[str] = None
@@ -62,13 +93,15 @@ async def create_activity_endpoint(session_id: str, req: CreateActivityRequest):
         else:
             effective_rate = resolve_rate(req.matter_id)
 
+    category = utbms_to_category(req.activity_code) if req.activity_code else req.category
+
     result = insert_activity(
         session_id=session_id,
         app=req.app,
         context=req.context,
         minutes=req.minutes,
         narrative=req.narrative,
-        category=req.category,
+        category=category,
         matter_id=req.matter_id,
         billable=billable,
         effective_rate=effective_rate,
@@ -101,6 +134,7 @@ async def update_activity_endpoint(activity_id: str, req: UpdateActivityRequest)
         updates["minutes"] = req.minutes
     if req.activity_code is not None:
         updates["activity_code"] = req.activity_code
+        updates["category"] = utbms_to_category(req.activity_code)
     if req.start_time is not None:
         updates["start_time"] = req.start_time
     if req.end_time is not None:

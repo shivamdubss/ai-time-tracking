@@ -1,8 +1,8 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import type { Activity, Matter } from '@/lib/types'
-import { LEGAL_CATEGORIES, getCategoryBarColor } from '@/lib/types'
+import { getCategoryBarColor, getCategoryColors } from '@/lib/types'
 import { formatDuration, roundToDecimalHours } from '@/lib/format'
-import { UTBMS_CODE_LIST } from '@/lib/utbms'
+import { UTBMS_CODE_LIST, utbmsToCategory } from '@/lib/utbms'
 import { api } from '@/lib/api'
 
 interface ActivityRowProps {
@@ -36,8 +36,16 @@ export function ActivityRow({ activity, isLast, matters, selected, onSelectToggl
   const hours = formatDuration(activity.minutes)
   const [isEditingNarrative, setIsEditingNarrative] = useState(false)
   const [narrativeValue, setNarrativeValue] = useState(activity.narrative)
+  const [isEditingHours, setIsEditingHours] = useState(false)
+  const [hoursValue, setHoursValue] = useState(formatDuration(activity.minutes))
   const [saveError, setSaveError] = useState(false)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    if (!isEditingHours) {
+      setHoursValue(formatDuration(activity.minutes))
+    }
+  }, [activity.minutes, isEditingHours])
 
   const matterName = activity.matter_id
     ? matters?.find(m => m.id === activity.matter_id)?.name || 'Unknown'
@@ -71,20 +79,33 @@ export function ActivityRow({ activity, isLast, matters, selected, onSelectToggl
     } catch {}
   }
 
-  async function handleCategoryChange(newCategory: string) {
-    if (!activity.id) return
-    try {
-      const updated = await api.updateActivity(activity.id, { category: newCategory })
-      onActivityUpdated?.(updated)
-    } catch {}
-  }
-
   async function handleActivityCodeChange(code: string) {
     if (!activity.id) return
     try {
       const updated = await api.updateActivity(activity.id, { activity_code: code || undefined })
       onActivityUpdated?.(updated)
     } catch {}
+  }
+
+  async function handleHoursSave() {
+    setIsEditingHours(false)
+    const parsed = parseFloat(hoursValue)
+    if (isNaN(parsed) || parsed < 0.1) {
+      setHoursValue(formatDuration(activity.minutes))
+      return
+    }
+    const newMinutes = Math.round(parsed * 60)
+    if (newMinutes === activity.minutes) return
+    if (!activity.id) return
+    try {
+      setSaveError(false)
+      const updated = await api.updateActivity(activity.id, { minutes: newMinutes })
+      onActivityUpdated?.(updated)
+    } catch {
+      setSaveError(true)
+      setHoursValue(formatDuration(activity.minutes))
+      setTimeout(() => setSaveError(false), 3000)
+    }
   }
 
   return (
@@ -122,22 +143,11 @@ export function ActivityRow({ activity, isLast, matters, selected, onSelectToggl
         </div>
         <div className="text-xs text-text-muted mt-0.5 pl-7">{activity.context}</div>
 
-        {/* Category dropdown */}
+        {/* UTBMS code dropdown + derived category pill */}
         {activity.id && (
-          <div className="mt-1 pl-7">
+          <div className="mt-1 pl-7 flex items-center gap-1.5">
             <select
               className="text-xs bg-transparent border border-border-subtle rounded px-1.5 py-0.5 text-text-muted cursor-pointer hover:border-border-default transition-colors"
-              value={category}
-              onChange={(e) => handleCategoryChange(e.target.value)}
-            >
-              {LEGAL_CATEGORIES.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-
-            {/* Activity code dropdown */}
-            <select
-              className="text-xs bg-transparent border border-border-subtle rounded px-1.5 py-0.5 text-text-muted cursor-pointer hover:border-border-default transition-colors ml-1"
               value={activity.activity_code || ''}
               onChange={(e) => handleActivityCodeChange(e.target.value)}
             >
@@ -146,6 +156,15 @@ export function ActivityRow({ activity, isLast, matters, selected, onSelectToggl
                 <option key={code} value={code}>{label}</option>
               ))}
             </select>
+            <span
+              className="text-[10px] font-semibold px-1.5 py-0.5 rounded"
+              style={{
+                backgroundColor: getCategoryColors(category).bg,
+                color: getCategoryColors(category).text,
+              }}
+            >
+              {category}
+            </span>
           </div>
         )}
 
@@ -183,7 +202,30 @@ export function ActivityRow({ activity, isLast, matters, selected, onSelectToggl
       </div>
 
       <div className="font-mono text-[13px] text-text-muted tabular-nums">
-        <div>{hours}</div>
+        {isEditingHours ? (
+          <input
+            type="number"
+            className="w-16 bg-bg-surface border border-border-default rounded px-2 py-0.5 text-[13px] font-mono tabular-nums text-text-secondary focus:outline-none focus:ring-1 focus:ring-text-faint"
+            value={hoursValue}
+            onChange={(e) => setHoursValue(e.target.value)}
+            onBlur={handleHoursSave}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') { setHoursValue(formatDuration(activity.minutes)); setIsEditingHours(false) }
+              if (e.key === 'Enter') { e.preventDefault(); handleHoursSave() }
+            }}
+            min="0.1"
+            step="0.1"
+            autoFocus
+          />
+        ) : (
+          <div
+            className="cursor-pointer hover:bg-bg-surface-hover rounded px-1 -mx-1 transition-colors"
+            onClick={() => { setHoursValue(formatDuration(activity.minutes)); setIsEditingHours(true) }}
+            title="Click to edit hours"
+          >
+            {hours}
+          </div>
+        )}
         {billableValue && (
           <div className="text-xs text-text-faint">{billableValue}</div>
         )}

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import type { Activity, Matter } from '@/lib/types'
-import { LEGAL_CATEGORIES } from '@/lib/types'
-import { UTBMS_CODE_LIST } from '@/lib/utbms'
+import { UTBMS_CODE_LIST, utbmsToCategory } from '@/lib/utbms'
 import { api } from '@/lib/api'
 
 interface AddActivityFormProps {
@@ -14,7 +13,6 @@ interface AddActivityFormProps {
 export function AddActivityForm({ sessionId, matters, onActivityAdded, onCancel }: AddActivityFormProps) {
   const [narrative, setNarrative] = useState('')
   const [hours, setHours] = useState('0.1')
-  const [category, setCategory] = useState('Administrative')
   const [matterId, setMatterId] = useState('')
   const [activityCode, setActivityCode] = useState('')
   const [saving, setSaving] = useState(false)
@@ -38,7 +36,7 @@ export function AddActivityForm({ sessionId, matters, onActivityAdded, onCancel 
         context: 'Offline work',
         minutes,
         narrative: narrative.trim(),
-        category,
+        category: utbmsToCategory(activityCode),
         matter_id: matterId || undefined,
         activity_code: activityCode || undefined,
       })
@@ -79,17 +77,6 @@ export function AddActivityForm({ sessionId, matters, onActivityAdded, onCancel 
               step="0.1"
             />
           </div>
-
-          {/* Category */}
-          <select
-            className="text-xs bg-transparent border border-border-subtle rounded px-1.5 py-0.5 text-text-muted cursor-pointer hover:border-border-default transition-colors"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            {LEGAL_CATEGORIES.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
 
           {/* Activity code */}
           <select

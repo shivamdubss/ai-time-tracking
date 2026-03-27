@@ -19,7 +19,7 @@ export function SessionsPage() {
   const [sessions, setSessions] = useState<Session[]>([])
   const [matters, setMatters] = useState<Matter[]>([])
   const [clients, setClients] = useState<Client[]>([])
-  const [viewMode, setViewMode] = useState<ViewMode>('timeline')
+  const [viewMode, setViewMode] = useState<ViewMode>('by-matter')
   const [selectedActivities, setSelectedActivities] = useState<Set<string>>(new Set())
 
   const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
@@ -211,17 +211,6 @@ export function SessionsPage() {
           <button
             className={cn(
               'px-3 py-1.5 text-sm font-medium rounded-[var(--radius-sm)] transition-colors cursor-pointer',
-              viewMode === 'timeline'
-                ? 'bg-surface text-text-primary shadow-md'
-                : 'text-text-secondary hover:text-text-primary',
-            )}
-            onClick={() => setViewMode('timeline')}
-          >
-            Timeline View
-          </button>
-          <button
-            className={cn(
-              'px-3 py-1.5 text-sm font-medium rounded-[var(--radius-sm)] transition-colors cursor-pointer',
               viewMode === 'by-matter'
                 ? 'bg-surface text-text-primary shadow-md'
                 : 'text-text-secondary hover:text-text-primary',
@@ -229,6 +218,17 @@ export function SessionsPage() {
             onClick={() => setViewMode('by-matter')}
           >
             By Matter
+          </button>
+          <button
+            className={cn(
+              'px-3 py-1.5 text-sm font-medium rounded-[var(--radius-sm)] transition-colors cursor-pointer',
+              viewMode === 'timeline'
+                ? 'bg-surface text-text-primary shadow-md'
+                : 'text-text-secondary hover:text-text-primary',
+            )}
+            onClick={() => setViewMode('timeline')}
+          >
+            Timeline
           </button>
         </div>
 
@@ -280,6 +280,7 @@ export function SessionsPage() {
           selectedActivities={selectedActivities}
           onSelectToggle={handleSelectToggle}
           onActivityUpdated={handleMatterActivityUpdated}
+          onSwitchToTimeline={() => setViewMode('timeline')}
         />
       )}
     </div>

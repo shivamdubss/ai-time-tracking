@@ -7,6 +7,7 @@ import { TimelinePage } from '@/pages/TimelinePage'
 import { TimesheetPage } from '@/pages/TimesheetPage'
 import { ClientsMattersPage } from '@/pages/ClientsMattersPage'
 import { SettingsPage } from '@/pages/SettingsPage'
+import { AnalyticsPage } from '@/pages/AnalyticsPage'
 import { initAuth } from '@/lib/api'
 import { SettingsProvider } from '@/hooks/useSettings'
 import { TrackingProvider } from '@/hooks/useTrackingContext'
@@ -59,6 +60,7 @@ export default function App() {
             <Routes>
               <Route path="/" element={<TimelinePage />} />
               <Route path="/timesheet" element={<TimesheetPage />} />
+              <Route path="/analytics" element={<AnalyticsPage />} />
               <Route path="/clients" element={<ClientsMattersPage />} />
               <Route path="/settings" element={<SettingsPage />} />
             </Routes>

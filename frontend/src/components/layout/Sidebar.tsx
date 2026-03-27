@@ -1,10 +1,11 @@
 import { NavLink } from 'react-router-dom'
-import { Clock, FileSpreadsheet, Briefcase, Settings } from 'lucide-react'
+import { Clock, FileSpreadsheet, BarChart3, Briefcase, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
   { to: '/', icon: Clock, label: 'Timeline' },
   { to: '/timesheet', icon: FileSpreadsheet, label: 'Timesheet' },
+  { to: '/analytics', icon: BarChart3, label: 'Analytics' },
   { to: '/clients', icon: Briefcase, label: 'Clients & Matters' },
 ]
 

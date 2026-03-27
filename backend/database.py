@@ -643,6 +643,268 @@ def delete_activity(activity_id: str) -> bool:
     return cursor.rowcount > 0
 
 
+# ---------------------------------------------------------------------------
+# Analytics
+# ---------------------------------------------------------------------------
+
+def _round_to_decimal_hours(minutes: int) -> float:
+    """Python equivalent of frontend roundToDecimalHours — 0.1 hr increments."""
+    if minutes <= 0:
+        return 0.0
+    hours = minutes / 60
+    return max(round(hours * 10) / 10, 0.1)
+
+
+def _count_working_days(start_date: str, end_date: str) -> tuple[int, int, int]:
+    """Count total working days, elapsed working days (up to today), and remaining."""
+    from datetime import date as date_type
+    start = date_type.fromisoformat(start_date)
+    end = date_type.fromisoformat(end_date)
+    today = date_type.today()
+
+    total = 0
+    elapsed = 0
+    d = start
+    while d <= end:
+        if d.weekday() < 5:  # Mon-Fri
+            total += 1
+            if d <= today:
+                elapsed += 1
+        d += timedelta(days=1)
+
+    remaining = total - elapsed
+    return total, elapsed, remaining
+
+
+def get_analytics_summary(start_date: str, end_date: str, available_hours_per_day: float = 8.0) -> dict:
+    conn = get_db()
+    rows = conn.execute(
+        """SELECT a.minutes, a.billable, a.effective_rate
+           FROM activities a
+           JOIN sessions s ON a.session_id = s.id
+           WHERE date(s.start_time) BETWEEN ? AND ?
+             AND s.status = 'completed'""",
+        (start_date, end_date),
+    ).fetchall()
+    conn.close()
+
+    billable_min = 0
+    non_billable_min = 0
+    revenue = 0.0
+
+    for r in rows:
+        mins = r["minutes"] or 0
+        if r["billable"]:
+            billable_min += mins
+            rate = r["effective_rate"] or 0
+            revenue += _round_to_decimal_hours(mins) * rate
+        else:
+            non_billable_min += mins
+
+    billable_hours = round(billable_min / 60, 2)
+    non_billable_hours = round(non_billable_min / 60, 2)
+    total_hours = round((billable_min + non_billable_min) / 60, 2)
+
+    total_days, elapsed_days, remaining_days = _count_working_days(start_date, end_date)
+    available_hours = round(total_days * available_hours_per_day, 1)
+    elapsed_available = round(elapsed_days * available_hours_per_day, 1)
+
+    utilization_rate = round(billable_hours / elapsed_available, 4) if elapsed_available > 0 else 0.0
+    effective_rate = round(revenue / billable_hours, 2) if billable_hours > 0 else 0.0
+    realization_rate = round(billable_hours / total_hours, 4) if total_hours > 0 else 0.0
+
+    # Forecast
+    if elapsed_days > 0:
+        daily_avg_billable = round(billable_hours / elapsed_days, 2)
+        daily_avg_revenue = revenue / elapsed_days
+        projected_monthly_revenue = round(daily_avg_revenue * total_days, 2)
+    else:
+        daily_avg_billable = 0.0
+        projected_monthly_revenue = 0.0
+
+    return {
+        "billable_hours": billable_hours,
+        "non_billable_hours": non_billable_hours,
+        "total_hours": total_hours,
+        "revenue": round(revenue, 2),
+        "effective_rate": effective_rate,
+        "utilization_rate": utilization_rate,
+        "realization_rate": realization_rate,
+        "available_hours": available_hours,
+        "working_days": elapsed_days,
+        "forecast": {
+            "projected_monthly_revenue": projected_monthly_revenue,
+            "daily_average_billable": daily_avg_billable,
+            "working_days_remaining": remaining_days,
+        },
+    }
+
+
+def get_analytics_trend(start_date: str, end_date: str, granularity: str = "day") -> list[dict]:
+    if granularity == "week":
+        group_expr = "strftime('%Y-W%W', s.start_time)"
+    elif granularity == "month":
+        group_expr = "strftime('%Y-%m', s.start_time)"
+    else:
+        group_expr = "date(s.start_time)"
+
+    conn = get_db()
+    rows = conn.execute(
+        f"""SELECT {group_expr} as period,
+               SUM(CASE WHEN a.billable = 1 THEN a.minutes ELSE 0 END) as billable_min,
+               SUM(CASE WHEN a.billable = 0 THEN a.minutes ELSE 0 END) as non_billable_min
+           FROM activities a
+           JOIN sessions s ON a.session_id = s.id
+           WHERE date(s.start_time) BETWEEN ? AND ?
+             AND s.status = 'completed'
+           GROUP BY {group_expr}
+           ORDER BY {group_expr}""",
+        (start_date, end_date),
+    ).fetchall()
+
+    # Compute revenue per period (need per-activity rounding)
+    period_revenue: dict[str, float] = {}
+    detail_rows = conn.execute(
+        f"""SELECT {group_expr} as period, a.minutes, a.billable, a.effective_rate
+           FROM activities a
+           JOIN sessions s ON a.session_id = s.id
+           WHERE date(s.start_time) BETWEEN ? AND ?
+             AND s.status = 'completed'""",
+        (start_date, end_date),
+    ).fetchall()
+    conn.close()
+
+    for r in detail_rows:
+        p = r["period"]
+        if r["billable"] and r["effective_rate"]:
+            rev = _round_to_decimal_hours(r["minutes"] or 0) * r["effective_rate"]
+            period_revenue[p] = period_revenue.get(p, 0) + rev
+
+    result = []
+    for r in rows:
+        p = r["period"]
+        result.append({
+            "date": p,
+            "billable_hours": round((r["billable_min"] or 0) / 60, 2),
+            "non_billable_hours": round((r["non_billable_min"] or 0) / 60, 2),
+            "revenue": round(period_revenue.get(p, 0), 2),
+        })
+    return result
+
+
+def get_analytics_by_matter(start_date: str, end_date: str, limit: int = 10) -> dict:
+    conn = get_db()
+    rows = conn.execute(
+        """SELECT a.matter_id, m.name as matter_name, c.name as client_name,
+               SUM(CASE WHEN a.billable = 1 THEN a.minutes ELSE 0 END) as billable_min
+           FROM activities a
+           JOIN sessions s ON a.session_id = s.id
+           LEFT JOIN matters m ON a.matter_id = m.id
+           LEFT JOIN clients c ON m.client_id = c.id
+           WHERE date(s.start_time) BETWEEN ? AND ?
+             AND s.status = 'completed'
+           GROUP BY a.matter_id
+           ORDER BY billable_min DESC""",
+        (start_date, end_date),
+    ).fetchall()
+
+    # Compute revenue per matter with per-activity rounding
+    detail_rows = conn.execute(
+        """SELECT a.matter_id, a.minutes, a.billable, a.effective_rate
+           FROM activities a
+           JOIN sessions s ON a.session_id = s.id
+           WHERE date(s.start_time) BETWEEN ? AND ?
+             AND s.status = 'completed'""",
+        (start_date, end_date),
+    ).fetchall()
+    conn.close()
+
+    matter_revenue: dict[str | None, float] = {}
+    for r in detail_rows:
+        mid = r["matter_id"]
+        if r["billable"] and r["effective_rate"]:
+            rev = _round_to_decimal_hours(r["minutes"] or 0) * r["effective_rate"]
+            matter_revenue[mid] = matter_revenue.get(mid, 0) + rev
+
+    total_billable_min = sum((r["billable_min"] or 0) for r in rows)
+
+    data = []
+    unassigned = {"hours": 0.0, "revenue": 0.0}
+
+    for r in rows:
+        b_min = r["billable_min"] or 0
+        b_hours = round(b_min / 60, 2)
+        rev = round(matter_revenue.get(r["matter_id"], 0), 2)
+        pct = round(b_min / total_billable_min * 100, 1) if total_billable_min > 0 else 0.0
+
+        if r["matter_id"] is None:
+            unassigned = {"hours": b_hours, "revenue": rev}
+            continue
+
+        eff_rate = round(rev / b_hours, 2) if b_hours > 0 else 0.0
+        data.append({
+            "matter_id": r["matter_id"],
+            "matter_name": r["matter_name"] or "Unknown",
+            "client_name": r["client_name"] or "Unknown",
+            "billable_hours": b_hours,
+            "revenue": rev,
+            "effective_rate": eff_rate,
+            "percentage": pct,
+        })
+
+    return {"data": data[:limit], "unassigned": unassigned}
+
+
+def get_analytics_by_category(start_date: str, end_date: str) -> list[dict]:
+    conn = get_db()
+    rows = conn.execute(
+        """SELECT a.category,
+               SUM(CASE WHEN a.billable = 1 THEN a.minutes ELSE 0 END) as billable_min,
+               SUM(CASE WHEN a.billable = 0 THEN a.minutes ELSE 0 END) as non_billable_min
+           FROM activities a
+           JOIN sessions s ON a.session_id = s.id
+           WHERE date(s.start_time) BETWEEN ? AND ?
+             AND s.status = 'completed'
+           GROUP BY a.category
+           ORDER BY (COALESCE(billable_min, 0) + COALESCE(non_billable_min, 0)) DESC""",
+        (start_date, end_date),
+    ).fetchall()
+
+    detail_rows = conn.execute(
+        """SELECT a.category, a.minutes, a.billable, a.effective_rate
+           FROM activities a
+           JOIN sessions s ON a.session_id = s.id
+           WHERE date(s.start_time) BETWEEN ? AND ?
+             AND s.status = 'completed'""",
+        (start_date, end_date),
+    ).fetchall()
+    conn.close()
+
+    cat_revenue: dict[str, float] = {}
+    for r in detail_rows:
+        cat = r["category"] or "Administrative"
+        if r["billable"] and r["effective_rate"]:
+            rev = _round_to_decimal_hours(r["minutes"] or 0) * r["effective_rate"]
+            cat_revenue[cat] = cat_revenue.get(cat, 0) + rev
+
+    total_min = sum(((r["billable_min"] or 0) + (r["non_billable_min"] or 0)) for r in rows)
+
+    result = []
+    for r in rows:
+        cat = r["category"] or "Administrative"
+        b_min = r["billable_min"] or 0
+        nb_min = r["non_billable_min"] or 0
+        pct = round((b_min + nb_min) / total_min * 100, 1) if total_min > 0 else 0.0
+        result.append({
+            "category": cat,
+            "billable_hours": round(b_min / 60, 2),
+            "non_billable_hours": round(nb_min / 60, 2),
+            "revenue": round(cat_revenue.get(cat, 0), 2),
+            "percentage": pct,
+        })
+    return result
+
+
 def get_next_sort_order(session_id: str) -> int:
     conn = get_db()
     row = conn.execute(

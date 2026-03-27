@@ -1,4 +1,7 @@
-import type { Session, TrackingStatus, Client, Matter, Activity } from './types'
+import type {
+  Session, TrackingStatus, Client, Matter, Activity,
+  AnalyticsSummary, AnalyticsTrendPoint, AnalyticsByMatter, AnalyticsCategoryRow,
+} from './types'
 
 const API_BASE = '/api'
 
@@ -128,6 +131,19 @@ export const api = {
 
   deleteActivity: (id: string) =>
     request<{ deleted: boolean }>(`/activities/${id}`, { method: 'DELETE' }),
+
+  // Analytics
+  getAnalyticsSummary: (startDate: string, endDate: string) =>
+    request<AnalyticsSummary>(`/analytics/summary?start_date=${startDate}&end_date=${endDate}`),
+
+  getAnalyticsTrend: (startDate: string, endDate: string, granularity: string = 'day') =>
+    request<{ data: AnalyticsTrendPoint[] }>(`/analytics/trend?start_date=${startDate}&end_date=${endDate}&granularity=${granularity}`),
+
+  getAnalyticsByMatter: (startDate: string, endDate: string, limit: number = 10) =>
+    request<AnalyticsByMatter>(`/analytics/by-matter?start_date=${startDate}&end_date=${endDate}&limit=${limit}`),
+
+  getAnalyticsByCategory: (startDate: string, endDate: string) =>
+    request<{ data: AnalyticsCategoryRow[] }>(`/analytics/by-category?start_date=${startDate}&end_date=${endDate}`),
 
   exportTimesheet: async (date: string) => {
     const res = await fetch(`${API_BASE}/export?date=${date}&format=csv`, {

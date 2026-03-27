@@ -136,3 +136,55 @@ export const CATEGORY_BAR_COLORS: Record<string, string> = {
 export function getCategoryBarColor(name: string): string {
   return CATEGORY_BAR_COLORS[name] || FALLBACK_BAR_COLOR
 }
+
+// Analytics types
+export interface AnalyticsForecast {
+  projected_monthly_revenue: number
+  daily_average_billable: number
+  working_days_remaining: number
+}
+
+export interface AnalyticsSummary {
+  billable_hours: number
+  non_billable_hours: number
+  total_hours: number
+  revenue: number
+  effective_rate: number
+  utilization_rate: number
+  realization_rate: number
+  available_hours: number
+  working_days: number
+  forecast: AnalyticsForecast
+}
+
+export interface AnalyticsTrendPoint {
+  date: string
+  billable_hours: number
+  non_billable_hours: number
+  revenue: number
+}
+
+export interface AnalyticsMatterRow {
+  matter_id: string
+  matter_name: string
+  client_name: string
+  billable_hours: number
+  revenue: number
+  effective_rate: number
+  percentage: number
+}
+
+export interface AnalyticsCategoryRow {
+  category: string
+  billable_hours: number
+  non_billable_hours: number
+  revenue: number
+  percentage: number
+}
+
+export interface AnalyticsByMatter {
+  data: AnalyticsMatterRow[]
+  unassigned: { hours: number; revenue: number }
+}
+
+export type PeriodPreset = 'today' | 'this_week' | 'this_month' | 'last_month' | 'this_quarter' | 'ytd'

@@ -218,13 +218,13 @@ export function SessionsPage() {
         <div className="flex gap-2">
           <button
             onClick={handleApproveAll}
-            className="px-3 py-1.5 text-sm font-medium bg-surface border border-border rounded-[var(--radius-sm)] text-text-primary hover:bg-surface-hover transition-colors cursor-pointer"
+            className="px-4 py-2 text-sm font-medium bg-surface border border-border rounded-[var(--radius-sm)] text-text-primary hover:bg-surface-hover transition-colors cursor-pointer"
           >
             Approve All Pending
           </button>
           <button
             onClick={handleExport}
-            className="px-3 py-1.5 text-sm font-medium bg-accent text-inverse rounded-[var(--radius-sm)] hover:opacity-90 transition-opacity cursor-pointer"
+            className="px-4 py-2 text-sm font-medium bg-accent text-inverse rounded-[var(--radius-sm)] hover:opacity-90 transition-opacity cursor-pointer"
           >
             Export Timesheet &rarr;
           </button>

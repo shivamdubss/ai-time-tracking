@@ -30,7 +30,8 @@ export function Header({
         <div className="flex items-center gap-2">
           <button
             onClick={onGoBack}
-            className="w-[30px] h-[30px] rounded-[var(--radius-sm)] border border-border bg-surface flex items-center justify-center text-text-muted hover:bg-surface-hover hover:text-text-primary transition-all duration-100 cursor-pointer"
+            aria-label="Previous day"
+            className="w-[36px] h-[36px] rounded-[var(--radius-sm)] border border-border bg-surface flex items-center justify-center text-text-muted hover:bg-surface-hover hover:text-text-primary transition-all duration-100 cursor-pointer"
           >
             <ChevronLeft size={16} />
           </button>
@@ -40,7 +41,8 @@ export function Header({
           <button
             onClick={onGoForward}
             disabled={isToday}
-            className="w-[30px] h-[30px] rounded-[var(--radius-sm)] border border-border bg-surface flex items-center justify-center text-text-muted hover:bg-surface-hover hover:text-text-primary transition-all duration-100 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+            aria-label="Next day"
+            className="w-[36px] h-[36px] rounded-[var(--radius-sm)] border border-border bg-surface flex items-center justify-center text-text-muted hover:bg-surface-hover hover:text-text-primary transition-all duration-100 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
           >
             <ChevronRight size={16} />
           </button>

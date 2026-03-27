@@ -6,6 +6,8 @@ interface MatterGroupViewProps {
   sessions: Session[]
   matters: Matter[]
   clients: Client[]
+  selectedActivities?: Set<string>
+  onSelectToggle?: (activityId: string) => void
   onActivityUpdated?: (activity: Activity) => void
 }
 
@@ -16,7 +18,7 @@ interface MatterGroup {
   activities: Activity[]
 }
 
-export function MatterGroupView({ sessions, matters, clients, onActivityUpdated }: MatterGroupViewProps) {
+export function MatterGroupView({ sessions, matters, clients, selectedActivities, onSelectToggle, onActivityUpdated }: MatterGroupViewProps) {
   const clientMap = useMemo(
     () => new Map(clients.map(c => [c.id, c])),
     [clients],
@@ -83,6 +85,8 @@ export function MatterGroupView({ sessions, matters, clients, onActivityUpdated 
           matter={group.matter}
           client={group.client}
           activities={group.activities}
+          selectedActivities={selectedActivities}
+          onSelectToggle={onSelectToggle}
           onActivityUpdated={onActivityUpdated}
         />
       ))}

@@ -204,3 +204,59 @@ Visit https://react.dev/link/error-boundaries to learn more about error boundari
 [2026-03-27T03:24:55.966Z] [debug] [vite] connected.
 [2026-03-27T03:24:55.991Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
 [2026-03-27T03:24:56.086Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.
+[2026-03-27T03:33:35.604Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
+[2026-03-27T03:33:35.606Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:33:41.476Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
+[2026-03-27T03:33:41.476Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:33:46.771Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
+[2026-03-27T03:33:46.771Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:33:53.343Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
+[2026-03-27T03:33:53.343Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:34:05.686Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
+[2026-03-27T03:34:05.686Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:34:15.516Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
+[2026-03-27T03:34:15.516Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:34:26.468Z] [debug] [vite] hot updated: /src/components/sessions/MatterActivityRow.tsx
+[2026-03-27T03:34:26.468Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:34:34.749Z] [error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-03-27T03:34:34.765Z] [error] [vite] Failed to reload /src/components/sessions/MatterActivityRow.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above)
+[2026-03-27T03:34:34.782Z] [debug] [vite] hot updated: /src/components/sessions/MatterActivityRow.tsx
+[2026-03-27T03:34:34.782Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:34:43.209Z] [debug] [vite] hot updated: /src/components/sessions/MatterActivityRow.tsx
+[2026-03-27T03:34:43.209Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:34:49.625Z] [debug] [vite] hot updated: /src/components/sessions/SessionRow.tsx
+[2026-03-27T03:34:49.625Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:34:55.832Z] [debug] [vite] hot updated: /src/components/sessions/SessionRow.tsx
+[2026-03-27T03:34:55.832Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:35:03.789Z] [debug] [vite] hot updated: /src/components/sessions/SessionTable.tsx
+[2026-03-27T03:35:03.789Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:35:09.510Z] [debug] [vite] hot updated: /src/components/sessions/SessionTable.tsx
+[2026-03-27T03:35:09.510Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:35:16.342Z] [debug] [vite] hot updated: /src/components/sessions/MatterGroupCard.tsx
+[2026-03-27T03:35:16.342Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:35:22.256Z] [debug] [vite] hot updated: /src/components/sessions/MatterGroupCard.tsx
+[2026-03-27T03:35:22.256Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:35:29.937Z] [debug] [vite] hot updated: /src/components/sessions/MatterGroupView.tsx
+[2026-03-27T03:35:29.937Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:35:34.895Z] [debug] [vite] hot updated: /src/components/sessions/MatterGroupView.tsx
+[2026-03-27T03:35:34.895Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:35:40.890Z] [debug] [vite] hot updated: /src/components/sessions/MatterGroupView.tsx
+[2026-03-27T03:35:40.890Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:35:47.035Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:35:47.035Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:35:53.160Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:35:53.160Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:35:58.886Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:35:58.886Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:36:08.144Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:36:08.144Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:36:23.438Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:36:23.438Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:36:29.979Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:36:29.979Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:36:38.029Z] [debug] [vite] hot updated: /src/components/sessions/SessionTable.tsx
+[2026-03-27T03:36:38.029Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:36:45.964Z] [debug] [vite] hot updated: /src/components/sessions/SessionRow.tsx
+[2026-03-27T03:36:45.964Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:36:57.145Z] [debug] [vite] hot updated: /src/components/sessions/SessionRow.tsx
+[2026-03-27T03:36:57.145Z] [debug] [vite] hot updated: /src/index.css

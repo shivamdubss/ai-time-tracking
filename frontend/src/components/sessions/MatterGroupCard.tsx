@@ -9,10 +9,12 @@ interface MatterGroupCardProps {
   matter: Matter | null
   client: Client | null
   activities: Activity[]
+  selectedActivities?: Set<string>
+  onSelectToggle?: (activityId: string) => void
   onActivityUpdated?: (activity: Activity) => void
 }
 
-export function MatterGroupCard({ matter, client, activities, onActivityUpdated }: MatterGroupCardProps) {
+export function MatterGroupCard({ matter, client, activities, selectedActivities, onSelectToggle, onActivityUpdated }: MatterGroupCardProps) {
   const [expanded, setExpanded] = useState(true)
 
   const totalMinutes = activities.reduce((sum, a) => sum + a.minutes, 0)
@@ -73,6 +75,8 @@ export function MatterGroupCard({ matter, client, activities, onActivityUpdated 
               key={activity.id || i}
               activity={activity}
               isLast={i === activities.length - 1}
+              selected={activity.id ? selectedActivities?.has(activity.id) : false}
+              onSelectToggle={onSelectToggle}
               onActivityUpdated={onActivityUpdated}
             />
           ))}

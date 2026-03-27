@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react'
-import { Pencil } from 'lucide-react'
 import type { Activity } from '@/lib/types'
 import { formatDuration, formatTimeRange } from '@/lib/format'
 import { api } from '@/lib/api'
@@ -7,10 +6,12 @@ import { api } from '@/lib/api'
 interface MatterActivityRowProps {
   activity: Activity
   isLast: boolean
+  selected?: boolean
+  onSelectToggle?: (activityId: string) => void
   onActivityUpdated?: (activity: Activity) => void
 }
 
-export function MatterActivityRow({ activity, isLast, onActivityUpdated }: MatterActivityRowProps) {
+export function MatterActivityRow({ activity, isLast, selected, onSelectToggle, onActivityUpdated }: MatterActivityRowProps) {
   const hours = formatDuration(activity.minutes)
   const [isEditingNarrative, setIsEditingNarrative] = useState(false)
   const [narrativeValue, setNarrativeValue] = useState(activity.narrative)
@@ -37,7 +38,20 @@ export function MatterActivityRow({ activity, isLast, onActivityUpdated }: Matte
   }
 
   return (
-    <div className={`py-4 ${!isLast ? 'border-b border-border-subtle' : ''}`}>
+    <div className={`flex gap-3 py-4 items-start ${!isLast ? 'border-b border-border-subtle' : ''}`}>
+      {/* Selection checkbox */}
+      {activity.id && onSelectToggle ? (
+        <input
+          type="checkbox"
+          checked={selected || false}
+          onChange={() => onSelectToggle(activity.id!)}
+          className="mt-1 w-3.5 h-3.5 rounded border-border accent-accent cursor-pointer shrink-0"
+        />
+      ) : (
+        <div className="w-3.5 shrink-0" />
+      )}
+
+      <div className="flex-1 min-w-0">
       {/* Top row: time range + code + hours + status */}
       <div className="flex items-center justify-between mb-1.5">
         <div className="flex items-center gap-2">
@@ -75,19 +89,17 @@ export function MatterActivityRow({ activity, isLast, onActivityUpdated }: Matte
           />
         ) : (
           <div
-            className="group cursor-pointer hover:bg-bg-surface-hover rounded px-1 -mx-1 transition-colors flex items-start gap-1"
+            className="cursor-pointer hover:bg-bg-surface-hover rounded px-1 -mx-1 transition-colors"
             onClick={() => setIsEditingNarrative(true)}
             title="Click to edit"
           >
-            <span className="flex-1">
-              {activity.narrative || <span className="italic text-text-faint">Click to add narrative</span>}
-            </span>
-            <Pencil size={13} className="mt-0.5 shrink-0 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+            {activity.narrative || <span className="italic text-text-faint">Click to add narrative</span>}
           </div>
         )}
         {saveError && (
           <div className="text-xs text-error mt-0.5">Failed to save. Please try again.</div>
         )}
+      </div>
       </div>
     </div>
   )

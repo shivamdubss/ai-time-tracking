@@ -11,11 +11,13 @@ interface SessionTableProps {
   totalBillableValue?: number
   totalNonBillableMinutes?: number
   matters?: Matter[]
+  selectedActivities?: Set<string>
+  onSelectToggle?: (activityId: string) => void
   onSessionUpdated?: (session: Session) => void
   isProcessing?: boolean
 }
 
-export function SessionTable({ sessions, totalHours, totalActivities, totalBillableValue, totalNonBillableMinutes, matters, onSessionUpdated, isProcessing }: SessionTableProps) {
+export function SessionTable({ sessions, totalHours, totalActivities, totalBillableValue, totalNonBillableMinutes, matters, selectedActivities, onSelectToggle, onSessionUpdated, isProcessing }: SessionTableProps) {
   if (sessions.length === 0 && !isProcessing) {
     return <EmptyState />
   }
@@ -23,7 +25,8 @@ export function SessionTable({ sessions, totalHours, totalActivities, totalBilla
   return (
     <div className="bg-surface border border-border rounded-[var(--radius-md)] overflow-hidden">
       {/* Header */}
-      <div className="hidden md:grid grid-cols-[1fr_80px_1.2fr] gap-4 px-5 py-2.5 border-b border-border text-xs font-bold tracking-wider uppercase text-text-muted">
+      <div className="hidden md:grid grid-cols-[24px_1fr_80px_1.2fr] gap-4 px-5 py-2.5 border-b border-border text-xs font-bold tracking-wider uppercase text-text-muted">
+        <div />
         <div>Activity</div>
         <div>Hours</div>
         <div>Narrative</div>
@@ -38,6 +41,8 @@ export function SessionTable({ sessions, totalHours, totalActivities, totalBilla
           key={session.id}
           session={session}
           matters={matters}
+          selectedActivities={selectedActivities}
+          onSelectToggle={onSelectToggle}
           onSessionUpdated={onSessionUpdated}
         />
       ))}

@@ -11,10 +11,12 @@ import { AddActivityForm } from './AddActivityForm'
 interface SessionRowProps {
   session: Session
   matters?: Matter[]
+  selectedActivities?: Set<string>
+  onSelectToggle?: (activityId: string) => void
   onSessionUpdated?: (session: Session) => void
 }
 
-export function SessionRow({ session, matters, onSessionUpdated }: SessionRowProps) {
+export function SessionRow({ session, matters, selectedActivities, onSelectToggle, onSessionUpdated }: SessionRowProps) {
   const [expanded, setExpanded] = useState(false)
   const [isAddingActivity, setIsAddingActivity] = useState(false)
   const hours = formatSessionHours(session.startTime, session.endTime)
@@ -57,10 +59,11 @@ export function SessionRow({ session, matters, onSessionUpdated }: SessionRowPro
         onClick={() => setExpanded(!expanded)}
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpanded(!expanded) } }}
         className={cn(
-          'flex flex-col gap-2 md:grid md:grid-cols-[1fr_80px_1.2fr] md:gap-4 px-5 py-4 cursor-pointer transition-colors duration-100 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent',
+          'flex flex-col gap-2 md:grid md:grid-cols-[24px_1fr_80px_1.2fr] md:gap-4 px-5 py-4 cursor-pointer transition-colors duration-100 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent',
           expanded ? 'bg-surface-hover' : 'hover:bg-surface-hover',
         )}
       >
+        <div className="hidden md:block" />
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="font-display font-semibold text-sm text-text-primary">
@@ -107,6 +110,8 @@ export function SessionRow({ session, matters, onSessionUpdated }: SessionRowPro
               activity={activity}
               isLast={i === session.activities.length - 1 && !isAddingActivity}
               matters={matters}
+              selected={activity.id ? selectedActivities?.has(activity.id) : false}
+              onSelectToggle={onSelectToggle}
               onActivityUpdated={handleActivityUpdated}
               onActivityDeleted={handleActivityDeleted}
             />

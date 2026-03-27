@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react'
-import { Trash2, Pencil } from 'lucide-react'
 import type { Activity, Matter } from '@/lib/types'
 import { LEGAL_CATEGORIES, getCategoryBarColor } from '@/lib/types'
 import { formatDuration, roundToDecimalHours } from '@/lib/format'
@@ -10,6 +9,8 @@ interface ActivityRowProps {
   activity: Activity
   isLast: boolean
   matters?: Matter[]
+  selected?: boolean
+  onSelectToggle?: (activityId: string) => void
   onActivityUpdated?: (activity: Activity) => void
   onActivityDeleted?: (activityId: string) => void
 }
@@ -29,14 +30,13 @@ function getAppAbbrev(app: string): string {
   return app.slice(0, 2)
 }
 
-export function ActivityRow({ activity, isLast, matters, onActivityUpdated, onActivityDeleted }: ActivityRowProps) {
+export function ActivityRow({ activity, isLast, matters, selected, onSelectToggle, onActivityUpdated, onActivityDeleted }: ActivityRowProps) {
   const category = activity.category || 'Administrative'
   const color = getCategoryBarColor(category)
   const hours = formatDuration(activity.minutes)
   const [isEditingNarrative, setIsEditingNarrative] = useState(false)
   const [narrativeValue, setNarrativeValue] = useState(activity.narrative)
   const [saveError, setSaveError] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const matterName = activity.matter_id
@@ -87,32 +87,22 @@ export function ActivityRow({ activity, isLast, matters, onActivityUpdated, onAc
     } catch {}
   }
 
-  async function handleDelete() {
-    if (!activity.id) return
-    if (!window.confirm('Delete this activity?')) return
-    try {
-      await api.deleteActivity(activity.id)
-      onActivityDeleted?.(activity.id)
-    } catch {}
-  }
-
   return (
     <div
-      className={`relative grid grid-cols-[1fr_80px_1.2fr] gap-4 py-3 text-[13px] ${
+      className={`grid grid-cols-[24px_1fr_80px_1.2fr] gap-4 py-3 text-[13px] items-start ${
         !isLast ? 'border-b border-border-subtle' : ''
       }`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Delete button - top right, visible on hover */}
-      {activity.id && onActivityDeleted && (
-        <button
-          onClick={handleDelete}
-          className={`absolute top-2 right-2 p-1.5 rounded-[var(--radius-sm)] text-text-muted hover:text-error hover:bg-error-bg transition-all ${isHovered ? 'opacity-100' : 'opacity-0'}`}
-          title="Delete activity"
-        >
-          <Trash2 size={14} />
-        </button>
+      {/* Selection checkbox */}
+      {activity.id && onSelectToggle ? (
+        <input
+          type="checkbox"
+          checked={selected || false}
+          onChange={() => onSelectToggle(activity.id!)}
+          className="mt-1 w-3.5 h-3.5 rounded border-border accent-accent cursor-pointer"
+        />
+      ) : (
+        <div />
       )}
 
       <div>
@@ -222,14 +212,11 @@ export function ActivityRow({ activity, isLast, matters, onActivityUpdated, onAc
           />
         ) : (
           <div
-            className="group cursor-pointer hover:bg-bg-surface-hover rounded px-1 -mx-1 transition-colors flex items-start gap-1"
+            className="cursor-pointer hover:bg-bg-surface-hover rounded px-1 -mx-1 transition-colors"
             onClick={() => setIsEditingNarrative(true)}
             title="Click to edit"
           >
-            <span className="flex-1">
-              {activity.narrative || <span className="italic text-text-faint">Click to add narrative</span>}
-            </span>
-            <Pencil size={13} className="mt-0.5 shrink-0 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+            {activity.narrative || <span className="italic text-text-faint">Click to add narrative</span>}
           </div>
         )}
         {saveError && (

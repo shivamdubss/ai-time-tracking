@@ -177,6 +177,7 @@ export function SessionsPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6 flex-1 min-h-0">
+      <h1 className="sr-only">Sessions</h1>
       <Header
         selectedDate={selectedDate}
         isToday={isToday}
@@ -190,13 +191,13 @@ export function SessionsPage() {
 
       {/* View toggle + action buttons */}
       <div className="flex items-center justify-between">
-        <div className="flex gap-0.5 bg-bg-inset rounded-[var(--radius-sm)] p-0.5">
+        <div className="flex gap-0.5 bg-bg-inset border border-border rounded-[var(--radius-sm)] p-0.5">
           <button
             className={cn(
               'px-3 py-1.5 text-sm font-medium rounded-[var(--radius-sm)] transition-colors cursor-pointer',
               viewMode === 'timeline'
-                ? 'bg-surface text-text-primary shadow-sm'
-                : 'text-text-muted hover:text-text-secondary',
+                ? 'bg-surface text-text-primary shadow-md'
+                : 'text-text-secondary hover:text-text-primary',
             )}
             onClick={() => setViewMode('timeline')}
           >
@@ -206,8 +207,8 @@ export function SessionsPage() {
             className={cn(
               'px-3 py-1.5 text-sm font-medium rounded-[var(--radius-sm)] transition-colors cursor-pointer',
               viewMode === 'by-matter'
-                ? 'bg-surface text-text-primary shadow-sm'
-                : 'text-text-muted hover:text-text-secondary',
+                ? 'bg-surface text-text-primary shadow-md'
+                : 'text-text-secondary hover:text-text-primary',
             )}
             onClick={() => setViewMode('by-matter')}
           >
@@ -221,12 +222,6 @@ export function SessionsPage() {
             className="px-4 py-2 text-sm font-medium bg-surface border border-border rounded-[var(--radius-sm)] text-text-primary hover:bg-surface-hover transition-colors cursor-pointer"
           >
             Approve All Pending
-          </button>
-          <button
-            onClick={handleExport}
-            className="px-4 py-2 text-sm font-medium bg-accent text-inverse rounded-[var(--radius-sm)] hover:opacity-90 transition-opacity cursor-pointer"
-          >
-            Export Timesheet &rarr;
           </button>
         </div>
       </div>

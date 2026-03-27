@@ -3,8 +3,8 @@ uvicorn[standard]==0.34.2
 websockets==15.0.1
 anthropic==0.52.0
 Pillow==11.2.1
-pyobjc-framework-Cocoa==11.0.1
-pyobjc-framework-Quartz==11.0.1
+platformdirs>=4.0
+python-dotenv>=1.0
 pytest==8.3.5
 pytest-asyncio==0.25.3
 httpx==0.28.1

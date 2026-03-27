@@ -7,11 +7,23 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
+from platformdirs import user_data_dir
+
 logger = logging.getLogger("timetrack")
 
 _db_dir_env = os.getenv("TIMETRACK_DB_DIR", "")
-DB_DIR = Path(_db_dir_env).expanduser() if _db_dir_env else Path.home() / "Library" / "Application Support" / "TimeTrack"
+DB_DIR = Path(_db_dir_env).expanduser() if _db_dir_env else Path(user_data_dir("Donna", appauthor=False))
 DB_PATH = DB_DIR / "timetrack.db"
+
+# One-time migration from old "TimeTrack" data directory
+import sys as _sys
+if not _db_dir_env and not DB_PATH.exists():
+    _old_path = Path.home() / "Library" / "Application Support" / "TimeTrack" / "timetrack.db"
+    if _sys.platform == "darwin" and _old_path.exists():
+        DB_DIR.mkdir(parents=True, exist_ok=True)
+        import shutil as _shutil
+        _shutil.copy2(str(_old_path), str(DB_PATH))
+        logger.info(f"Migrated database from {_old_path} to {DB_PATH}")
 
 # Old developer category -> new legal category mapping
 CATEGORY_MIGRATION_MAP = {
@@ -134,6 +146,23 @@ def init_db():
         conn.execute("SELECT activity_code FROM activities LIMIT 1")
     except sqlite3.OperationalError:
         conn.execute("ALTER TABLE activities ADD COLUMN activity_code TEXT")
+
+    # Add sync columns to all tables (user_id, synced_at, updated_at)
+    _sync_columns = {
+        "sessions": ["user_id TEXT", "synced_at TEXT", "updated_at TEXT"],
+        "activities": ["user_id TEXT", "synced_at TEXT", "updated_at TEXT"],
+        "clients": ["synced_at TEXT"],  # already has updated_at
+        "matters": ["user_id TEXT", "synced_at TEXT"],  # already has updated_at
+    }
+    for table, columns in _sync_columns.items():
+        for col_def in columns:
+            col_name = col_def.split()[0]
+            try:
+                conn.execute(f"SELECT {col_name} FROM {table} LIMIT 1")
+            except sqlite3.OperationalError:
+                conn.execute(f"ALTER TABLE {table} ADD COLUMN {col_def}")
+                if col_name == "updated_at":
+                    conn.execute(f"UPDATE {table} SET updated_at = datetime('now') WHERE updated_at IS NULL")
 
     conn.commit()
 

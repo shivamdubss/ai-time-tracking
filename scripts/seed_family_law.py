@@ -12,7 +12,11 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-DB_DIR = Path.home() / "Library" / "Application Support" / "TimeTrack"
+try:
+    from platformdirs import user_data_dir
+    DB_DIR = Path(user_data_dir("Donna", appauthor=False))
+except ImportError:
+    DB_DIR = Path.home() / "Library" / "Application Support" / "Donna"
 DB_PATH = DB_DIR / "timetrack.db"
 
 # ---------------------------------------------------------------------------

@@ -8,20 +8,29 @@ import { TimesheetPage } from '@/pages/TimesheetPage'
 import { ClientsMattersPage } from '@/pages/ClientsMattersPage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
+import { LoginPage } from '@/pages/LoginPage'
 import { initAuth } from '@/lib/api'
 import { SettingsProvider } from '@/hooks/useSettings'
 import { TrackingProvider } from '@/hooks/useTrackingContext'
+import { AuthProvider, useAuth } from '@/hooks/useAuth'
+import { isSupabaseConfigured } from '@/lib/supabase'
 import { Agentation } from 'agentation'
 
-export default function App() {
+function AppContent() {
   const [ready, setReady] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { user, loading } = useAuth()
 
   useEffect(() => {
     initAuth().then(() => setReady(true))
   }, [])
 
-  if (!ready) return null
+  if (loading || !ready) return null
+
+  // If Supabase is configured and user isn't logged in, show login
+  if (isSupabaseConfigured() && !user) {
+    return <LoginPage />
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-page">
@@ -69,5 +78,13 @@ export default function App() {
       </main>
       {import.meta.env.DEV && <Agentation />}
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   )
 }

@@ -1,6 +1,7 @@
 import logging
 import os
 import shutil
+import sys
 import tempfile
 import threading
 import time
@@ -109,7 +110,8 @@ class SessionManager:
 
             # Create secure temp directory
             self.temp_dir = Path(tempfile.mkdtemp(prefix="timetrack-"))
-            os.chmod(str(self.temp_dir), 0o700)
+            if sys.platform != "win32":
+                os.chmod(str(self.temp_dir), 0o700)
 
             # Start trackers
             self.window_tracker = WindowTracker(

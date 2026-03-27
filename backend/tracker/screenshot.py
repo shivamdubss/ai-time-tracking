@@ -1,30 +1,11 @@
 import os
 import threading
-import time
 from datetime import datetime
 from pathlib import Path
 
-SCREENSHOT_INTERVAL = float(os.getenv("TIMETRACK_SCREENSHOT_INTERVAL", "30"))
+from .platforms import get_screen_capture_provider
 
-try:
-    from Quartz import (
-        CGWindowListCreateImage,
-        CGRectNull,
-        kCGWindowListOptionOnScreenOnly,
-        kCGNullWindowID,
-        CGWindowListCopyWindowInfo,
-        kCGWindowOwnerName,
-        kCGWindowNumber,
-        kCGWindowLayer,
-        CGWindowListCreateImageFromArray,
-        CGRectInfinite,
-        kCGWindowImageDefault,
-    )
-    from AppKit import NSWorkspace, NSBitmapImageRep, NSJPEGFileType
-    from Foundation import NSArray
-    HAS_MACOS = True
-except ImportError:
-    HAS_MACOS = False
+SCREENSHOT_INTERVAL = float(os.getenv("TIMETRACK_SCREENSHOT_INTERVAL", "30"))
 
 
 class ScreenshotCapture:
@@ -34,60 +15,16 @@ class ScreenshotCapture:
         self.screenshots: list[Path] = []
         self._stop_event = threading.Event()
         self._paused: bool = False
+        self._provider = get_screen_capture_provider()
         (self.temp_dir / "screenshots").mkdir(parents=True, exist_ok=True)
 
     def capture(self) -> Path | None:
-        if not HAS_MACOS:
-            return None
-
         try:
-            # Get the frontmost app's window ID
-            active_app = NSWorkspace.sharedWorkspace().activeApplication()
-            app_name = active_app.get("NSApplicationName", "Unknown")
-
-            window_list = CGWindowListCopyWindowInfo(
-                kCGWindowListOptionOnScreenOnly, kCGNullWindowID
-            )
-
-            window_id = None
-            for window in window_list:
-                if window.get(kCGWindowOwnerName) == app_name and window.get(kCGWindowLayer) == 0:
-                    window_id = window.get(kCGWindowNumber)
-                    break
-
-            if window_id is None:
-                # Fall back to full screen capture
-                image = CGWindowListCreateImage(
-                    CGRectInfinite,
-                    kCGWindowListOptionOnScreenOnly,
-                    kCGNullWindowID,
-                    kCGWindowImageDefault,
-                )
-            else:
-                # Capture specific window
-                image = CGWindowListCreateImageFromArray(
-                    CGRectNull,
-                    NSArray.arrayWithObject_(window_id),
-                    kCGWindowImageDefault,
-                )
-
-            if image is None:
-                return None
-
-            # Convert to JPEG
-            bitmap = NSBitmapImageRep.alloc().initWithCGImage_(image)
-            jpeg_data = bitmap.representationUsingType_properties_(
-                NSJPEGFileType, {NSBitmapImageRep.NSImageCompressionFactor: 0.6}
-            )
-
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filepath = self.temp_dir / "screenshots" / f"capture_{timestamp}.jpg"
-            jpeg_data.writeToFile_atomically_(str(filepath), True)
-
-            # Set restrictive permissions
-            filepath.chmod(0o600)
-
-            return filepath
+            if self._provider.capture_active_window(filepath):
+                return filepath
+            return None
         except Exception:
             return None
 

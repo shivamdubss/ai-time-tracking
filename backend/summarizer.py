@@ -212,6 +212,7 @@ async def _summarize_via_edge_function(
             "end_time": end_time,
             "elapsed_seconds": elapsed_seconds,
             "matters_context": matters_context,
+            "system_prompt": SYSTEM_PROMPT,
         }
 
         async with httpx.AsyncClient(timeout=120) as client:

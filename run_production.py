@@ -15,14 +15,26 @@ import logging
 from pathlib import Path
 from platformdirs import user_data_dir
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
-logger = logging.getLogger("donna")
-
 # ---------------------------------------------------------------------------
-# Data directory setup
+# Data directory setup (must come before logging so we can write the log file)
 # ---------------------------------------------------------------------------
 DATA_DIR = Path(user_data_dir("Donna", appauthor=False))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+# ---------------------------------------------------------------------------
+# File-based logging — always writes to DATA_DIR/donna.log so crashes are
+# visible even when console=False (Windows packaged build).
+# ---------------------------------------------------------------------------
+LOG_PATH = DATA_DIR / "donna.log"
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(name)s] %(levelname)s %(message)s",
+    handlers=[
+        logging.FileHandler(LOG_PATH, encoding="utf-8"),
+        logging.StreamHandler(),
+    ],
+)
+logger = logging.getLogger("donna")
 
 # Point the database to the data directory
 os.environ.setdefault("TIMETRACK_DB_DIR", str(DATA_DIR))
@@ -126,7 +138,41 @@ def _run_tray(shutdown_event: threading.Event):
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+def _show_error_dialog(message: str):
+    """Show a native OS error dialog (no extra dependencies)."""
+    try:
+        if sys.platform == "win32":
+            import ctypes
+            ctypes.windll.user32.MessageBoxW(0, message, "Donna Error", 0x10)
+        elif sys.platform == "darwin":
+            os.system(
+                f'osascript -e \'display dialog "{message}" with title "Donna Error" buttons {{"OK"}} default button "OK" with icon stop\''
+            )
+    except Exception:
+        pass  # last resort — if even the dialog fails, the log file is our only hope
+
+
 def main():
+    # Startup diagnostics
+    logger.info("=" * 60)
+    logger.info("Donna starting up")
+    logger.info(f"  Python:   {sys.version}")
+    logger.info(f"  Platform: {sys.platform}")
+    logger.info(f"  Data dir: {DATA_DIR}")
+    logger.info(f"  Log file: {LOG_PATH}")
+    logger.info(f"  .env:     {'found' if ENV_PATH.exists() else 'NOT FOUND'}")
+    logger.info(f"  Port:     {PORT}")
+    logger.info("=" * 60)
+
+    try:
+        _main_inner()
+    except Exception:
+        logger.exception("Donna failed to start")
+        _show_error_dialog(f"Donna failed to start.\n\nCheck the log file at:\n{LOG_PATH}")
+        sys.exit(1)
+
+
+def _main_inner():
     shutdown_event = threading.Event()
 
     # Start uvicorn in background thread
@@ -136,7 +182,8 @@ def main():
     # Wait for server to be ready
     logger.info("Starting Donna server...")
     if not _wait_for_server():
-        logger.error("Server failed to start")
+        logger.error("Server failed to start within 15 seconds")
+        _show_error_dialog(f"Donna server failed to start.\n\nCheck the log file at:\n{LOG_PATH}")
         sys.exit(1)
 
     logger.info(f"Donna running at {SERVER_URL}")
@@ -144,6 +191,7 @@ def main():
     # Try pywebview for a native window
     try:
         import webview
+        logger.info(f"pywebview loaded (version {getattr(webview, '__version__', 'unknown')})")
 
         def _on_closing():
             # Don't actually close — minimize to tray if available
@@ -166,10 +214,11 @@ def main():
         # If webview exits, signal shutdown
         shutdown_event.set()
 
-    except ImportError:
-        # No pywebview — fall back to browser
+    except Exception as e:
+        # Any pywebview failure (missing module, no WebView2, renderer error)
+        # falls back to the default browser gracefully.
         import webbrowser
-        logger.info("pywebview not installed — opening in browser")
+        logger.warning(f"pywebview failed ({type(e).__name__}: {e}) — opening in browser")
         webbrowser.open(SERVER_URL)
 
         # Start tray on main thread (blocking)

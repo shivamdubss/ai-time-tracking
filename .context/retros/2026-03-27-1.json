@@ -1,0 +1,48 @@
+{
+  "date": "2026-03-27",
+  "window": "7d",
+  "metrics": {
+    "commits": 33,
+    "contributors": 1,
+    "prs_merged": 1,
+    "insertions": 25221,
+    "deletions": 3819,
+    "net_loc": 21402,
+    "test_loc": 689,
+    "test_ratio": 0.027,
+    "active_days": 2,
+    "sessions": 11,
+    "deep_sessions": 1,
+    "avg_session_minutes": 18,
+    "loc_per_session_hour": 4950,
+    "feat_pct": 0.18,
+    "fix_pct": 0.21,
+    "peak_hour": 23,
+    "ai_assisted_commits": 0
+  },
+  "authors": {
+    "shivamdubss": {
+      "commits": 33,
+      "insertions": 25221,
+      "deletions": 3819,
+      "test_ratio": 0.027,
+      "top_area": "frontend/src/"
+    }
+  },
+  "version_range": null,
+  "streak_days": 2,
+  "tweetable": "Week of Mar 26: 33 commits, 25.2k LOC, 2.7% tests, 1 PR, peak: 11pm | Streak: 2d",
+  "test_health": {
+    "total_test_files": 1,
+    "tests_added_this_period": 689,
+    "regression_test_commits": 0,
+    "test_files_changed": 1
+  },
+  "backlog": {
+    "total_open": 10,
+    "p0_p1": 1,
+    "p2": 3,
+    "completed_this_period": 0,
+    "added_this_period": 10
+  }
+}

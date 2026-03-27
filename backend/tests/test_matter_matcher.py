@@ -93,3 +93,24 @@ class TestMatterMatcher:
         assert result[0]["matter_id"] == "m1"
         assert result[1]["matter_id"] == "m2"
         assert "matter_id" not in result[2] or result[2].get("matter_id") is None
+
+    def test_internal_matter_matched_by_keyword(self):
+        matters = [
+            _make_matter("nb-admin", "Administrative",
+                         keywords=["calendar", "outlook calendar", "billing"]),
+        ]
+        activities = [_make_activity("Outlook", "Calendar - Team Meeting")]
+
+        result = match_activities_to_matters(activities, matters)
+        assert result[0]["matter_id"] == "nb-admin"
+
+    def test_client_matter_wins_over_internal_with_longer_keyword(self):
+        matters = [
+            _make_matter("nb-admin", "Administrative", keywords=["calendar"]),
+            _make_matter("m1", "Client Meeting Prep", keywords=["team meeting"]),
+        ]
+        activities = [_make_activity("Outlook", "Calendar - Team Meeting")]
+
+        result = match_activities_to_matters(activities, matters)
+        # "team meeting" (12 chars) is longer than "calendar" (8 chars)
+        assert result[0]["matter_id"] == "m1"

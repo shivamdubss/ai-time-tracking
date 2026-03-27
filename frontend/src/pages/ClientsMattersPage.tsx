@@ -19,7 +19,18 @@ export function ClientsMattersPage() {
   const fetchClients = useCallback(async () => {
     try {
       const data = await api.getClients()
-      setClients(data)
+      // Sort internal client to top
+      const sorted = [...data].sort((a, b) => {
+        if (a.is_internal && !b.is_internal) return -1
+        if (!a.is_internal && b.is_internal) return 1
+        return a.name.localeCompare(b.name)
+      })
+      setClients(sorted)
+      // Auto-expand the internal client
+      const internal = sorted.find(c => c.is_internal)
+      if (internal) {
+        setExpandedClients(prev => new Set([...prev, internal.id]))
+      }
     } catch {
       setClients([])
     }
@@ -113,7 +124,14 @@ export function ClientsMattersPage() {
                       )}
                     />
                     <div>
-                      <div className="font-display font-semibold text-sm text-text-primary">{client.name}</div>
+                      <div className="font-display font-semibold text-sm text-text-primary">
+                        {client.name}
+                        {client.is_internal && (
+                          <span className="ml-2 text-[10px] font-medium text-text-faint bg-bg-inset px-1.5 py-0.5 rounded">
+                            INTERNAL
+                          </span>
+                        )}
+                      </div>
                       <div className="text-xs text-text-muted">
                         {activeMatters.length} active {activeMatters.length === 1 ? 'matter' : 'matters'}
                         {client.default_rate ? ` · $${client.default_rate}/hr` : ''}
@@ -121,18 +139,22 @@ export function ClientsMattersPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                    <button
-                      className="p-1.5 rounded hover:bg-bg-inset transition-colors text-text-faint hover:text-text-muted"
-                      onClick={() => { setEditingClient(client); setShowClientModal(true) }}
-                    >
-                      <Pencil size={13} />
-                    </button>
-                    <button
-                      className="p-1.5 rounded hover:bg-bg-inset transition-colors text-text-faint hover:text-red-500"
-                      onClick={() => handleDeleteClient(client.id)}
-                    >
-                      <Trash2 size={13} />
-                    </button>
+                    {!client.is_internal && (
+                      <button
+                        className="p-1.5 rounded hover:bg-bg-inset transition-colors text-text-faint hover:text-text-muted"
+                        onClick={() => { setEditingClient(client); setShowClientModal(true) }}
+                      >
+                        <Pencil size={13} />
+                      </button>
+                    )}
+                    {!client.is_internal && (
+                      <button
+                        className="p-1.5 rounded hover:bg-bg-inset transition-colors text-text-faint hover:text-red-500"
+                        onClick={() => handleDeleteClient(client.id)}
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -149,7 +171,10 @@ export function ClientsMattersPage() {
                           <div className="text-xs text-text-muted flex gap-2">
                             {matter.matter_number && <span>{matter.matter_number}</span>}
                             {matter.practice_area && <span>{matter.practice_area}</span>}
-                            {matter.hourly_rate && <span>${matter.hourly_rate}/hr</span>}
+                            {matter.billing_type === 'non-billable'
+                              ? <span className="text-text-faint italic">Non-billable</span>
+                              : matter.hourly_rate && <span>${matter.hourly_rate}/hr</span>
+                            }
                             {matter.keywords.length > 0 && (
                               <span className="text-text-faint">
                                 Keywords: {matter.keywords.join(', ')}
@@ -157,20 +182,22 @@ export function ClientsMattersPage() {
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <button
-                            className="p-1.5 rounded hover:bg-bg-inset transition-colors text-text-faint hover:text-text-muted"
-                            onClick={() => handleEditMatter(matter)}
-                          >
-                            <Pencil size={13} />
-                          </button>
-                          <button
-                            className="p-1.5 rounded hover:bg-bg-inset transition-colors text-text-faint hover:text-red-500"
-                            onClick={() => handleDeleteMatter(matter.id)}
-                          >
-                            <Trash2 size={13} />
-                          </button>
-                        </div>
+                        {!client.is_internal && (
+                          <div className="flex items-center gap-1">
+                            <button
+                              className="p-1.5 rounded hover:bg-bg-inset transition-colors text-text-faint hover:text-text-muted"
+                              onClick={() => handleEditMatter(matter)}
+                            >
+                              <Pencil size={13} />
+                            </button>
+                            <button
+                              className="p-1.5 rounded hover:bg-bg-inset transition-colors text-text-faint hover:text-red-500"
+                              onClick={() => handleDeleteMatter(matter.id)}
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))}
 

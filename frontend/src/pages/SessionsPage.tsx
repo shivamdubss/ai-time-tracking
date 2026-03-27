@@ -22,7 +22,7 @@ export function SessionsPage() {
   // Fetch sessions for selected date
   const fetchSessions = useCallback(async () => {
     try {
-      const dateStr = selectedDate.toISOString().split('T')[0]
+      const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
       const data = await api.getSessions(dateStr)
       // Map snake_case from API to camelCase
       const mapped = data.map((s: any) => ({
@@ -108,6 +108,11 @@ export function SessionsPage() {
     }, 0)
   }, 0)
 
+  // Compute billable vs non-billable minute totals
+  const totalNonBillableMinutes = sessions.reduce((sum, s) =>
+    sum + (s.activities || []).reduce((actSum, act) =>
+      actSum + (act.billable === false ? act.minutes : 0), 0), 0)
+
   const handleStart = useCallback(async () => {
     try {
       await api.startSession()
@@ -166,6 +171,7 @@ export function SessionsPage() {
           totalHours={totalHours}
           totalActivities={totalActivities}
           totalBillableValue={totalBillableValue}
+          totalNonBillableMinutes={totalNonBillableMinutes}
           matters={matters}
           onSessionUpdated={handleSessionUpdated}
         />

@@ -35,7 +35,8 @@ class TestClients:
         create_client("Alpha Corp")
         create_client("Beta Inc")
         clients = get_all_clients()
-        assert len(clients) == 2
+        # +1 for the seeded internal client
+        assert len(clients) == 3
 
     def test_update_client(self, test_db):
         client = create_client("Old Name", default_rate=200.0)
@@ -105,10 +106,10 @@ class TestMatters:
         matters = get_all_matters(client_id=c1["id"])
         assert len(matters) == 2
 
-        # Filter by status
+        # Filter by status — 3 user matters + 4 internal = 7, close one = 6 active
         update_matter(m2["id"], status="closed")
         active = get_all_matters(status="active")
-        assert len(active) == 2
+        assert len(active) == 6
 
     def test_update_matter_keywords(self, test_db):
         client = create_client("Client")
@@ -220,3 +221,70 @@ class TestRateResolution:
 
     def test_returns_none_for_nonexistent_matter(self, test_db):
         assert resolve_rate("nonexistent") is None
+
+    def test_returns_none_for_non_billable_matter(self, test_db):
+        """Non-billable matters should always resolve to None rate."""
+        from backend.database import INTERNAL_MATTERS
+        for m in INTERNAL_MATTERS:
+            assert resolve_rate(m["id"]) is None
+
+    def test_non_billable_matter_ignores_client_rate(self, test_db):
+        """Even if the parent client has a rate, non-billable matters return None."""
+        client = create_client("Test Corp", default_rate=500.0)
+        matter = create_matter(client["id"], "Internal Task", billing_type="non-billable")
+        assert resolve_rate(matter["id"]) is None
+
+
+# ---------------------------------------------------------------------------
+# Internal client
+# ---------------------------------------------------------------------------
+
+class TestInternalClient:
+    def test_internal_client_seeded_on_init(self, test_db):
+        clients = get_all_clients()
+        internal = [c for c in clients if c.get("is_internal")]
+        assert len(internal) == 1
+        assert internal[0]["name"] == "Firm / Internal"
+        assert internal[0]["default_rate"] is None
+
+    def test_internal_client_has_four_matters(self, test_db):
+        from backend.database import INTERNAL_CLIENT_ID
+        matters = get_all_matters(client_id=INTERNAL_CLIENT_ID)
+        assert len(matters) == 4
+        names = {m["name"] for m in matters}
+        assert names == {"Administrative", "CLE/Training", "Business Development", "Pro Bono"}
+
+    def test_internal_matters_are_non_billable(self, test_db):
+        from backend.database import INTERNAL_CLIENT_ID
+        matters = get_all_matters(client_id=INTERNAL_CLIENT_ID)
+        for m in matters:
+            assert m["billing_type"] == "non-billable"
+
+    def test_cannot_delete_internal_client(self, test_db):
+        from backend.database import INTERNAL_CLIENT_ID
+        success, err = delete_client(INTERNAL_CLIENT_ID)
+        assert success is False
+        assert "internal" in err.lower()
+
+    def test_cannot_delete_internal_matter(self, test_db):
+        from backend.database import INTERNAL_CLIENT_ID
+        matters = get_all_matters(client_id=INTERNAL_CLIENT_ID)
+        for m in matters:
+            success, err = delete_matter(m["id"])
+            assert success is False
+            assert "internal" in err.lower()
+
+    def test_init_db_is_idempotent(self, test_db):
+        from backend.database import init_db, INTERNAL_CLIENT_ID
+        init_db()  # second call
+        clients = get_all_clients()
+        internal = [c for c in clients if c.get("is_internal")]
+        assert len(internal) == 1
+        matters = get_all_matters(client_id=INTERNAL_CLIENT_ID)
+        assert len(matters) == 4
+
+    def test_activity_assigned_to_internal_matter_is_non_billable(self, test_db):
+        create_session("s1", "2026-03-26T10:00:00")
+        act = insert_activity("s1", "Calendar", matter_id="nb-admin", billable=False, effective_rate=None)
+        assert act["billable"] is False
+        assert act["effective_rate"] is None

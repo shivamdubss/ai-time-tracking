@@ -46,7 +46,10 @@ export function ActivityRow({ activity, isLast, matters, onActivityUpdated }: Ac
   async function handleNarrativeSave() {
     setIsEditingNarrative(false)
     if (narrativeValue === activity.narrative) return
-    if (!activity.id) return
+    if (!activity.id) {
+      // Legacy activity from JSON blob — no ID to update
+      return
+    }
     try {
       setSaveError(false)
       const updated = await api.updateActivity(activity.id, { narrative: narrativeValue })
@@ -86,26 +89,45 @@ export function ActivityRow({ activity, isLast, matters, onActivityUpdated }: Ac
           {activity.app}
         </div>
         <div className="text-xs text-text-muted mt-0.5 pl-7">{activity.context}</div>
-        {matters && matters.length > 0 && (
-          <div className="mt-1 pl-7">
-            <select
-              className="text-xs bg-transparent border border-border-subtle rounded px-1.5 py-0.5 text-text-muted cursor-pointer hover:border-border-default transition-colors"
-              value={activity.matter_id || ''}
-              onChange={(e) => handleMatterChange(e.target.value)}
-            >
-              <option value="">Unassigned</option>
-              {matters.filter(m => m.status === 'active').map(m => (
-                <option key={m.id} value={m.id}>{m.name}</option>
-              ))}
-            </select>
-          </div>
-        )}
+        {matters && matters.length > 0 && (() => {
+          const active = matters.filter(m => m.status === 'active')
+          const billableMatters = active.filter(m => m.billing_type !== 'non-billable')
+          const nonBillableMatters = active.filter(m => m.billing_type === 'non-billable')
+          return (
+            <div className="mt-1 pl-7">
+              <select
+                className="text-xs bg-transparent border border-border-subtle rounded px-1.5 py-0.5 text-text-muted cursor-pointer hover:border-border-default transition-colors"
+                value={activity.matter_id || ''}
+                onChange={(e) => handleMatterChange(e.target.value)}
+              >
+                <option value="">Unassigned</option>
+                {billableMatters.length > 0 && (
+                  <optgroup label="Client Matters">
+                    {billableMatters.map(m => (
+                      <option key={m.id} value={m.id}>{m.name}</option>
+                    ))}
+                  </optgroup>
+                )}
+                {nonBillableMatters.length > 0 && (
+                  <optgroup label="Non-Billable">
+                    {nonBillableMatters.map(m => (
+                      <option key={m.id} value={m.id}>{m.name}</option>
+                    ))}
+                  </optgroup>
+                )}
+              </select>
+            </div>
+          )
+        })()}
       </div>
 
       <div className="font-mono text-[13px] text-text-muted tabular-nums">
         <div>{hours}</div>
         {billableValue && (
           <div className="text-xs text-text-faint">{billableValue}</div>
+        )}
+        {activity.billable === false && (
+          <div className="text-[10px] text-text-faint italic font-sans">Non-billable</div>
         )}
       </div>
 

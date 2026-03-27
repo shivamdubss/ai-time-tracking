@@ -25,29 +25,11 @@ export default function App() {
           <Route path="/" element={<SessionsPage />} />
           <Route path="/clients" element={<ClientsMattersPage />} />
           <Route
-            path="/analytics"
-            element={
-              <PlaceholderPage
-                title="Analytics"
-                description="Aggregate stats across sessions, days, and weeks. Coming in a future update."
-              />
-            }
-          />
-          <Route
             path="/rules"
             element={
               <PlaceholderPage
                 title="Rules"
                 description="Customize how activities are categorized and tracked. Coming in a future update."
-              />
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <PlaceholderPage
-                title="Settings"
-                description="Configure API keys, screenshot intervals, and privacy preferences. Coming in a future update."
               />
             }
           />

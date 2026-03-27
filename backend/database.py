@@ -58,6 +58,7 @@ def init_db():
             billing_address TEXT,
             default_rate REAL,
             notes TEXT,
+            is_internal INTEGER DEFAULT 0,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             updated_at TEXT DEFAULT CURRENT_TIMESTAMP
         )
@@ -109,11 +110,64 @@ def init_db():
     except sqlite3.OperationalError:
         conn.execute("ALTER TABLE sessions ADD COLUMN matter_id TEXT")
 
+    # Add is_internal column to clients if missing (migration for existing DBs)
+    try:
+        conn.execute("SELECT is_internal FROM clients LIMIT 1")
+    except sqlite3.OperationalError:
+        conn.execute("ALTER TABLE clients ADD COLUMN is_internal INTEGER DEFAULT 0")
+
     conn.commit()
 
     # Migrate existing activities from JSON to activities table
     _migrate_activities(conn)
 
+    # Seed the built-in internal client and non-billable matters
+    _seed_internal_client()
+
+    conn.close()
+
+
+INTERNAL_CLIENT_ID = "internal"
+INTERNAL_MATTERS = [
+    {
+        "id": "nb-admin",
+        "name": "Administrative",
+        "keywords": ["calendar", "outlook calendar", "timekeeping", "billing", "expense", "invoice"],
+    },
+    {
+        "id": "nb-cle",
+        "name": "CLE/Training",
+        "keywords": ["cle", "training", "seminar", "webinar", "continuing legal education"],
+    },
+    {
+        "id": "nb-bizdev",
+        "name": "Business Development",
+        "keywords": ["business development", "marketing", "proposal", "pitch", "networking", "linkedin"],
+    },
+    {
+        "id": "nb-probono",
+        "name": "Pro Bono",
+        "keywords": ["pro bono", "legal aid", "volunteer"],
+    },
+]
+
+
+def _seed_internal_client():
+    """Create the built-in Firm / Internal client and non-billable matters if they don't exist."""
+    now = datetime.now().isoformat()
+    conn = get_db()
+    conn.execute(
+        """INSERT OR IGNORE INTO clients (id, name, is_internal, created_at, updated_at)
+           VALUES (?, ?, 1, ?, ?)""",
+        (INTERNAL_CLIENT_ID, "Firm / Internal", now, now),
+    )
+    for m in INTERNAL_MATTERS:
+        conn.execute(
+            """INSERT OR IGNORE INTO matters (id, client_id, name, billing_type, keywords, created_at, updated_at)
+               VALUES (?, ?, ?, 'non-billable', ?, ?, ?)""",
+            (m["id"], INTERNAL_CLIENT_ID, m["name"], json.dumps(m["keywords"]), now, now),
+        )
+    conn.commit()
     conn.close()
 
 
@@ -284,7 +338,7 @@ def get_client(client_id: str) -> Optional[dict]:
     if not row:
         conn.close()
         return None
-    client = dict(row)
+    client = _client_row_to_dict(row)
     # Nest matters
     matters = conn.execute(
         "SELECT * FROM matters WHERE client_id = ? ORDER BY name", (client_id,)
@@ -299,7 +353,7 @@ def get_all_clients() -> list[dict]:
     rows = conn.execute("SELECT * FROM clients ORDER BY name").fetchall()
     clients = []
     for r in rows:
-        c = dict(r)
+        c = _client_row_to_dict(r)
         matters = conn.execute(
             "SELECT * FROM matters WHERE client_id = ? ORDER BY name", (r["id"],)
         ).fetchall()
@@ -325,9 +379,22 @@ def update_client(client_id: str, **kwargs) -> Optional[dict]:
     return get_client(client_id)
 
 
+def _client_row_to_dict(row: sqlite3.Row) -> dict:
+    d = dict(row)
+    d["is_internal"] = bool(d.get("is_internal", 0))
+    return d
+
+
 def delete_client(client_id: str) -> tuple[bool, str]:
     """Delete a client. Returns (success, error_message)."""
     conn = get_db()
+
+    # Guard: cannot delete the built-in internal client
+    row = conn.execute("SELECT is_internal FROM clients WHERE id = ?", (client_id,)).fetchone()
+    if row and row["is_internal"]:
+        conn.close()
+        return False, "Cannot delete the built-in internal client."
+
     # App-level FK check: block if active matters exist
     active = conn.execute(
         "SELECT COUNT(*) as cnt FROM matters WHERE client_id = ? AND status = 'active'",
@@ -430,6 +497,14 @@ def update_matter(matter_id: str, **kwargs) -> Optional[dict]:
 def delete_matter(matter_id: str) -> tuple[bool, str]:
     """Delete (or soft-delete) a matter. Returns (success, error_message)."""
     conn = get_db()
+
+    # Guard: cannot delete built-in internal matters
+    matter_row = conn.execute("SELECT client_id FROM matters WHERE id = ?", (matter_id,)).fetchone()
+    if matter_row:
+        internal = conn.execute("SELECT is_internal FROM clients WHERE id = ?", (matter_row["client_id"],)).fetchone()
+        if internal and internal["is_internal"]:
+            conn.close()
+            return False, "Cannot delete built-in internal matters."
 
     # Check if any activities reference this matter
     has_activities = conn.execute(
@@ -540,12 +615,16 @@ def _activity_row_to_dict(row: sqlite3.Row) -> dict:
 # ---------------------------------------------------------------------------
 
 def resolve_rate(matter_id: str = None) -> Optional[float]:
-    """Resolve the effective hourly rate: matter rate > client rate > None."""
+    """Resolve the effective hourly rate: matter rate > client rate > None.
+    Non-billable matters always return None."""
     if not matter_id:
         return None
     conn = get_db()
-    matter = conn.execute("SELECT hourly_rate, client_id FROM matters WHERE id = ?", (matter_id,)).fetchone()
+    matter = conn.execute("SELECT hourly_rate, client_id, billing_type FROM matters WHERE id = ?", (matter_id,)).fetchone()
     if not matter:
+        conn.close()
+        return None
+    if matter["billing_type"] == "non-billable":
         conn.close()
         return None
     if matter["hourly_rate"] is not None:

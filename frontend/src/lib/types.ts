@@ -53,6 +53,7 @@ export interface Client {
   billing_address?: string | null
   default_rate?: number | null
   notes?: string | null
+  is_internal?: boolean
   matters?: Matter[]
   created_at?: string
   updated_at?: string

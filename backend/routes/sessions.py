@@ -124,7 +124,14 @@ async def _summarize_and_cleanup(
         # Insert activities into the normalized table with rate snapshots
         for i, act in enumerate(matched_activities):
             matter_id = act.get("matter_id")
-            effective_rate = resolve_rate(matter_id) if matter_id else None
+            billable = True
+            effective_rate = None
+            if matter_id:
+                matched_matter = next((m for m in active_matters if m["id"] == matter_id), None)
+                if matched_matter and matched_matter.get("billing_type") == "non-billable":
+                    billable = False
+                else:
+                    effective_rate = resolve_rate(matter_id)
 
             insert_activity(
                 session_id=session_id,
@@ -134,7 +141,7 @@ async def _summarize_and_cleanup(
                 narrative=act.get("narrative", ""),
                 category=act.get("category", ""),
                 matter_id=matter_id,
-                billable=True,
+                billable=billable,
                 effective_rate=effective_rate,
                 sort_order=i,
             )

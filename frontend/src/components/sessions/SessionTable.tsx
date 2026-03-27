@@ -7,11 +7,12 @@ interface SessionTableProps {
   totalHours: number
   totalActivities: number
   totalBillableValue?: number
+  totalNonBillableMinutes?: number
   matters?: Matter[]
   onSessionUpdated?: (session: Session) => void
 }
 
-export function SessionTable({ sessions, totalHours, totalActivities, totalBillableValue, matters, onSessionUpdated }: SessionTableProps) {
+export function SessionTable({ sessions, totalHours, totalActivities, totalBillableValue, totalNonBillableMinutes, matters, onSessionUpdated }: SessionTableProps) {
   if (sessions.length === 0) {
     return <EmptyState />
   }
@@ -42,6 +43,11 @@ export function SessionTable({ sessions, totalHours, totalActivities, totalBilla
           {totalActivities} {totalActivities === 1 ? 'activity' : 'activities'}
         </span>
         <span className="flex items-center gap-3">
+          {totalNonBillableMinutes != null && totalNonBillableMinutes > 0 && (
+            <span className="text-xs text-text-faint">
+              <span className="font-mono tabular-nums">{(totalNonBillableMinutes / 60).toFixed(1)}h</span> non-billable
+            </span>
+          )}
           {totalBillableValue != null && totalBillableValue > 0 && (
             <span className="font-mono font-semibold text-text-primary tabular-nums">
               ${totalBillableValue.toFixed(0)}

@@ -121,11 +121,23 @@ def _build_matters_context(matters: list[dict]) -> str:
     if not matters:
         return ""
 
-    lines = ["\nActive matters (use these to add specificity to narratives):"]
-    for m in matters:
-        keywords = m.get("keywords", [])
-        kw_str = f" (keywords: {', '.join(keywords)})" if keywords else ""
-        lines.append(f"- {m['name']}{kw_str}")
+    billable = [m for m in matters if m.get("billing_type") != "non-billable"]
+    non_billable = [m for m in matters if m.get("billing_type") == "non-billable"]
+
+    lines = []
+    if billable:
+        lines.append("\nActive client matters (use these to add specificity to narratives):")
+        for m in billable:
+            keywords = m.get("keywords", [])
+            kw_str = f" (keywords: {', '.join(keywords)})" if keywords else ""
+            lines.append(f"- {m['name']}{kw_str}")
+
+    if non_billable:
+        lines.append("\nNon-billable internal matters (for admin, training, business development, pro bono):")
+        for m in non_billable:
+            keywords = m.get("keywords", [])
+            kw_str = f" (keywords: {', '.join(keywords)})" if keywords else ""
+            lines.append(f"- {m['name']}{kw_str}")
 
     return "\n".join(lines)
 

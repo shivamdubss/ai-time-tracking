@@ -4,6 +4,7 @@ from typing import Optional
 
 from ..database import (
     get_activities_for_session, update_activity, get_activity, get_session,
+    resolve_rate, get_matter,
 )
 
 router = APIRouter(tags=["activities"])
@@ -42,6 +43,22 @@ async def update_activity_endpoint(activity_id: str, req: UpdateActivityRequest)
 
     if not updates:
         return existing
+
+    # When matter changes, recalculate the effective rate and billable status
+    if "matter_id" in updates:
+        new_matter_id = updates["matter_id"]
+        if new_matter_id:
+            matter = get_matter(new_matter_id)
+            if matter and matter.get("billing_type") == "non-billable":
+                updates["billable"] = False
+                updates["effective_rate"] = None
+            else:
+                updates["billable"] = True
+                updates["effective_rate"] = resolve_rate(new_matter_id)
+        else:
+            # Unassigned: revert to default billable, no rate
+            updates["billable"] = True
+            updates["effective_rate"] = None
 
     result = update_activity(activity_id, **updates)
     if not result:

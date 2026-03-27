@@ -20,12 +20,15 @@ export function formatDateLabel(date: Date): string {
 }
 
 export function formatTimeRange(start: string, end: string): string {
-  const fmt = (d: string) =>
-    new Date(d).toLocaleTimeString('en-US', {
+  const fmt = (d: string) => {
+    const date = new Date(d)
+    if (isNaN(date.getTime())) return '\u2014'
+    return date.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
     })
+  }
   return `${fmt(start)} \u2013 ${fmt(end)}`
 }
 

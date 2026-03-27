@@ -41,10 +41,14 @@ export default function App() {
 
       {/* Sidebar — hidden off-screen on mobile, static on md+ */}
       <div className={cn(
-        'fixed inset-y-0 left-0 z-40 transition-transform duration-200 ease-out md:relative md:translate-x-0',
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+        'hidden md:block md:shrink-0',
+        sidebarOpen && '!block',
       )}>
-        <Sidebar theme={theme} onToggleTheme={toggleTheme} />
+        <div className={cn(
+          'fixed inset-y-0 left-0 z-40 md:relative',
+        )}>
+          <Sidebar theme={theme} onToggleTheme={toggleTheme} />
+        </div>
       </div>
 
       <main className="flex-1 overflow-y-auto">

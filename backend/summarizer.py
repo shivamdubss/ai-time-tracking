@@ -182,6 +182,74 @@ def _build_matters_context(matters: list[dict]) -> str:
     return "\n".join(lines)
 
 
+SUPABASE_FUNCTION_URL = os.getenv("SUPABASE_FUNCTION_URL", "")  # e.g. https://xyz.supabase.co/functions/v1/summarize
+
+
+async def _summarize_via_edge_function(
+    timeline: str,
+    screenshots_b64: list[str],
+    start_time: str,
+    end_time: str,
+    elapsed_seconds: int,
+    matters_context: str,
+    access_token: str,
+) -> dict:
+    """Call the Supabase Edge Function to summarize (proxies to Anthropic)."""
+    import httpx
+
+    # Batch screenshots into chunks of ~12 to stay under 6MB body limit
+    BATCH_SIZE = 12
+    all_activities = []
+    all_categories = []
+    summary_parts = []
+
+    for i in range(0, max(1, len(screenshots_b64)), BATCH_SIZE):
+        batch = screenshots_b64[i:i + BATCH_SIZE]
+        payload = {
+            "window_entries": timeline,
+            "screenshots_base64": batch,
+            "start_time": start_time,
+            "end_time": end_time,
+            "elapsed_seconds": elapsed_seconds,
+            "matters_context": matters_context,
+        }
+
+        async with httpx.AsyncClient(timeout=120) as client:
+            resp = await client.post(
+                SUPABASE_FUNCTION_URL,
+                json=payload,
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Content-Type": "application/json",
+                },
+            )
+            resp.raise_for_status()
+            result = resp.json()
+
+        all_activities.extend(result.get("activities", []))
+        all_categories.extend(result.get("categories", []))
+        if result.get("summary"):
+            summary_parts.append(result["summary"])
+
+    # Merge categories by name
+    merged_categories: dict[str, int] = {}
+    for cat in all_categories:
+        name = cat.get("name", "")
+        merged_categories[name] = merged_categories.get(name, 0) + cat.get("minutes", 0)
+
+    total_minutes = sum(merged_categories.values()) or 1
+    categories = [
+        {"name": name, "minutes": mins, "percentage": round(mins / total_minutes * 100)}
+        for name, mins in merged_categories.items()
+    ]
+
+    return {
+        "summary": " ".join(summary_parts) if summary_parts else "Session summarized.",
+        "categories": categories,
+        "activities": all_activities,
+    }
+
+
 async def summarize_session(
     window_entries: list[dict],
     screenshots: list[str],
@@ -189,18 +257,32 @@ async def summarize_session(
     end_time: str,
     elapsed_seconds: int = 0,
     matters: list[dict] = None,
+    access_token: str = "",
 ) -> dict:
     """Call Claude to generate a session summary.
 
-    Args:
-        matters: Optional list of active matters to include in prompt context.
+    Uses the Supabase Edge Function if configured, otherwise calls Anthropic directly.
     """
-    client = anthropic.Anthropic()
-
     timeline = build_timeline(window_entries)
     selected = select_screenshots(screenshots)
+    matters_context = _build_matters_context(matters or [])
 
-    # Build the message content
+    # If Supabase Edge Function is configured, use it
+    if SUPABASE_FUNCTION_URL and access_token:
+        screenshots_b64 = []
+        for path in selected:
+            img = encode_screenshot(path)
+            if img:
+                screenshots_b64.append(img["source"]["data"])
+
+        return await _summarize_via_edge_function(
+            timeline, screenshots_b64, start_time, end_time,
+            elapsed_seconds, matters_context, access_token,
+        )
+
+    # Otherwise, call Anthropic directly (local dev / no Supabase)
+    client = anthropic.Anthropic()
+
     content: list[dict] = []
 
     active_time_line = ""
@@ -208,14 +290,11 @@ async def summarize_session(
         active_minutes = elapsed_seconds // 60
         active_time_line = f"\nActive work time: {active_minutes} minutes (excludes idle/sleep pauses)\n"
 
-    matters_context = _build_matters_context(matters or [])
-
     content.append({
         "type": "text",
         "text": f"Session: {start_time} to {end_time}{active_time_line}\nWindow Activity Timeline:\n{timeline}{matters_context}",
     })
 
-    # Add screenshots
     for path in selected:
         img = encode_screenshot(path)
         if img:
@@ -234,10 +313,8 @@ async def summarize_session(
         messages=[{"role": "user", "content": content}],
     )
 
-    # Parse JSON response
     response_text = message.content[0].text.strip()
 
-    # Handle potential markdown code blocks
     if response_text.startswith("```"):
         lines = response_text.split("\n")
         response_text = "\n".join(lines[1:-1])

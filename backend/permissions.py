@@ -67,7 +67,15 @@ def check_screen_recording() -> bool:
 
 
 def check_all_permissions() -> dict:
-    """Return status of all required macOS permissions."""
+    """Return status of all required permissions for the current platform."""
+    if sys.platform == "win32":
+        # Windows doesn't require explicit permissions for window tracking or screenshots
+        return {
+            "accessibility": True,
+            "screen_recording": True,
+            "platform_supported": True,
+        }
+
     if sys.platform != "darwin":
         return {
             "accessibility": False,

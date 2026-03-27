@@ -9,18 +9,24 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from pathlib import Path
 
-from .database import init_db, prune_old_sessions
+from .database import init_db, get_db, prune_old_sessions
 from .tracker.session_manager import SessionManager
 from .ws import ws_connections
 from .auth import AuthMiddleware, get_auth_token
 from .permissions import check_all_permissions
 from .routes import sessions, status, clients, matters, activities, analytics
+from .sync import SyncEngine
 
 logger = logging.getLogger("timetrack")
 
 
+sync_engine: SyncEngine | None = None
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global sync_engine
+
     # Startup
     init_db()
     prune_old_sessions()
@@ -29,7 +35,26 @@ async def lifespan(app: FastAPI):
     if not os.environ.get("ANTHROPIC_API_KEY"):
         logger.warning("ANTHROPIC_API_KEY not set — session summarization will fail")
 
+    # Start sync engine if Supabase is configured
+    supabase_url = os.environ.get("SUPABASE_URL", "")
+    supabase_key = os.environ.get("SUPABASE_SERVICE_KEY", "")
+    if supabase_url and supabase_key:
+        try:
+            from supabase import create_client
+            sb = create_client(supabase_url, supabase_key)
+            sync_engine = SyncEngine(sb, get_db)
+            # user_id will be set when the frontend sends it after auth
+            logger.info("SyncEngine initialized (waiting for user auth)")
+        except ImportError:
+            logger.warning("supabase-py not installed — sync disabled")
+        except Exception as e:
+            logger.warning(f"SyncEngine init failed: {e}")
+
     yield
+
+    # Shutdown
+    if sync_engine:
+        sync_engine.stop()
 
 
 app = FastAPI(title="Donna", lifespan=lifespan)
@@ -64,8 +89,20 @@ async def init_endpoint():
 
 @app.get("/api/permissions")
 async def permissions_endpoint():
-    """Check macOS permission status."""
+    """Check platform permission status."""
     return check_all_permissions()
+
+
+@app.post("/api/auth/sync")
+async def auth_sync_endpoint(body: dict = {}):
+    """Notify backend of authenticated user to start sync engine."""
+    global sync_engine
+    user_id = body.get("user_id")
+    if sync_engine and user_id:
+        sync_engine.set_user(user_id)
+        sync_engine.start()
+        return {"syncing": True}
+    return {"syncing": False}
 
 
 @app.websocket("/ws")

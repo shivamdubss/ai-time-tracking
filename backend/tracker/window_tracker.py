@@ -1,30 +1,17 @@
 import logging
 import os
-import time
 import json
 import threading
 from datetime import datetime
 from pathlib import Path
 from typing import Callable, Optional
 
+from .platforms import get_window_provider
+
 logger = logging.getLogger("timetrack")
 
 WINDOW_INTERVAL = float(os.getenv("TIMETRACK_WINDOW_INTERVAL", "3"))
 IDLE_THRESHOLD = float(os.getenv("TIMETRACK_IDLE_THRESHOLD", "300"))
-
-try:
-    from AppKit import NSWorkspace
-    from Quartz import (
-        CGWindowListCopyWindowInfo,
-        kCGWindowListOptionOnScreenOnly,
-        kCGNullWindowID,
-        kCGWindowOwnerName,
-        kCGWindowName,
-        kCGWindowLayer,
-    )
-    HAS_MACOS = True
-except ImportError:
-    HAS_MACOS = False
 
 
 class WindowTracker:
@@ -44,40 +31,10 @@ class WindowTracker:
         self._on_active = on_active
         self._idle_threshold = IDLE_THRESHOLD
         self._is_idle: bool = False
+        self._provider = get_window_provider()
 
     def get_active_window(self) -> dict:
-        if not HAS_MACOS:
-            return {
-                "timestamp": datetime.now().isoformat(),
-                "app": "Unknown",
-                "title": "macOS APIs not available",
-            }
-
-        try:
-            active_app = NSWorkspace.sharedWorkspace().activeApplication()
-            app_name = active_app.get("NSApplicationName", "Unknown")
-
-            # Get window title from CGWindowList
-            title = ""
-            window_list = CGWindowListCopyWindowInfo(
-                kCGWindowListOptionOnScreenOnly, kCGNullWindowID
-            )
-            for window in window_list:
-                if window.get(kCGWindowOwnerName) == app_name and window.get(kCGWindowLayer) == 0:
-                    title = window.get(kCGWindowName, "") or ""
-                    break
-
-            return {
-                "timestamp": datetime.now().isoformat(),
-                "app": app_name,
-                "title": title,
-            }
-        except Exception as e:
-            return {
-                "timestamp": datetime.now().isoformat(),
-                "app": "Error",
-                "title": str(e),
-            }
+        return self._provider.get_active_window()
 
     def set_paused(self, paused: bool):
         self._paused = paused

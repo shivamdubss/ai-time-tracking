@@ -1,0 +1,123 @@
+name: Build Desktop Apps
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags (e.g., v1.0.0)
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Build frontend
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npx vite build
+
+      # Install Python dependencies
+      - name: Install Python dependencies
+        run: |
+          pip install -r backend/requirements-darwin.txt
+          pip install pyinstaller pywebview pystray
+
+      # Build app
+      - name: Run PyInstaller
+        run: pyinstaller donna-mac.spec --noconfirm
+
+      # Create DMG
+      - name: Create DMG
+        run: |
+          npm install -g create-dmg || true
+          create-dmg 'dist/Donna.app' dist/ || true
+          # Rename to consistent name
+          mv dist/*.dmg dist/Donna.dmg 2>/dev/null || true
+          # Fallback: zip if create-dmg fails
+          if [ ! -f dist/Donna.dmg ]; then
+            cd dist && zip -r Donna-macOS.zip Donna.app
+          fi
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: donna-macos
+          path: |
+            dist/Donna.dmg
+            dist/Donna-macOS.zip
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Build frontend
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npx vite build
+
+      # Install Python dependencies
+      - name: Install Python dependencies
+        run: |
+          pip install -r backend/requirements-win32.txt
+          pip install pyinstaller pywebview pystray
+
+      # Build exe
+      - name: Run PyInstaller
+        run: pyinstaller donna-win.spec --noconfirm
+
+      # Create installer
+      - name: Install Inno Setup
+        run: choco install innosetup -y
+
+      - name: Build installer
+        run: iscc donna.iss
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: donna-windows
+          path: Output/DonnaSetup.exe
+
+  release:
+    needs: [build-macos, build-windows]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            donna-macos/*
+            donna-windows/*
+          generate_release_notes: true

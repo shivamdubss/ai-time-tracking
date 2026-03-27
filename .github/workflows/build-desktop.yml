@@ -105,7 +105,7 @@ jobs:
           path: Output/DonnaSetup.exe
 
   release:
-    needs: [build-macos, build-windows]
+    needs: [build-windows]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     permissions:
@@ -118,6 +118,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            donna-macos/*
             donna-windows/*
           generate_release_notes: true

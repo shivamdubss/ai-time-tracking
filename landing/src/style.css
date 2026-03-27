@@ -209,15 +209,39 @@ details summary::marker {
 .mockup-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text-primary); }
 .mockup-btn-primary { background: var(--color-accent); color: var(--color-text-inverse); border-color: var(--color-accent); }
 
+/* Focused mockup (no sidebar — used for feature sections) */
+.mockup-focused .mockup-main { padding: 20px 24px; }
+
+/* Narrative-emphasis variant (Feature 2: widen narrative column) */
+.mockup-narrative-emphasis .mockup-table-header,
+.mockup-narrative-emphasis .mockup-row { grid-template-columns: 0.8fr 50px 1.5fr; }
+.mockup-narrative-emphasis .mockup-row-narrative { padding-left: 10px; border-left: 2px solid var(--color-cat-research); }
+
+/* Analytics chart mockup (Feature 4) */
+.mockup-chart-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; overflow: hidden; }
+.mockup-chart-title { font-size: 10px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 10px; }
+.mockup-bar-chart { display: flex; align-items: flex-end; gap: 6px; flex: 1; position: relative; padding-bottom: 18px; }
+.mockup-bar { flex: 1; border-radius: 2px 2px 0 0; min-height: 4px; }
+.mockup-bar-label { position: absolute; bottom: 0; font-size: 8px; color: var(--color-text-muted); text-align: center; width: 100%; }
+.mockup-bar-group { flex: 1; display: flex; flex-direction: column; align-items: stretch; position: relative; }
+.mockup-bar-target { position: absolute; left: -4px; right: -4px; border-top: 1.5px dashed var(--color-text-faint); pointer-events: none; }
+.mockup-legend-row { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--color-text-secondary); padding: 4px 0; }
+.mockup-legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.mockup-legend-value { margin-left: auto; font-family: var(--font-mono); font-size: 10px; font-variant-numeric: tabular-nums; color: var(--color-text-primary); font-weight: 500; }
+.mockup-stacked-bar { display: flex; height: 12px; border-radius: 9999px; overflow: hidden; gap: 1px; }
+
 /* Responsive: hide mockup details on small screens */
 @media (max-width: 767px) {
   .mockup { height: 360px; font-size: 10px; }
+  .mockup-focused { height: 320px; }
   .mockup-sidebar { width: 0; min-width: 0; padding: 0; overflow: hidden; border: none; }
   .mockup-main { padding: 10px 12px; gap: 8px; }
   .mockup-stat-value { font-size: 13px; }
   .mockup-row { grid-template-columns: 1fr 40px; }
   .mockup-row-narrative, .mockup-table-header span:last-child { display: none; }
   .mockup-activity { grid-template-columns: 1fr 40px; }
+  .mockup-narrative-emphasis .mockup-row { grid-template-columns: 1fr 40px; }
+  .mockup-chart-card { padding: 8px 10px; }
 }
 
 /* Feature label pills */

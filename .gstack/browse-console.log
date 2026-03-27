@@ -131,3 +131,5 @@
 [2026-03-27T22:54:12.903Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
 [2026-03-27T22:54:14.174Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
 [2026-03-27T22:54:16.460Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T23:32:30.971Z] [debug] [vite] connecting...
+[2026-03-27T23:32:31.056Z] [debug] [vite] connected.

@@ -164,13 +164,6 @@ export function SessionsPage() {
     })))
   }
 
-  async function handleApproveAll() {
-    try {
-      await api.approveAllActivities(dateStr)
-      fetchSessions()
-    } catch {}
-  }
-
   function handleExport() {
     api.exportTimesheet(dateStr)
   }
@@ -216,14 +209,6 @@ export function SessionsPage() {
           </button>
         </div>
 
-        <div className="flex gap-2">
-          <button
-            onClick={handleApproveAll}
-            className="px-4 py-2 text-sm font-medium bg-surface border border-border rounded-[var(--radius-sm)] text-text-primary hover:bg-surface-hover transition-colors cursor-pointer"
-          >
-            Approve All Pending
-          </button>
-        </div>
       </div>
 
       {/* Content */}

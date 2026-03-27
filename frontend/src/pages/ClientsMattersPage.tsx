@@ -149,7 +149,7 @@ export function ClientsMattersPage() {
                     )}
                     {!client.is_internal && (
                       <button
-                        className="p-1.5 rounded hover:bg-bg-inset transition-colors text-text-faint hover:text-red-500"
+                        className="p-1.5 rounded hover:bg-bg-inset transition-colors text-text-faint hover:text-error"
                         onClick={() => handleDeleteClient(client.id)}
                       >
                         <Trash2 size={13} />
@@ -191,7 +191,7 @@ export function ClientsMattersPage() {
                               <Pencil size={13} />
                             </button>
                             <button
-                              className="p-1.5 rounded hover:bg-bg-inset transition-colors text-text-faint hover:text-red-500"
+                              className="p-1.5 rounded hover:bg-bg-inset transition-colors text-text-faint hover:text-error"
                               onClick={() => handleDeleteMatter(matter.id)}
                             >
                               <Trash2 size={13} />

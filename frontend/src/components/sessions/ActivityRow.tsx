@@ -104,14 +104,14 @@ export function ActivityRow({ activity, isLast, matters, onActivityUpdated, onAc
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Delete button - top right on hover */}
-      {isHovered && activity.id && onActivityDeleted && (
+      {/* Delete button - top right, visible on hover */}
+      {activity.id && onActivityDeleted && (
         <button
           onClick={handleDelete}
-          className="absolute top-2 right-2 p-1 rounded text-text-faint hover:text-red-500 hover:bg-red-50 transition-colors"
+          className={`absolute top-2 right-2 p-1.5 rounded-[var(--radius-sm)] text-text-muted hover:text-error hover:bg-error-bg transition-all ${isHovered ? 'opacity-100' : 'opacity-0'}`}
           title="Delete activity"
         >
-          <Trash2 size={13} />
+          <Trash2 size={14} />
         </button>
       )}
 
@@ -229,11 +229,11 @@ export function ActivityRow({ activity, isLast, matters, onActivityUpdated, onAc
             <span className="flex-1">
               {activity.narrative || <span className="italic text-text-faint">Click to add narrative</span>}
             </span>
-            <Pencil size={11} className="mt-1 shrink-0 text-text-faint opacity-0 group-hover:opacity-100 transition-opacity" />
+            <Pencil size={13} className="mt-0.5 shrink-0 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
         )}
         {saveError && (
-          <div className="text-xs text-red-500 mt-0.5">Failed to save. Please try again.</div>
+          <div className="text-xs text-error mt-0.5">Failed to save. Please try again.</div>
         )}
       </div>
     </div>

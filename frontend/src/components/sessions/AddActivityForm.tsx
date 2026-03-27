@@ -127,7 +127,7 @@ export function AddActivityForm({ sessionId, matters, onActivityAdded, onCancel 
           </select>
         </div>
 
-        {error && <div className="text-xs text-red-500">{error}</div>}
+        {error && <div className="text-xs text-error">{error}</div>}
 
         <div className="flex gap-2 pt-1">
           <button

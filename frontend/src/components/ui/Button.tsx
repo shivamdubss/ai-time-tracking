@@ -15,7 +15,7 @@ const variantStyles: Record<Variant, string> = {
   ghost:
     'text-text-secondary hover:bg-surface-hover',
   danger:
-    'bg-error text-white hover:opacity-90',
+    'bg-error text-text-inverse hover:opacity-90',
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(

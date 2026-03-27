@@ -72,8 +72,8 @@ export function MatterActivityRow({ activity, isLast, onActivityUpdated }: Matte
             onClick={handleApprove}
             className={`text-[11px] font-semibold px-2.5 py-1 rounded-[var(--radius-sm)] border transition-colors cursor-pointer ${
               isPending
-                ? 'border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100'
-                : 'border-green-300 text-green-700 bg-green-50 hover:bg-green-100'
+                ? 'border-warning/30 text-warning bg-warning-bg hover:opacity-80'
+                : 'border-success/30 text-success bg-success-bg hover:opacity-80'
             }`}
           >
             {isPending ? 'PENDING REVIEW' : 'APPROVED'}
@@ -106,11 +106,11 @@ export function MatterActivityRow({ activity, isLast, onActivityUpdated }: Matte
             <span className="flex-1">
               {activity.narrative || <span className="italic text-text-faint">Click to add narrative</span>}
             </span>
-            <Pencil size={12} className="mt-1 shrink-0 text-text-faint opacity-0 group-hover:opacity-100 transition-opacity" />
+            <Pencil size={13} className="mt-0.5 shrink-0 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
         )}
         {saveError && (
-          <div className="text-xs text-red-500 mt-0.5">Failed to save. Please try again.</div>
+          <div className="text-xs text-error mt-0.5">Failed to save. Please try again.</div>
         )}
       </div>
     </div>

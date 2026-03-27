@@ -13,8 +13,7 @@ Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
 PrivilegesRequired=lowest
-; Uncomment when you have an icon:
-; SetupIconFile=assets\donna.ico
+SetupIconFile=assets\donna.ico
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

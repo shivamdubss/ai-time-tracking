@@ -34,6 +34,12 @@ Use the `/browse` skill from gstack for all web browsing. Never use `mcp__claude
 - `/unfreeze` — Remove freeze boundary
 - `/gstack-upgrade` — Upgrade gstack to latest version
 
+## Landing Page Deployment
+The marketing site lives in `landing/`. Vercel project is linked there.
+- **Deploy:** `cd landing && npx vercel --prod`
+- **Build:** `cd landing && npm run build`
+- The repo root is NOT the landing page — deploying from root will fail (tries to build the React app).
+
 ## Design System
 Always read DESIGN.md before making any visual or UI decisions.
 All font choices, colors, spacing, and aesthetic direction are defined there.

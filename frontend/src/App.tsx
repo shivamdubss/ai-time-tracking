@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
+import { Menu, X } from 'lucide-react'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { SessionsPage } from '@/pages/SessionsPage'
 import { ClientsMattersPage } from '@/pages/ClientsMattersPage'
@@ -10,6 +11,7 @@ import { initAuth } from '@/lib/api'
 export default function App() {
   const { theme, toggleTheme } = useTheme()
   const [ready, setReady] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     initAuth().then(() => setReady(true))
@@ -19,7 +21,32 @@ export default function App() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-page">
-      <Sidebar theme={theme} onToggleTheme={toggleTheme} />
+      {/* Mobile menu button */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="fixed top-4 left-4 z-50 w-10 h-10 rounded-[var(--radius-sm)] bg-surface border border-border flex items-center justify-center text-text-primary md:hidden cursor-pointer"
+        aria-label="Toggle menu"
+      >
+        {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
+      {/* Sidebar overlay on mobile */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 z-30 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`
+        fixed inset-y-0 left-0 z-40 transform transition-transform duration-200 ease-out
+        md:relative md:translate-x-0
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <Sidebar theme={theme} onToggleTheme={toggleTheme} />
+      </div>
+
       <main className="flex-1 overflow-y-auto">
         <Routes>
           <Route path="/" element={<SessionsPage />} />

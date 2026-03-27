@@ -176,7 +176,7 @@ export function SessionsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6 flex-1 min-h-0">
+    <div className="flex flex-col gap-4 md:gap-6 p-4 md:p-6 flex-1 min-h-0 pt-16 md:pt-6">
       <h1 className="sr-only">Sessions</h1>
       <Header
         selectedDate={selectedDate}
@@ -190,7 +190,7 @@ export function SessionsPage() {
       />
 
       {/* View toggle + action buttons */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex gap-0.5 bg-bg-inset border border-border rounded-[var(--radius-sm)] p-0.5">
           <button
             className={cn(

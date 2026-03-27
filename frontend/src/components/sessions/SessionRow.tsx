@@ -52,9 +52,12 @@ export function SessionRow({ session, matters, onSessionUpdated }: SessionRowPro
   return (
     <div className="border-b border-border-subtle last:border-b-0">
       <div
+        role="button"
+        tabIndex={0}
         onClick={() => setExpanded(!expanded)}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpanded(!expanded) } }}
         className={cn(
-          'grid grid-cols-[1fr_80px_1.2fr] gap-4 px-5 py-4 cursor-pointer transition-colors duration-100',
+          'grid grid-cols-[1fr_80px_1.2fr] gap-4 px-5 py-4 cursor-pointer transition-colors duration-100 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent',
           expanded ? 'bg-surface-hover' : 'hover:bg-surface-hover',
         )}
       >

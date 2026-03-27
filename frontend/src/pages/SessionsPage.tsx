@@ -1,17 +1,23 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { Header } from '@/components/layout/Header'
 import { SessionTable } from '@/components/sessions/SessionTable'
 import { ProcessingState } from '@/components/sessions/ProcessingState'
 import { useSelectedDate } from '@/hooks/useSelectedDate'
 import { useTimer } from '@/hooks/useTimer'
-import { api } from '@/lib/api'
-import type { Session, TrackingStatus } from '@/lib/types'
+import { api, TimeTrackWebSocket } from '@/lib/api'
+import type { Session, TrackingStatus, Matter } from '@/lib/types'
 
 export function SessionsPage() {
   const { selectedDate, goBack, goForward, isToday } = useSelectedDate()
   const timer = useTimer()
   const [status, setStatus] = useState<TrackingStatus>('idle')
   const [sessions, setSessions] = useState<Session[]>([])
+  const [matters, setMatters] = useState<Matter[]>([])
+
+  // Fetch matters once on mount
+  useEffect(() => {
+    api.getMatters({ status: 'active' }).then(setMatters).catch(() => {})
+  }, [])
 
   // Fetch sessions for selected date
   const fetchSessions = useCallback(async () => {
@@ -27,10 +33,10 @@ export function SessionsPage() {
         summary: s.summary || '',
         categories: s.categories || [],
         activities: s.activities || [],
+        matter_id: s.matter_id,
       }))
       setSessions(mapped)
     } catch {
-      // API not available — show empty state
       setSessions([])
     }
   }, [selectedDate])
@@ -44,10 +50,43 @@ export function SessionsPage() {
     api.getStatus().then((s) => {
       if (s.status === 'tracking') {
         setStatus('tracking')
-        // Timer will start from elapsed seconds
         timer.start(s.elapsed_seconds)
+      } else if (s.status === 'paused') {
+        setStatus('paused')
+        timer.start(s.elapsed_seconds)
+        timer.pause()
       }
     }).catch(() => {})
+  }, [])
+
+  // Listen for pause/resume via WebSocket
+  useEffect(() => {
+    const ws = new TimeTrackWebSocket()
+    ws.connect()
+
+    const unsubState = ws.on('tracking_state', (data: { status: string }) => {
+      if (data.status === 'paused') {
+        setStatus('paused')
+        timer.pause()
+      } else if (data.status === 'tracking') {
+        setStatus('tracking')
+        api.getStatus().then((s) => {
+          timer.start(s.elapsed_seconds)
+        }).catch(() => {})
+      }
+    })
+
+    const unsubComplete = ws.on('session_completed', () => {
+      setStatus('idle')
+      timer.reset()
+      fetchSessions()
+    })
+
+    return () => {
+      unsubState()
+      unsubComplete()
+      ws.disconnect()
+    }
   }, [])
 
   const totalHours = sessions.reduce((acc, s) => {
@@ -58,6 +97,16 @@ export function SessionsPage() {
   }, 0)
 
   const totalActivities = sessions.reduce((acc, s) => acc + (s.activities?.length || 0), 0)
+
+  // Compute total billable value across all sessions
+  const totalBillableValue = sessions.reduce((sessionSum, s) => {
+    return sessionSum + (s.activities || []).reduce((actSum, act) => {
+      if (act.effective_rate != null && act.minutes > 0) {
+        return actSum + (act.minutes / 60) * act.effective_rate
+      }
+      return actSum
+    }, 0)
+  }, 0)
 
   const handleStart = useCallback(async () => {
     try {
@@ -74,7 +123,6 @@ export function SessionsPage() {
       timer.stop()
       setStatus('processing')
       await api.stopSession()
-      // Poll for completion
       const poll = setInterval(async () => {
         try {
           const s = await api.getStatus()
@@ -92,6 +140,10 @@ export function SessionsPage() {
       timer.reset()
     }
   }, [timer, fetchSessions])
+
+  function handleSessionUpdated(updatedSession: Session) {
+    setSessions(prev => prev.map(s => s.id === updatedSession.id ? updatedSession : s))
+  }
 
   return (
     <div className="flex flex-col gap-6 p-6 flex-1 min-h-0">
@@ -113,6 +165,9 @@ export function SessionsPage() {
           sessions={sessions}
           totalHours={totalHours}
           totalActivities={totalActivities}
+          totalBillableValue={totalBillableValue}
+          matters={matters}
+          onSessionUpdated={handleSessionUpdated}
         />
       )}
     </div>

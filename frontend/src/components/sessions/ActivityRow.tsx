@@ -1,41 +1,73 @@
-import type { Activity, CategoryName } from '@/lib/types'
-import { CATEGORY_BAR_COLORS } from '@/lib/types'
+import { useState, useRef } from 'react'
+import type { Activity, Matter } from '@/lib/types'
+import { getCategoryBarColor } from '@/lib/types'
 import { formatDuration } from '@/lib/format'
+import { api } from '@/lib/api'
 
 interface ActivityRowProps {
   activity: Activity
   isLast: boolean
-}
-
-function getAppCategory(app: string): CategoryName {
-  const lower = app.toLowerCase()
-  if (lower.includes('code') || lower.includes('terminal') || lower.includes('iterm'))
-    return 'Coding'
-  if (lower.includes('slack') || lower.includes('teams') || lower.includes('discord'))
-    return 'Communication'
-  if (lower.includes('zoom') || lower.includes('meet') || lower.includes('facetime'))
-    return 'Meetings'
-  if (lower.includes('notion') || lower.includes('docs'))
-    return 'Research'
-  return 'Browsing'
+  matters?: Matter[]
+  onActivityUpdated?: (activity: Activity) => void
 }
 
 function getAppAbbrev(app: string): string {
-  if (app.toLowerCase().includes('code')) return 'VS'
-  if (app.toLowerCase().includes('slack')) return 'Sl'
-  if (app.toLowerCase().includes('chrome')) return 'Ch'
-  if (app.toLowerCase().includes('zoom')) return 'Zm'
-  if (app.toLowerCase().includes('notion')) return 'No'
-  if (app.toLowerCase().includes('safari')) return 'Sa'
-  if (app.toLowerCase().includes('figma')) return 'Fi'
-  if (app.toLowerCase().includes('terminal')) return 'Te'
+  const lower = app.toLowerCase()
+  if (lower.includes('code')) return 'VS'
+  if (lower.includes('slack')) return 'Sl'
+  if (lower.includes('chrome')) return 'Ch'
+  if (lower.includes('zoom')) return 'Zm'
+  if (lower.includes('word')) return 'Wo'
+  if (lower.includes('acrobat') || lower.includes('pdf')) return 'Pd'
+  if (lower.includes('outlook') || lower.includes('mail')) return 'Ma'
+  if (lower.includes('safari')) return 'Sa'
+  if (lower.includes('excel')) return 'Ex'
+  if (lower.includes('teams')) return 'Tm'
   return app.slice(0, 2)
 }
 
-export function ActivityRow({ activity, isLast }: ActivityRowProps) {
-  const category = getAppCategory(activity.app)
-  const color = CATEGORY_BAR_COLORS[category]
+export function ActivityRow({ activity, isLast, matters, onActivityUpdated }: ActivityRowProps) {
+  const category = activity.category || 'Administrative'
+  const color = getCategoryBarColor(category)
   const hours = formatDuration(activity.minutes)
+  const [isEditingNarrative, setIsEditingNarrative] = useState(false)
+  const [narrativeValue, setNarrativeValue] = useState(activity.narrative)
+  const [saveError, setSaveError] = useState(false)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  const matterName = activity.matter_id
+    ? matters?.find(m => m.id === activity.matter_id)?.name || 'Unknown'
+    : null
+
+  const billableValue = activity.effective_rate != null && activity.minutes > 0
+    ? `$${((activity.minutes / 60) * activity.effective_rate).toFixed(0)}`
+    : null
+
+  async function handleNarrativeSave() {
+    setIsEditingNarrative(false)
+    if (narrativeValue === activity.narrative) return
+    if (!activity.id) return
+    try {
+      setSaveError(false)
+      const updated = await api.updateActivity(activity.id, { narrative: narrativeValue })
+      onActivityUpdated?.(updated)
+    } catch {
+      setSaveError(true)
+      setNarrativeValue(activity.narrative) // Revert on error
+      setTimeout(() => setSaveError(false), 3000)
+    }
+  }
+
+  async function handleMatterChange(matterId: string) {
+    if (!activity.id) return
+    const newMatterId = matterId === '' ? null : matterId
+    try {
+      const updated = await api.updateActivity(activity.id, { matter_id: newMatterId })
+      onActivityUpdated?.(updated)
+    } catch {
+      // Silently fail — matter dropdown reverts on next render
+    }
+  }
 
   return (
     <div
@@ -54,9 +86,57 @@ export function ActivityRow({ activity, isLast }: ActivityRowProps) {
           {activity.app}
         </div>
         <div className="text-xs text-text-muted mt-0.5 pl-7">{activity.context}</div>
+        {matters && matters.length > 0 && (
+          <div className="mt-1 pl-7">
+            <select
+              className="text-xs bg-transparent border border-border-subtle rounded px-1.5 py-0.5 text-text-muted cursor-pointer hover:border-border-default transition-colors"
+              value={activity.matter_id || ''}
+              onChange={(e) => handleMatterChange(e.target.value)}
+            >
+              <option value="">Unassigned</option>
+              {matters.filter(m => m.status === 'active').map(m => (
+                <option key={m.id} value={m.id}>{m.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
-      <div className="font-mono text-[13px] text-text-muted tabular-nums">{hours}</div>
-      <div className="text-[13px] leading-relaxed text-text-secondary">{activity.narrative}</div>
+
+      <div className="font-mono text-[13px] text-text-muted tabular-nums">
+        <div>{hours}</div>
+        {billableValue && (
+          <div className="text-xs text-text-faint">{billableValue}</div>
+        )}
+      </div>
+
+      <div className="text-[13px] leading-relaxed text-text-secondary">
+        {matterName && (
+          <div className="text-xs text-text-muted mb-1 font-medium">{matterName}</div>
+        )}
+        {isEditingNarrative ? (
+          <textarea
+            ref={inputRef}
+            className="w-full bg-bg-surface border border-border-default rounded px-2 py-1 text-[13px] text-text-secondary resize-none focus:outline-none focus:ring-1 focus:ring-text-faint"
+            value={narrativeValue}
+            onChange={(e) => setNarrativeValue(e.target.value)}
+            onBlur={handleNarrativeSave}
+            onKeyDown={(e) => { if (e.key === 'Escape') { setNarrativeValue(activity.narrative); setIsEditingNarrative(false) } }}
+            rows={2}
+            autoFocus
+          />
+        ) : (
+          <div
+            className="cursor-pointer hover:bg-bg-surface-hover rounded px-1 -mx-1 transition-colors"
+            onClick={() => setIsEditingNarrative(true)}
+            title="Click to edit"
+          >
+            {activity.narrative || <span className="italic text-text-faint">Click to add narrative</span>}
+          </div>
+        )}
+        {saveError && (
+          <div className="text-xs text-red-500 mt-0.5">Failed to save. Please try again.</div>
+        )}
+      </div>
     </div>
   )
 }

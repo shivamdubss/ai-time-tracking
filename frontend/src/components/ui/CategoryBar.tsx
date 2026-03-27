@@ -1,5 +1,5 @@
-import type { Category, CategoryName } from '@/lib/types'
-import { CATEGORY_BAR_COLORS } from '@/lib/types'
+import type { Category } from '@/lib/types'
+import { getCategoryBarColor } from '@/lib/types'
 
 interface CategoryBarProps {
   categories: Category[]
@@ -14,7 +14,7 @@ export function CategoryBar({ categories }: CategoryBarProps) {
           className="h-full rounded-full transition-all duration-250 ease-out"
           style={{
             width: `${cat.percentage}%`,
-            backgroundColor: CATEGORY_BAR_COLORS[cat.name as CategoryName],
+            backgroundColor: getCategoryBarColor(cat.name),
           }}
         />
       ))}

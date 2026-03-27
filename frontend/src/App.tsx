@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { SessionsPage } from '@/pages/SessionsPage'
+import { ClientsMattersPage } from '@/pages/ClientsMattersPage'
 import { PlaceholderPage } from '@/pages/PlaceholderPage'
 import { useTheme } from '@/hooks/useTheme'
 import { initAuth } from '@/lib/api'
@@ -22,6 +23,7 @@ export default function App() {
       <main className="flex-1 overflow-y-auto">
         <Routes>
           <Route path="/" element={<SessionsPage />} />
+          <Route path="/clients" element={<ClientsMattersPage />} />
           <Route
             path="/analytics"
             element={

@@ -11,7 +11,7 @@ async def get_status():
 
     if manager.is_tracking:
         return {
-            "status": "tracking",
+            "status": "paused" if manager.is_paused else "tracking",
             "elapsed_seconds": manager.elapsed_seconds,
             "session_id": manager.current_session_id,
         }

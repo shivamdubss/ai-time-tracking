@@ -1,87 +1,54 @@
-[2026-03-26T14:41:42.022Z] [debug] [vite] connecting...
-[2026-03-26T14:41:42.033Z] [debug] [vite] connected.
-[2026-03-26T14:41:42.057Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-26T14:42:51.050Z] [debug] [vite] connecting...
-[2026-03-26T14:42:51.097Z] [debug] [vite] connected.
-[2026-03-26T14:42:51.117Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-26T14:43:06.678Z] [debug] [vite] connecting...
-[2026-03-26T14:43:06.722Z] [debug] [vite] connected.
-[2026-03-26T14:43:06.728Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-26T14:45:53.193Z] [error] WebSocket connection to 'ws://localhost:5173/?token=wQxO5DspqM8G' failed: 
-[2026-03-26T14:45:53.201Z] [log] [vite] server connection lost. Polling for restart...
-[2026-03-26T14:45:53.628Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:45:54.636Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:45:55.640Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:45:56.648Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:45:57.650Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:45:58.654Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:45:59.679Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:00.697Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:01.718Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:02.788Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:03.941Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:05.256Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:06.825Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:08.127Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:10.974Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:13.058Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:16.940Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:19.993Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:23.596Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:26.509Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:30.419Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:32.939Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:37.206Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:41.166Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:46.227Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:51.766Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:55.394Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:46:59.750Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:47:05.228Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:47:09.208Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:47:13.343Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:47:18.567Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:47:22.050Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:47:25.896Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:47:30.235Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:47:32.490Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:47:35.633Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:47:38.592Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:47:44.556Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:47:47.611Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:47:51.711Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:47:53.962Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:47:59.686Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:48:05.149Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:48:08.111Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:48:13.600Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:48:16.291Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:48:21.980Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:48:25.768Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:48:28.698Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:48:31.384Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:48:36.642Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:48:39.032Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:48:42.524Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:48:46.928Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:48:49.910Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:48:55.488Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:48:57.945Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:49:02.570Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:49:07.166Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:49:11.270Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:49:14.972Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:49:20.709Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:49:23.521Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:49:25.967Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:49:28.831Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:49:31.440Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:49:34.938Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-26T14:49:41.235Z] [debug] [vite] connecting...
-[2026-03-26T14:49:41.567Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-26T14:49:45.719Z] [debug] [vite] connected.
-[2026-03-26T14:59:59.309Z] [debug] [vite] connecting...
-[2026-03-26T14:59:59.317Z] [debug] [vite] connected.
-[2026-03-26T14:59:59.378Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-26T15:00:34.371Z] [debug] [vite] hot updated: /src/App.tsx
-[2026-03-26T15:00:34.371Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-26T23:00:49.604Z] [log] CC: 1.loading the data layer
+[2026-03-26T23:00:49.604Z] [log] No active experiments found {}
+[2026-03-26T23:00:49.636Z] [log] CC: 2. gtm container snippet
+[2026-03-26T23:00:49.963Z] [log] firing page event
+[2026-03-26T23:00:50.247Z] [log] Old consent is not available or invalid
+[2026-03-26T23:00:50.373Z] [debug] Munchkin.init("%s") options: 048-ACR-930 {asyncOnly: true, disableClickDelay: true}
+[2026-03-26T23:00:50.537Z] [warning] [Meta Pixel] - Duplicate Pixel ID: 739511622798898.
+[2026-03-26T23:00:54.172Z] [error] Failed to load resource: the server responded with a status of 429 ()
+[2026-03-26T23:01:12.639Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:01:15.697Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:01:24.686Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:01:27.728Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:01:33.666Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:01:39.259Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:01:42.754Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:01:55.987Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:02:00.675Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:02:09.691Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:02:18.761Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:02:27.710Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:02:36.833Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:02:45.810Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:02:57.041Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:03:03.751Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:03:30.815Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:03:53.817Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:03:58.087Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:04:09.538Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:04:24.935Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:04:51.820Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:04:59.038Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:05:18.838Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:05:45.890Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:05:54.001Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:06:09.349Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:06:12.847Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:06:39.773Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:07:06.868Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:07:33.874Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:08:54.934Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:09:24.398Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:10:15.873Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:11:36.923Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:12:58.010Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:15:52.404Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:16:12.486Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:17:13.119Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:18:34.105Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:19:55.251Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:21:16.161Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:22:37.226Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:24:42.425Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:26:40.240Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-03-26T23:30:43.388Z] [warning] The resource https://www.clio.com/wp-content/themes/clio/assets/vendor/slick-carousel/fonts/slick.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.

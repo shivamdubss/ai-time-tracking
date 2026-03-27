@@ -14,7 +14,7 @@ from .tracker.session_manager import SessionManager
 from .ws import ws_connections
 from .auth import AuthMiddleware, get_auth_token
 from .permissions import check_all_permissions
-from .routes import sessions, status
+from .routes import sessions, status, clients, matters, activities
 
 logger = logging.getLogger("timetrack")
 
@@ -49,6 +49,9 @@ app.add_middleware(
 # API routes
 app.include_router(sessions.router)
 app.include_router(status.router)
+app.include_router(clients.router)
+app.include_router(matters.router)
+app.include_router(activities.router)
 
 
 @app.get("/api/init")

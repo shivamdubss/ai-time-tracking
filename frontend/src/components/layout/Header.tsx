@@ -57,6 +57,16 @@ export function Header({
           </div>
         )}
 
+        {status === 'paused' && (
+          <div className="flex items-center gap-2 px-2.5 py-1.5 bg-warning-bg border border-warning/20 rounded-[var(--radius-sm)]">
+            <span className="w-[7px] h-[7px] rounded-full bg-warning" />
+            <span className="font-mono text-[13px] font-medium text-warning tabular-nums">
+              {formatTime(elapsed)}
+            </span>
+            <span className="text-[11px] font-medium text-warning/70 ml-0.5">PAUSED</span>
+          </div>
+        )}
+
         {status === 'processing' && (
           <div className="flex items-center gap-2 px-2.5 py-1.5 bg-info-bg border border-info/20 rounded-[var(--radius-sm)]">
             <div className="w-3.5 h-3.5 border-2 border-info/30 border-t-info rounded-full animate-spin" />
@@ -64,7 +74,7 @@ export function Header({
           </div>
         )}
 
-        {status === 'tracking' ? (
+        {(status === 'tracking' || status === 'paused') ? (
           <Button variant="danger" onClick={onStopTracking}>
             Stop Tracking
           </Button>

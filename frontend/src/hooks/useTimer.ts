@@ -28,10 +28,14 @@ export function useTimer() {
     setIsRunning(false)
   }, [])
 
+  const pause = useCallback(() => {
+    setIsRunning(false)
+  }, [])
+
   const reset = useCallback(() => {
     setElapsed(0)
     setIsRunning(false)
   }, [])
 
-  return { elapsed, isRunning, start, stop, reset }
+  return { elapsed, isRunning, start, stop, pause, reset }
 }

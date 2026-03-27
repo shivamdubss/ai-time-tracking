@@ -33,6 +33,7 @@ class ScreenshotCapture:
         self.interval = interval
         self.screenshots: list[Path] = []
         self._stop_event = threading.Event()
+        self._paused: bool = False
         (self.temp_dir / "screenshots").mkdir(parents=True, exist_ok=True)
 
     def capture(self) -> Path | None:
@@ -90,11 +91,15 @@ class ScreenshotCapture:
         except Exception:
             return None
 
+    def set_paused(self, paused: bool):
+        self._paused = paused
+
     def run(self):
         while not self._stop_event.is_set():
-            path = self.capture()
-            if path:
-                self.screenshots.append(path)
+            if not self._paused:
+                path = self.capture()
+                if path:
+                    self.screenshots.append(path)
             self._stop_event.wait(self.interval)
 
     def stop(self):

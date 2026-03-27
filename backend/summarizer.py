@@ -1,6 +1,7 @@
 import base64
 import json
 import os
+from datetime import datetime
 from pathlib import Path
 
 import anthropic
@@ -8,37 +9,44 @@ import anthropic
 MODEL = os.getenv("TIMETRACK_MODEL", "claude-sonnet-4-20250514")
 
 
-SYSTEM_PROMPT = """You are an AI assistant that analyzes work sessions. Given a chronological log of window activity and optional screenshots, produce a structured JSON summary.
+SYSTEM_PROMPT = """You are an AI assistant that analyzes work sessions for a legal time tracking application. Given a chronological log of window activity and optional screenshots, produce a structured JSON summary.
 
 Return ONLY valid JSON with this exact schema:
 {
   "summary": "High-level 1-2 sentence overview of the session.",
   "categories": [
-    { "name": "Coding", "minutes": 45, "percentage": 38 },
-    { "name": "Communication", "minutes": 30, "percentage": 25 }
+    { "name": "Legal Research", "minutes": 45, "percentage": 38 },
+    { "name": "Document Drafting", "minutes": 30, "percentage": 25 }
   ],
   "activities": [
     {
-      "app": "VS Code",
-      "context": "project-name / src",
+      "app": "Microsoft Word",
+      "context": "Smith v Jones - Motion to Compel.docx",
       "minutes": 40,
-      "narrative": "Specific description of what was done in this app."
+      "narrative": "Drafted and revised motion to compel discovery responses in Smith v. Jones"
     }
   ]
 }
 
 Rules:
-- Categories must be one of: Coding, Communication, Research, Meetings, Browsing
+- Categories must be one of: Legal Research, Document Drafting, Client Communication, Court & Hearings, Case Review, Administrative
+- Legal Research: Westlaw, LexisNexis, Fastcase, Google Scholar, court websites, legal databases
+- Document Drafting: Word, Google Docs, Adobe Acrobat, Pages, any document editing
+- Client Communication: Email apps, messaging apps, video calls (non-court)
+- Court & Hearings: Zoom/Teams court appearances, e-filing systems, court portals
+- Case Review: Document management systems, PDF viewers, file browsers reviewing case materials
+- Administrative: Calendar, billing, firm management, non-case browsing, general admin
 - Percentages must sum to 100
 - Minutes should be approximate based on the time spent in each app
-- Narratives should be specific and descriptive, not vague
-- Context should include the most relevant detail from window titles (repo name, channel, URL domain)
-- Group related activities by app (e.g., multiple VS Code windows = one activity)
-- summary should be 1-2 sentences, specific about what was accomplished"""
+- Narratives should follow legal billing format: action verb + what + why/for whom
+- Narratives should be specific and descriptive, not vague (avoid "worked on case")
+- Context should include the most relevant detail from window titles (document name, case reference, client name)
+- Group related activities by app (e.g., multiple Word windows = one activity)
+- Summary should be 1-2 sentences, specific about what was accomplished"""
 
 
-def build_timeline(window_entries: list[dict]) -> str:
-    """Convert raw window entries into a readable timeline."""
+def build_timeline(window_entries: list[dict], idle_threshold_seconds: float = 300) -> str:
+    """Convert raw window entries into a readable timeline, annotating idle gaps."""
     if not window_entries:
         return "No window activity recorded."
 
@@ -46,6 +54,7 @@ def build_timeline(window_entries: list[dict]) -> str:
     prev_app = None
     prev_title = None
     start_ts = None
+    start_dt = None
 
     for entry in window_entries:
         app = entry.get("app", "Unknown")
@@ -53,11 +62,23 @@ def build_timeline(window_entries: list[dict]) -> str:
         ts = entry.get("timestamp", "")
 
         if app != prev_app or title != prev_title:
-            if prev_app and start_ts:
+            if prev_app and start_ts and start_dt:
                 lines.append(f"[{start_ts}] {prev_app}: {prev_title}")
+                try:
+                    current_dt = datetime.fromisoformat(ts)
+                    run_duration = (current_dt - start_dt).total_seconds()
+                    if run_duration >= idle_threshold_seconds:
+                        idle_minutes = int(run_duration / 60)
+                        lines.append(f"  [IDLE GAP: ~{idle_minutes}m — same window unchanged]")
+                except (ValueError, TypeError):
+                    pass
             prev_app = app
             prev_title = title
             start_ts = ts
+            try:
+                start_dt = datetime.fromisoformat(ts)
+            except (ValueError, TypeError):
+                start_dt = None
 
     # Add last entry
     if prev_app and start_ts:
@@ -95,13 +116,33 @@ def encode_screenshot(path: str) -> dict | None:
         return None
 
 
+def _build_matters_context(matters: list[dict]) -> str:
+    """Build a context string describing active matters for the summarizer prompt."""
+    if not matters:
+        return ""
+
+    lines = ["\nActive matters (use these to add specificity to narratives):"]
+    for m in matters:
+        keywords = m.get("keywords", [])
+        kw_str = f" (keywords: {', '.join(keywords)})" if keywords else ""
+        lines.append(f"- {m['name']}{kw_str}")
+
+    return "\n".join(lines)
+
+
 async def summarize_session(
     window_entries: list[dict],
     screenshots: list[str],
     start_time: str,
     end_time: str,
+    elapsed_seconds: int = 0,
+    matters: list[dict] = None,
 ) -> dict:
-    """Call Claude to generate a session summary."""
+    """Call Claude to generate a session summary.
+
+    Args:
+        matters: Optional list of active matters to include in prompt context.
+    """
     client = anthropic.Anthropic()
 
     timeline = build_timeline(window_entries)
@@ -110,9 +151,16 @@ async def summarize_session(
     # Build the message content
     content: list[dict] = []
 
+    active_time_line = ""
+    if elapsed_seconds > 0:
+        active_minutes = elapsed_seconds // 60
+        active_time_line = f"\nActive work time: {active_minutes} minutes (excludes idle/sleep pauses)\n"
+
+    matters_context = _build_matters_context(matters or [])
+
     content.append({
         "type": "text",
-        "text": f"Session: {start_time} to {end_time}\n\nWindow Activity Timeline:\n{timeline}",
+        "text": f"Session: {start_time} to {end_time}{active_time_line}\nWindow Activity Timeline:\n{timeline}{matters_context}",
     })
 
     # Add screenshots

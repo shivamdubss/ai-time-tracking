@@ -1,4 +1,4 @@
-import type { Session, TrackingStatus } from './types'
+import type { Session, TrackingStatus, Client, Matter, Activity } from './types'
 
 const API_BASE = '/api'
 
@@ -37,6 +37,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  // Sessions
   getStatus: () =>
     request<{ status: TrackingStatus; elapsed_seconds: number; session_id: string | null }>('/status'),
 
@@ -57,6 +58,55 @@ export const api = {
 
   getPermissions: () =>
     request<{ accessibility: boolean; screen_recording: boolean; platform_supported: boolean }>('/permissions'),
+
+  // Clients
+  getClients: () =>
+    request<Client[]>('/clients'),
+
+  createClient: (data: { name: string; contact_info?: string; billing_address?: string; default_rate?: number; notes?: string }) =>
+    request<Client>('/clients', { method: 'POST', body: JSON.stringify(data) }),
+
+  getClient: (id: string) =>
+    request<Client>(`/clients/${id}`),
+
+  updateClient: (id: string, data: Partial<Client>) =>
+    request<Client>(`/clients/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+
+  deleteClient: (id: string) =>
+    request<{ deleted: boolean }>(`/clients/${id}`, { method: 'DELETE' }),
+
+  // Matters
+  getMatters: (params?: { status?: string; client_id?: string }) => {
+    const searchParams = new URLSearchParams()
+    if (params?.status) searchParams.set('status', params.status)
+    if (params?.client_id) searchParams.set('client_id', params.client_id)
+    const qs = searchParams.toString()
+    return request<Matter[]>(`/matters${qs ? `?${qs}` : ''}`)
+  },
+
+  createMatter: (data: {
+    client_id: string; name: string; matter_number?: string; practice_area?: string;
+    billing_type?: string; hourly_rate?: number; keywords?: string[];
+    key_people?: Array<{ name: string; role: string }>; team_members?: Array<{ name: string; role: string }>;
+    notes?: string;
+  }) =>
+    request<Matter>('/matters', { method: 'POST', body: JSON.stringify(data) }),
+
+  getMatter: (id: string) =>
+    request<Matter>(`/matters/${id}`),
+
+  updateMatter: (id: string, data: Partial<Matter>) =>
+    request<Matter>(`/matters/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+
+  deleteMatter: (id: string) =>
+    request<{ deleted: boolean }>(`/matters/${id}`, { method: 'DELETE' }),
+
+  // Activities
+  getActivities: (sessionId: string) =>
+    request<Activity[]>(`/sessions/${sessionId}/activities`),
+
+  updateActivity: (id: string, data: { matter_id?: string | null; narrative?: string; billable?: boolean }) =>
+    request<Activity>(`/activities/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
 }
 
 

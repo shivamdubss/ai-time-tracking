@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
-import type { Session, CategoryName } from '@/lib/types'
+import type { Session, Matter, Activity } from '@/lib/types'
 import { formatTimeRange, cn } from '@/lib/utils'
 import { formatSessionHours } from '@/lib/format'
 import { CategoryBar } from '@/components/ui/CategoryBar'
@@ -9,13 +9,31 @@ import { ActivityRow } from './ActivityRow'
 
 interface SessionRowProps {
   session: Session
+  matters?: Matter[]
+  onSessionUpdated?: (session: Session) => void
 }
 
-export function SessionRow({ session }: SessionRowProps) {
+export function SessionRow({ session, matters, onSessionUpdated }: SessionRowProps) {
   const [expanded, setExpanded] = useState(false)
   const hours = formatSessionHours(session.startTime, session.endTime)
 
   const topCategories = session.categories.slice(0, 3)
+
+  // Compute total billable value from activities
+  const totalBillableValue = session.activities.reduce((sum, act) => {
+    if (act.effective_rate != null && act.minutes > 0) {
+      return sum + (act.minutes / 60) * act.effective_rate
+    }
+    return sum
+  }, 0)
+
+  function handleActivityUpdated(updatedActivity: Activity) {
+    if (!onSessionUpdated) return
+    const updatedActivities = session.activities.map(a =>
+      a.id === updatedActivity.id ? updatedActivity : a
+    )
+    onSessionUpdated({ ...session, activities: updatedActivities })
+  }
 
   return (
     <div className="border-b border-border-subtle last:border-b-0">
@@ -47,14 +65,19 @@ export function SessionRow({ session }: SessionRowProps) {
             {topCategories.map((cat) => (
               <CategoryPill
                 key={cat.name}
-                name={cat.name as CategoryName}
+                name={cat.name}
                 percentage={cat.percentage}
               />
             ))}
           </div>
         </div>
         <div className="font-mono text-[15px] font-medium text-text-primary tabular-nums pt-0.5">
-          {hours}
+          <div>{hours}</div>
+          {totalBillableValue > 0 && (
+            <div className="text-xs text-text-muted font-normal">
+              ${totalBillableValue.toFixed(0)}
+            </div>
+          )}
         </div>
         <div className="text-sm leading-relaxed text-text-secondary">{session.summary}</div>
       </div>
@@ -63,9 +86,11 @@ export function SessionRow({ session }: SessionRowProps) {
         <div className="px-5 pb-3 animate-in fade-in duration-200">
           {session.activities.map((activity, i) => (
             <ActivityRow
-              key={i}
+              key={activity.id || i}
               activity={activity}
               isLast={i === session.activities.length - 1}
+              matters={matters}
+              onActivityUpdated={handleActivityUpdated}
             />
           ))}
         </div>

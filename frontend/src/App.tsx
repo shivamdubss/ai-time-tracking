@@ -6,7 +6,9 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { TimelinePage } from '@/pages/TimelinePage'
 import { TimesheetPage } from '@/pages/TimesheetPage'
 import { ClientsMattersPage } from '@/pages/ClientsMattersPage'
+import { SettingsPage } from '@/pages/SettingsPage'
 import { initAuth } from '@/lib/api'
+import { SettingsProvider } from '@/hooks/useSettings'
 import { TrackingProvider } from '@/hooks/useTrackingContext'
 import { Agentation } from 'agentation'
 
@@ -52,13 +54,16 @@ export default function App() {
       </div>
 
       <main className="flex-1 overflow-y-auto">
-        <TrackingProvider>
-          <Routes>
-            <Route path="/" element={<TimelinePage />} />
-            <Route path="/timesheet" element={<TimesheetPage />} />
-            <Route path="/clients" element={<ClientsMattersPage />} />
-          </Routes>
-        </TrackingProvider>
+        <SettingsProvider>
+          <TrackingProvider>
+            <Routes>
+              <Route path="/" element={<TimelinePage />} />
+              <Route path="/timesheet" element={<TimesheetPage />} />
+              <Route path="/clients" element={<ClientsMattersPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+            </Routes>
+          </TrackingProvider>
+        </SettingsProvider>
       </main>
       {import.meta.env.DEV && <Agentation />}
     </div>

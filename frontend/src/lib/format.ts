@@ -42,3 +42,15 @@ export function roundToDecimalHours(minutes: number): number {
   const hours = minutes / 60
   return Math.max(Math.round(hours * 10) / 10, 0.1)
 }
+
+/**
+ * Join activity narratives into a single draft string.
+ * Filters empties, deduplicates exact matches, joins with "; ".
+ */
+export function joinNarratives(narratives: string[]): string {
+  const cleaned = narratives
+    .map(n => n.trim())
+    .filter(n => n.length > 0)
+  const unique = [...new Set(cleaned)]
+  return unique.join('; ')
+}

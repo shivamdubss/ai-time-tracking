@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+import { Toggle } from '@/components/ui/Toggle'
 import { formatDateLabel, formatTime } from '@/lib/utils'
 import type { TrackingStatus } from '@/lib/types'
 
@@ -12,6 +12,7 @@ interface HeaderProps {
   elapsed: number
   onStartTracking: () => void
   onStopTracking: () => void
+  workHoursBlocked?: boolean
 }
 
 export function Header({
@@ -23,6 +24,7 @@ export function Header({
   elapsed,
   onStartTracking,
   onStopTracking,
+  workHoursBlocked,
 }: HeaderProps) {
   return (
     <header className="flex items-center justify-between">
@@ -76,19 +78,16 @@ export function Header({
           </div>
         )}
 
-        {(status === 'tracking' || status === 'paused') ? (
-          <Button variant="danger" onClick={onStopTracking}>
-            Stop Tracking
-          </Button>
-        ) : status === 'processing' ? (
-          <Button variant="secondary" disabled>
-            Generating Summary...
-          </Button>
-        ) : (
-          <Button variant="primary" onClick={onStartTracking}>
-            Start Tracking
-          </Button>
+        {workHoursBlocked && (
+          <span className="text-xs text-warning font-medium">Outside work hours</span>
         )}
+
+        <Toggle
+          checked={status === 'tracking' || status === 'paused'}
+          onChange={(checked) => checked ? onStartTracking() : onStopTracking()}
+          label="Auto Capture"
+          disabled={status === 'processing'}
+        />
       </div>
     </header>
   )

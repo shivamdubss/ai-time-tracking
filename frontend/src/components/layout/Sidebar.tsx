@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { Clock, FileSpreadsheet, Briefcase } from 'lucide-react'
+import { Clock, FileSpreadsheet, Briefcase, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -35,6 +35,23 @@ export function Sidebar() {
           </NavLink>
         ))}
       </nav>
+
+      <div className="mb-2">
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            cn(
+              'flex items-center gap-2.5 px-3 py-2.5 rounded-[var(--radius-sm)] text-sm font-medium transition-all duration-100',
+              isActive
+                ? 'bg-surface text-text-primary font-semibold shadow-sm'
+                : 'text-text-muted hover:bg-surface-hover hover:text-text-primary',
+            )
+          }
+        >
+          <Settings size={18} className="opacity-50" strokeWidth={2} />
+          Settings
+        </NavLink>
+      </div>
 
       <div className="border-t border-border pt-4">
         <div className="flex items-center gap-2.5 px-3">

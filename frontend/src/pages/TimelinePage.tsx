@@ -9,7 +9,7 @@ import { api } from '@/lib/api'
 import type { Session } from '@/lib/types'
 
 export function TimelinePage() {
-  const { selectedDate, isToday, goBack, goForward, status, elapsed, handleStart, handleStop } = useTracking()
+  const { selectedDate, isToday, goBack, goForward, status, elapsed, handleStart, handleStop, workHoursBlocked } = useTracking()
   const {
     sessions, setSessions, matters, clients,
     totalHours, totalActivities, totalBillableValue, totalBillableMinutes, totalNonBillableMinutes,
@@ -50,6 +50,7 @@ export function TimelinePage() {
         elapsed={elapsed}
         onStartTracking={handleStart}
         onStopTracking={handleStop}
+        workHoursBlocked={workHoursBlocked}
       />
 
       <SummaryStats

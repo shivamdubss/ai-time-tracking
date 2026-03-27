@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { useTimer } from './useTimer'
+import { useSettings } from './useSettings'
 import { api, TimeTrackWebSocket } from '@/lib/api'
 import { isSameDay } from '@/lib/utils'
 import { roundToDecimalHours } from '@/lib/format'
@@ -27,6 +28,8 @@ interface TrackingContextValue {
   totalNonBillableMinutes: number
   handleSessionUpdated: (session: Session) => void
   handleActivityUpdated: (activity: Activity) => void
+  handleActivityDeleted: (activityId: string) => void
+  workHoursBlocked: boolean
 }
 
 const TrackingContext = createContext<TrackingContextValue | null>(null)
@@ -38,9 +41,11 @@ export function useTracking() {
 }
 
 export function TrackingProvider({ children }: { children: React.ReactNode }) {
+  const { isWithinWorkHours } = useSettings()
   const [selectedDate, setSelectedDate] = useState(new Date())
   const timer = useTimer()
   const [status, setStatus] = useState<TrackingStatus>('idle')
+  const [workHoursBlocked, setWorkHoursBlocked] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const timerRef = useRef(timer)
   timerRef.current = timer
@@ -125,6 +130,13 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
     })))
   }
 
+  function handleActivityDeleted(activityId: string) {
+    setSessions(prev => prev.map(s => ({
+      ...s,
+      activities: s.activities.filter(a => a.id !== activityId),
+    })))
+  }
+
   const goBack = useCallback(() => {
     setSelectedDate((prev) => {
       const d = new Date(prev)
@@ -186,6 +198,11 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const handleStart = useCallback(async () => {
+    if (!isWithinWorkHours()) {
+      setWorkHoursBlocked(true)
+      setTimeout(() => setWorkHoursBlocked(false), 3000)
+      return
+    }
     try {
       await api.startSession()
       setStatus('tracking')
@@ -193,7 +210,7 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
     } catch (e: any) {
       console.error('Failed to start session:', e.message)
     }
-  }, [])
+  }, [isWithinWorkHours])
 
   const handleStop = useCallback(async () => {
     try {
@@ -238,6 +255,8 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
         ...stats,
         handleSessionUpdated,
         handleActivityUpdated,
+        handleActivityDeleted,
+        workHoursBlocked,
       }}
     >
       {children}

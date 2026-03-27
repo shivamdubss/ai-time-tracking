@@ -1,8 +1,11 @@
 import { useSettings } from '@/hooks/useSettings'
+import { useAuth } from '@/hooks/useAuth'
+import { isSupabaseConfigured } from '@/lib/supabase'
 import { Toggle } from '@/components/ui/Toggle'
 
 export function SettingsPage() {
   const { settings, updateSettings, isWithinWorkHours } = useSettings()
+  const { user, signOut } = useAuth()
   const { workHours } = settings
 
   return (
@@ -60,6 +63,24 @@ export function SettingsPage() {
           </div>
         )}
       </div>
+
+      {/* Account */}
+      {isSupabaseConfigured() && user && (
+        <div className="bg-surface border border-border rounded-[var(--radius-md)] overflow-hidden max-w-lg">
+          <div className="px-5 py-4">
+            <h2 className="font-display font-semibold text-sm text-text-primary">Account</h2>
+            <p className="text-xs text-text-muted mt-0.5">{user.email}</p>
+          </div>
+          <div className="px-5 py-4 border-t border-border-subtle">
+            <button
+              onClick={signOut}
+              className="px-4 py-2 text-sm font-medium rounded-[var(--radius-sm)] border border-border text-text-primary hover:bg-surface-hover transition-colors cursor-pointer"
+            >
+              Sign out
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

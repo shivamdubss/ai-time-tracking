@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Donna — AI Time Tracking for Attorneys</title>
+  <meta name="description" content="Donna silently tracks your billable work, generates ABA-compliant narratives with AI, and keeps every byte of client data on your device. Built for attorneys who bill in 0.1-hour increments." />
+
+  <meta property="og:title" content="Donna — Stop Losing Billable Hours" />
+  <meta property="og:description" content="AI-powered automatic time tracking built for attorney-client privilege." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Donna — AI Time Tracking for Attorneys" />
+  <meta name="twitter:description" content="Automatic time tracking that generates billing-ready narratives. Privacy-first, on-device AI." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body class="bg-page text-text-primary">
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav id="navbar" class="navbar fixed top-0 left-0 right-0 z-50 border-b border-transparent">
+    <div class="max-w-[1200px] mx-auto px-6 flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-2">
+        <img src="/images/donna-logo.png" alt="Donna" class="h-8" />
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#features" class="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">Features</a>
+        <a href="#how-it-works" class="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">How It Works</a>
+        <a href="#privacy" class="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">Privacy</a>
+      </div>
+
+      <!-- Desktop CTA -->
+      <a href="#cta" class="hidden md:inline-flex items-center px-4 py-2 bg-accent text-text-inverse text-sm font-semibold rounded-[6px] hover:bg-accent-hover transition-colors">
+        Book a Demo
+      </a>
+
+      <!-- Mobile Hamburger -->
+      <button id="mobile-menu-btn" class="md:hidden p-2 -mr-2" aria-label="Open menu">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-border bg-surface">
+      <div class="px-6 py-4 flex flex-col gap-4">
+        <a href="#features" class="text-sm font-medium text-text-secondary hover:text-text-primary">Features</a>
+        <a href="#how-it-works" class="text-sm font-medium text-text-secondary hover:text-text-primary">How It Works</a>
+        <a href="#privacy" class="text-sm font-medium text-text-secondary hover:text-text-primary">Privacy</a>
+        <a href="#cta" class="inline-flex items-center justify-center px-4 py-2 bg-accent text-text-inverse text-sm font-semibold rounded-[6px]">Book a Demo</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- ===================== HERO ===================== -->
+    <section class="pt-32 pb-16 md:pt-40 md:pb-24 px-6">
+      <div class="max-w-[1200px] mx-auto text-center">
+        <h1 class="font-display font-black text-4xl md:text-5xl lg:text-6xl tracking-[-0.04em] leading-[1.1] text-text-primary max-w-[800px] mx-auto">
+          Stop losing billable hours to end-of-day guesswork
+        </h1>
+        <p class="mt-6 text-lg text-text-secondary max-w-[640px] mx-auto leading-relaxed">
+          Donna silently tracks your work, generates billing-ready narratives with AI, and keeps every byte of client data on your device. Built for attorneys who bill in 0.1-hour increments.
+        </p>
+
+        <!-- CTAs -->
+        <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <a href="#cta" class="px-6 py-3 bg-accent text-text-inverse text-base font-semibold rounded-[10px] hover:bg-accent-hover transition-colors">
+            Book a Demo
+          </a>
+          <a href="#features" class="px-6 py-3 border border-border text-text-primary text-base font-medium rounded-[10px] hover:bg-surface-hover transition-colors">
+            See How It Works
+          </a>
+        </div>
+
+        <!-- Trust line -->
+        <p class="mt-6 text-sm text-text-muted">
+          Privacy-first &middot; On-device AI &middot; No data leaves your machine
+        </p>
+
+        <!-- Hero Screenshot -->
+        <div class="mt-12 md:mt-16 browser-frame max-w-[900px] mx-auto">
+          <div class="browser-frame-bar">
+            <span class="browser-frame-dot"></span>
+            <span class="browser-frame-dot"></span>
+            <span class="browser-frame-dot"></span>
+          </div>
+          <img src="/images/hero-desktop.png" alt="Donna timeline view showing AI-generated billing narratives for tracked work sessions" loading="eager" width="1400" height="900" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PROBLEM ===================== -->
+    <section class="py-16 md:py-24 px-6">
+      <div class="max-w-[680px] mx-auto text-center">
+        <p class="font-display text-xs font-semibold uppercase tracking-[0.08em] text-text-muted mb-4">The Problem</p>
+        <h2 class="font-display font-bold text-2xl md:text-3xl tracking-[-0.02em] text-text-primary">
+          The average attorney loses $50,000&nbsp;a&nbsp;year in unbilled time
+        </h2>
+        <p class="mt-6 text-base text-text-secondary leading-relaxed">
+          End-of-day time reconstruction misses 10–40% of billable work. Vague entries like "worked on case" get written down at court. And manual tracking tools go unused because they interrupt the work they're supposed to measure.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== FEATURES ===================== -->
+    <section id="features" class="py-16 md:py-24 px-6">
+      <div class="max-w-[1200px] mx-auto">
+        <div class="text-center mb-16 md:mb-20">
+          <p class="font-display text-xs font-semibold uppercase tracking-[0.08em] text-text-muted mb-4">Features</p>
+          <h2 class="font-display font-bold text-2xl md:text-3xl tracking-[-0.02em] text-text-primary">
+            Everything a solo practitioner needs to bill accurately
+          </h2>
+        </div>
+
+        <!-- Feature 1: Automatic Time Tracking -->
+        <div class="flex flex-col md:flex-row items-center gap-10 md:gap-16 mb-20 md:mb-28">
+          <div class="flex-1 order-2 md:order-1">
+            <span class="pill bg-cat-coding-bg text-cat-coding">Passive Capture</span>
+            <h3 class="font-display font-bold text-xl md:text-2xl tracking-[-0.02em] mt-4 mb-4">
+              It tracks your time. You practice law.
+            </h3>
+            <p class="text-text-secondary leading-relaxed mb-5">
+              Donna monitors your active window every three seconds and captures periodic screenshots in the background. You never click "start" or "stop" — just work. At the end of each session, AI transforms raw activity into structured billing entries.
+            </p>
+            <ul class="space-y-2.5">
+              <li class="flex items-start gap-2.5 text-sm text-text-secondary">
+                <svg class="w-4 h-4 mt-0.5 text-cat-coding shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Window title monitoring every 3 seconds
+              </li>
+              <li class="flex items-start gap-2.5 text-sm text-text-secondary">
+                <svg class="w-4 h-4 mt-0.5 text-cat-coding shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Periodic screenshot capture for AI context
+              </li>
+              <li class="flex items-start gap-2.5 text-sm text-text-secondary">
+                <svg class="w-4 h-4 mt-0.5 text-cat-coding shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Activity categories: Research, Drafting, Communication, Court, Case Review
+              </li>
+              <li class="flex items-start gap-2.5 text-sm text-text-secondary">
+                <svg class="w-4 h-4 mt-0.5 text-cat-coding shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Idle detection with smart resume
+              </li>
+            </ul>
+          </div>
+          <div class="flex-1 order-1 md:order-2">
+            <div class="browser-frame">
+              <div class="browser-frame-bar">
+                <span class="browser-frame-dot"></span>
+                <span class="browser-frame-dot"></span>
+                <span class="browser-frame-dot"></span>
+              </div>
+              <img src="/images/session-expanded.png" alt="Expanded session showing individual activities with AI-generated narratives" loading="lazy" width="1400" height="900" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 2: AI Billing Narratives -->
+        <div class="flex flex-col md:flex-row-reverse items-center gap-10 md:gap-16 mb-20 md:mb-28">
+          <div class="flex-1">
+            <span class="pill bg-cat-research-bg text-cat-research">AI-Powered</span>
+            <h3 class="font-display font-bold text-xl md:text-2xl tracking-[-0.02em] mt-4 mb-4">
+              Billing narratives that survive fee petitions
+            </h3>
+            <p class="text-text-secondary leading-relaxed mb-5">
+              Donna generates narratives in proper legal billing format: action verb, what was done, for whom. No more "reviewed documents" or "worked on case." Every entry is specific enough to withstand review under ABA Rule 1.5.
+            </p>
+            <ul class="space-y-2.5">
+              <li class="flex items-start gap-2.5 text-sm text-text-secondary">
+                <svg class="w-4 h-4 mt-0.5 text-cat-research shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Format: "Researched case law regarding motion to compel discovery"
+              </li>
+              <li class="flex items-start gap-2.5 text-sm text-text-secondary">
+                <svg class="w-4 h-4 mt-0.5 text-cat-research shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Block billing detection and warnings
+              </li>
+              <li class="flex items-start gap-2.5 text-sm text-text-secondary">
+                <svg class="w-4 h-4 mt-0.5 text-cat-research shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Edit any narrative after generation
+              </li>
+              <li class="flex items-start gap-2.5 text-sm text-text-secondary">
+                <svg class="w-4 h-4 mt-0.5 text-cat-research shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Powered by Claude AI with legal billing expertise
+              </li>
+            </ul>
+          </div>
+          <div class="flex-1">
+            <div class="browser-frame">
+              <div class="browser-frame-bar">
+                <span class="browser-frame-dot"></span>
+                <span class="browser-frame-dot"></span>
+                <span class="browser-frame-dot"></span>
+              </div>
+              <img src="/images/hero-desktop.png" alt="Donna timeline with AI-generated billing narratives" loading="lazy" width="1400" height="900" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 3: Client & Matter Management -->
+        <div class="flex flex-col md:flex-row items-center gap-10 md:gap-16 mb-20 md:mb-28">
+          <div class="flex-1 order-2 md:order-1">
+            <span class="pill bg-cat-comms-bg text-cat-comms">Legal Billing</span>
+            <h3 class="font-display font-bold text-xl md:text-2xl tracking-[-0.02em] mt-4 mb-4">
+              Client, matter, rate. The hierarchy you already know.
+            </h3>
+            <p class="text-text-secondary leading-relaxed mb-5">
+              Donna speaks your language. Organize work by Client and Matter with configurable hourly rates. Time displays in 0.1-hour increments. Export clean timesheets to CSV any time.
+            </p>
+            <ul class="space-y-2.5">
+              <li class="flex items-start gap-2.5 text-sm text-text-secondary">
+                <svg class="w-4 h-4 mt-0.5 text-cat-comms shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Client &gt; Matter hierarchy with active/closed status
+              </li>
+              <li class="flex items-start gap-2.5 text-sm text-text-secondary">
+                <svg class="w-4 h-4 mt-0.5 text-cat-comms shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Per-client and per-matter rate overrides
+              </li>
+              <li class="flex items-start gap-2.5 text-sm text-text-secondary">
+                <svg class="w-4 h-4 mt-0.5 text-cat-comms shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                0.1-hour billing increments
+              </li>
+              <li class="flex items-start gap-2.5 text-sm text-text-secondary">
+                <svg class="w-4 h-4 mt-0.5 text-cat-comms shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                One-click CSV timesheet export
+              </li>
+            </ul>
+          </div>
+          <div class="flex-1 order-1 md:order-2">
+            <div class="browser-frame">
+              <div class="browser-frame-bar">
+                <span class="browser-frame-dot"></span>
+                <span class="browser-frame-dot"></span>
+                <span class="browser-frame-dot"></span>
+              </div>
+              <img src="/images/clients-desktop.png" alt="Client and Matter management with legal billing hierarchy" loading="lazy" width="1400" height="900" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 4: Revenue Analytics -->
+        <div class="flex flex-col md:flex-row-reverse items-center gap-10 md:gap-16">
+          <div class="flex-1">
+            <span class="pill bg-cat-meetings-bg text-cat-meetings">Intelligence</span>
+            <h3 class="font-display font-bold text-xl md:text-2xl tracking-[-0.02em] mt-4 mb-4">
+              Know if you're on pace before the month ends
+            </h3>
+            <p class="text-text-secondary leading-relaxed mb-5">
+              Real-time billing analytics show your utilization rate, revenue forecast, hours by matter, and category breakdown. No more end-of-month surprises.
+            </p>
+            <ul class="space-y-2.5">
+              <li class="flex items-start gap-2.5 text-sm text-text-secondary">
+                <svg class="w-4 h-4 mt-0.5 text-cat-meetings shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Utilization rate with target comparison
+              </li>
+              <li class="flex items-start gap-2.5 text-sm text-text-secondary">
+                <svg class="w-4 h-4 mt-0.5 text-cat-meetings shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Revenue forecast based on current pace
+              </li>
+              <li class="flex items-start gap-2.5 text-sm text-text-secondary">
+                <svg class="w-4 h-4 mt-0.5 text-cat-meetings shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Hours ranked by matter and category
+              </li>
+              <li class="flex items-start gap-2.5 text-sm text-text-secondary">
+                <svg class="w-4 h-4 mt-0.5 text-cat-meetings shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Billable hour trend with daily target line
+              </li>
+            </ul>
+          </div>
+          <div class="flex-1">
+            <div class="browser-frame">
+              <div class="browser-frame-bar">
+                <span class="browser-frame-dot"></span>
+                <span class="browser-frame-dot"></span>
+                <span class="browser-frame-dot"></span>
+              </div>
+              <img src="/images/by-matter-view.png" alt="Revenue analytics showing hours by matter and billing data" loading="lazy" width="1400" height="900" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== HOW IT WORKS ===================== -->
+    <section id="how-it-works" class="py-16 md:py-24 px-6 bg-sidebar">
+      <div class="max-w-[1200px] mx-auto">
+        <div class="text-center mb-12 md:mb-16">
+          <p class="font-display text-xs font-semibold uppercase tracking-[0.08em] text-text-muted mb-4">How It Works</p>
+          <h2 class="font-display font-bold text-2xl md:text-3xl tracking-[-0.02em] text-text-primary">
+            Three steps. Zero effort.
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Step 1 -->
+          <div class="bg-surface border border-border rounded-[10px] p-8">
+            <div class="w-10 h-10 rounded-full bg-accent text-text-inverse flex items-center justify-center font-display font-bold text-sm mb-5">1</div>
+            <h3 class="font-display font-semibold text-lg mb-3">Open Donna and work</h3>
+            <p class="text-sm text-text-secondary leading-relaxed">
+              Donna runs in the background while you draft motions, research case law, and handle client calls. It observes your active window and captures screenshots for AI context.
+            </p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="bg-surface border border-border rounded-[10px] p-8">
+            <div class="w-10 h-10 rounded-full bg-accent text-text-inverse flex items-center justify-center font-display font-bold text-sm mb-5">2</div>
+            <h3 class="font-display font-semibold text-lg mb-3">AI generates your timesheet</h3>
+            <p class="text-sm text-text-secondary leading-relaxed">
+              When you stop tracking, Donna sends your activity data to Claude AI, which produces categorized billing entries with professional narratives. All raw data is immediately destroyed.
+            </p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="bg-surface border border-border rounded-[10px] p-8">
+            <div class="w-10 h-10 rounded-full bg-accent text-text-inverse flex items-center justify-center font-display font-bold text-sm mb-5">3</div>
+            <h3 class="font-display font-semibold text-lg mb-3">Review, edit, export</h3>
+            <p class="text-sm text-text-secondary leading-relaxed">
+              Review AI-generated entries, adjust narratives if needed, assign to matters, and export a clean timesheet. Donna handles the paperwork so you can handle the cases.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PRIVACY ===================== -->
+    <section id="privacy" class="py-16 md:py-24 px-6">
+      <div class="max-w-[1200px] mx-auto">
+        <div class="flex flex-col md:flex-row items-center gap-10 md:gap-16">
+          <!-- Text -->
+          <div class="flex-1">
+            <p class="font-display text-xs font-semibold uppercase tracking-[0.08em] text-text-muted mb-4">Privacy &amp; Security</p>
+            <h2 class="font-display font-bold text-2xl md:text-3xl tracking-[-0.02em] text-text-primary mb-5">
+              Built for attorney-client privilege
+            </h2>
+            <p class="text-text-secondary leading-relaxed mb-8">
+              ABA Model Rule 1.6 requires reasonable efforts to prevent unauthorized disclosure of client information. Window titles contain client names. Screenshots capture privileged documents. Donna's architecture ensures none of this data persists beyond the moment of summarization.
+            </p>
+
+            <!-- Security grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex items-start gap-3 p-4 bg-surface border border-border rounded-[6px]">
+                <svg class="w-5 h-5 text-accent shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+                <div>
+                  <p class="text-sm font-semibold text-text-primary">All data on your device</p>
+                  <p class="text-xs text-text-muted mt-0.5">Nothing stored in the cloud</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-4 bg-surface border border-border rounded-[6px]">
+                <svg class="w-5 h-5 text-accent shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                <div>
+                  <p class="text-sm font-semibold text-text-primary">Screenshots destroyed</p>
+                  <p class="text-xs text-text-muted mt-0.5">Deleted after AI processing</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-4 bg-surface border border-border rounded-[6px]">
+                <svg class="w-5 h-5 text-accent shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                <div>
+                  <p class="text-sm font-semibold text-text-primary">Encrypted API calls</p>
+                  <p class="text-xs text-text-muted mt-0.5">TLS for all AI processing</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-4 bg-surface border border-border rounded-[6px]">
+                <svg class="w-5 h-5 text-accent shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                <div>
+                  <p class="text-sm font-semibold text-text-primary">No telemetry</p>
+                  <p class="text-xs text-text-muted mt-0.5">No analytics or tracking</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- App screenshot -->
+          <div class="flex-1">
+            <div class="browser-frame">
+              <div class="browser-frame-bar">
+                <span class="browser-frame-dot"></span>
+                <span class="browser-frame-dot"></span>
+                <span class="browser-frame-dot"></span>
+              </div>
+              <img src="/images/session-expanded.png" alt="Donna session view showing AI-generated billing entries" loading="lazy" width="1400" height="900" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== TRUST SIGNALS ===================== -->
+    <section class="py-16 md:py-24 px-6 bg-sidebar">
+      <div class="max-w-[1200px] mx-auto">
+        <h2 class="font-display font-bold text-2xl md:text-3xl tracking-[-0.02em] text-text-primary text-center mb-12">
+          Designed for the way lawyers actually work
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-surface border border-border rounded-[10px] p-8 text-center">
+            <div class="font-mono text-3xl font-semibold text-text-primary mb-3">0.1<span class="text-text-muted text-lg">hr</span></div>
+            <h3 class="font-display font-semibold text-base mb-2">Precision Billing</h3>
+            <p class="text-sm text-text-secondary leading-relaxed">
+              Every minute tracked. Every increment billed. The same standard your practice has used for decades, now automated.
+            </p>
+          </div>
+          <div class="bg-surface border border-border rounded-[10px] p-8 text-center">
+            <div class="mb-3">
+              <svg class="w-8 h-8 mx-auto text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+            </div>
+            <h3 class="font-display font-semibold text-base mb-2">ABA-Compliant Narratives</h3>
+            <p class="text-sm text-text-secondary leading-relaxed">
+              AI-generated entries follow the action-verb format required by Rule 1.5 and expected by fee petition reviewers.
+            </p>
+          </div>
+          <div class="bg-surface border border-border rounded-[10px] p-8 text-center">
+            <div class="mb-3">
+              <svg class="w-8 h-8 mx-auto text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25"/></svg>
+            </div>
+            <h3 class="font-display font-semibold text-base mb-2">macOS &amp; Windows</h3>
+            <p class="text-sm text-text-secondary leading-relaxed">
+              Desktop-native application that runs locally. No browser tabs. No cloud dependency. No subscription to forget.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== FINAL CTA ===================== -->
+    <section id="cta" class="py-20 md:py-28 px-6 bg-accent">
+      <div class="max-w-[680px] mx-auto text-center">
+        <h2 class="font-display font-black text-3xl md:text-4xl tracking-[-0.03em] text-text-inverse leading-tight">
+          Recover the hours you've already earned
+        </h2>
+        <p class="mt-5 text-lg text-text-faint leading-relaxed">
+          At $350/hour, capturing just 10 extra minutes a day adds <span class="font-mono font-semibold text-text-inverse">$14,000</span> to your annual billings. Donna pays for itself before lunch on day one.
+        </p>
+        <div class="mt-8">
+          <a href="mailto:shivam@mesh.so?subject=Donna%20Demo%20Request" class="inline-flex px-8 py-4 bg-surface text-accent text-base font-semibold rounded-[10px] hover:bg-page transition-colors">
+            Book a Demo
+          </a>
+        </div>
+        <p class="mt-4 text-sm text-text-faint">
+          Free during early access. No credit card required.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== FAQ ===================== -->
+    <section id="faq" class="py-16 md:py-24 px-6">
+      <div class="max-w-[720px] mx-auto">
+        <div class="text-center mb-12">
+          <p class="font-display text-xs font-semibold uppercase tracking-[0.08em] text-text-muted mb-4">FAQ</p>
+          <h2 class="font-display font-bold text-2xl md:text-3xl tracking-[-0.02em] text-text-primary">
+            Frequently asked questions
+          </h2>
+        </div>
+
+        <div class="space-y-0 border-t border-border">
+          <!-- FAQ 1 -->
+          <details class="group border-b border-border">
+            <summary class="flex items-center justify-between py-5 cursor-pointer list-none">
+              <span class="text-base font-medium text-text-primary">What does Donna actually track?</span>
+              <svg class="w-5 h-5 text-text-muted group-open:rotate-45 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            </summary>
+            <div class="pb-5 text-sm text-text-secondary leading-relaxed">
+              Donna monitors your active window title every 3 seconds and captures periodic screenshots (every 30 seconds by default). Both are used by AI to generate billing narratives, then permanently deleted. Only the AI-generated summaries are kept.
+            </div>
+          </details>
+
+          <!-- FAQ 2 -->
+          <details class="group border-b border-border">
+            <summary class="flex items-center justify-between py-5 cursor-pointer list-none">
+              <span class="text-base font-medium text-text-primary">Is my client data sent to the cloud?</span>
+              <svg class="w-5 h-5 text-text-muted group-open:rotate-45 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            </summary>
+            <div class="pb-5 text-sm text-text-secondary leading-relaxed">
+              Activity data is sent only to the Anthropic API via an encrypted TLS connection for AI summarization. Anthropic does not store or train on this data. No screenshots, window logs, or client information are stored on any external server. All raw data is permanently deleted from your device immediately after processing.
+            </div>
+          </details>
+
+          <!-- FAQ 3 -->
+          <details class="group border-b border-border">
+            <summary class="flex items-center justify-between py-5 cursor-pointer list-none">
+              <span class="text-base font-medium text-text-primary">What AI model does Donna use?</span>
+              <svg class="w-5 h-5 text-text-muted group-open:rotate-45 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            </summary>
+            <div class="pb-5 text-sm text-text-secondary leading-relaxed">
+              Donna uses Claude by Anthropic. Your activity data is sent via an encrypted API call, processed into billing narratives, and never stored or used for model training. You provide your own Anthropic API key, so you have full control over the AI processing.
+            </div>
+          </details>
+
+          <!-- FAQ 4 -->
+          <details class="group border-b border-border">
+            <summary class="flex items-center justify-between py-5 cursor-pointer list-none">
+              <span class="text-base font-medium text-text-primary">What platforms does Donna support?</span>
+              <svg class="w-5 h-5 text-text-muted group-open:rotate-45 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            </summary>
+            <div class="pb-5 text-sm text-text-secondary leading-relaxed">
+              Donna runs as a native desktop application on macOS and Windows. It installs locally on your machine and runs entirely on your device. There is no web version or mobile app — by design, this ensures client data never leaves your computer.
+            </div>
+          </details>
+
+          <!-- FAQ 5 -->
+          <details class="group border-b border-border">
+            <summary class="flex items-center justify-between py-5 cursor-pointer list-none">
+              <span class="text-base font-medium text-text-primary">How does billing work?</span>
+              <svg class="w-5 h-5 text-text-muted group-open:rotate-45 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            </summary>
+            <div class="pb-5 text-sm text-text-secondary leading-relaxed">
+              Time displays in 0.1-hour (6-minute) increments, the legal industry standard since the 1970s. Rounding is configurable: round-up (default), round-down, or round-nearest. You can set hourly rates at the default, per-client, or per-matter level. Billable values are calculated automatically.
+            </div>
+          </details>
+
+          <!-- FAQ 6 -->
+          <details class="group border-b border-border">
+            <summary class="flex items-center justify-between py-5 cursor-pointer list-none">
+              <span class="text-base font-medium text-text-primary">Can I edit AI-generated narratives?</span>
+              <svg class="w-5 h-5 text-text-muted group-open:rotate-45 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            </summary>
+            <div class="pb-5 text-sm text-text-secondary leading-relaxed">
+              Yes. Every narrative can be edited after generation. You can also adjust time entries, change activity categories, reassign entries to different matters, and mark entries as billable or non-billable. Donna gives you a strong starting point, not a locked-in result.
+            </div>
+          </details>
+
+          <!-- FAQ 7 -->
+          <details class="group border-b border-border">
+            <summary class="flex items-center justify-between py-5 cursor-pointer list-none">
+              <span class="text-base font-medium text-text-primary">How do I export my timesheets?</span>
+              <svg class="w-5 h-5 text-text-muted group-open:rotate-45 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            </summary>
+            <div class="pb-5 text-sm text-text-secondary leading-relaxed">
+              One-click CSV export from the Timesheet view. You can filter by date range, client, and matter before exporting. The CSV includes all fields needed for billing: date, client, matter, hours, rate, billable value, category, and narrative.
+            </div>
+          </details>
+
+          <!-- FAQ 8 -->
+          <details class="group border-b border-border">
+            <summary class="flex items-center justify-between py-5 cursor-pointer list-none">
+              <span class="text-base font-medium text-text-primary">Is Donna free?</span>
+              <svg class="w-5 h-5 text-text-muted group-open:rotate-45 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            </summary>
+            <div class="pb-5 text-sm text-text-secondary leading-relaxed">
+              Donna is free during early access. No credit card required. You will need your own Anthropic API key for AI summarization, which typically costs a few cents per session summary.
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="bg-text-primary py-12 md:py-16 px-6">
+    <div class="max-w-[1200px] mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <!-- Brand -->
+        <div>
+          <img src="/images/donna-logo.png" alt="Donna" class="h-7 brightness-0 invert mb-4" />
+          <p class="text-sm text-text-faint leading-relaxed">
+            AI-powered time tracking for attorneys. Privacy-first, on-device, built for privilege.
+          </p>
+          <p class="text-xs text-text-faint mt-4">&copy; 2026 Donna AI. All rights reserved.</p>
+        </div>
+
+        <!-- Product -->
+        <div>
+          <h4 class="text-sm font-semibold text-text-inverse mb-4">Product</h4>
+          <ul class="space-y-2.5">
+            <li><a href="#features" class="text-sm text-text-faint hover:text-text-muted transition-colors">Timeline</a></li>
+            <li><a href="#features" class="text-sm text-text-faint hover:text-text-muted transition-colors">Timesheet</a></li>
+            <li><a href="#features" class="text-sm text-text-faint hover:text-text-muted transition-colors">Analytics</a></li>
+            <li><a href="#features" class="text-sm text-text-faint hover:text-text-muted transition-colors">Clients &amp; Matters</a></li>
+          </ul>
+        </div>
+
+        <!-- Legal -->
+        <div>
+          <h4 class="text-sm font-semibold text-text-inverse mb-4">Legal</h4>
+          <ul class="space-y-2.5">
+            <li><a href="#privacy" class="text-sm text-text-faint hover:text-text-muted transition-colors">Privacy Policy</a></li>
+            <li><a href="#privacy" class="text-sm text-text-faint hover:text-text-muted transition-colors">Terms of Service</a></li>
+            <li><a href="#privacy" class="text-sm text-text-faint hover:text-text-muted transition-colors">ABA Rule 1.6 Compliance</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -1,5 +1,52 @@
-[2026-03-27T12:19:39.933Z] [debug] [vite] connecting...
-[2026-03-27T12:19:39.984Z] [debug] [vite] connected.
-[2026-03-27T12:19:40.367Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T12:19:40.643Z] [warning] WebSocket connection to 'ws://localhost:5180/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.
-[2026-03-27T12:21:02.108Z] [warning] WebSocket connection to 'ws://localhost:5180/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.
+[2026-03-27T19:54:44.980Z] [debug] [vite] connecting...
+[2026-03-27T19:54:45.122Z] [debug] [vite] connected.
+[2026-03-27T19:54:45.428Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-03-27T19:57:29.166Z] [debug] [vite] connecting...
+[2026-03-27T19:57:29.223Z] [debug] [vite] connected.
+[2026-03-27T19:57:29.271Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-03-27T19:57:37.689Z] [log] [vite] server connection lost. Polling for restart...
+[2026-03-27T19:57:37.690Z] [error] WebSocket connection to 'ws://localhost:5174/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:57:38.741Z] [debug] [vite] connecting...
+[2026-03-27T19:57:38.755Z] [debug] [vite] connected.
+[2026-03-27T19:57:39.118Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-03-27T19:57:47.639Z] [debug] [vite] connecting...
+[2026-03-27T19:57:47.639Z] [debug] [vite] connected.
+[2026-03-27T19:57:48.093Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-03-27T19:57:48.130Z] [error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-03-27T19:57:48.133Z] [error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-03-27T19:57:56.667Z] [error] WebSocket connection to 'ws://localhost:5173/?token=SJ-9xVOg6-lY' failed: 
+[2026-03-27T19:57:56.667Z] [log] [vite] server connection lost. Polling for restart...
+[2026-03-27T19:57:56.923Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:57:57.927Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:57:58.931Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:57:59.932Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:58:00.937Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:58:02.277Z] [debug] [vite] connecting...
+[2026-03-27T19:58:02.318Z] [debug] [vite] connected.
+[2026-03-27T19:58:03.190Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-03-27T19:58:09.182Z] [debug] [vite] connecting...
+[2026-03-27T19:58:09.254Z] [debug] [vite] connected.
+[2026-03-27T19:58:09.323Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-03-27T19:58:39.836Z] [debug] [vite] connecting...
+[2026-03-27T19:58:39.917Z] [debug] [vite] connected.
+[2026-03-27T19:58:39.922Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-03-27T19:59:07.860Z] [error] WebSocket connection to 'ws://localhost:5173/?token=BUSqkT42tm3s' failed: 
+[2026-03-27T19:59:07.862Z] [log] [vite] server connection lost. Polling for restart...
+[2026-03-27T19:59:07.974Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:59:08.988Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:59:09.988Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:59:10.994Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:59:12.002Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:59:13.009Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:59:14.050Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:59:15.088Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:59:16.094Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:59:17.184Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:59:18.294Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:59:19.411Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:59:20.675Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:59:22.341Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:59:25.744Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+[2026-03-27T19:59:29.593Z] [debug] [vite] connecting...
+[2026-03-27T19:59:29.677Z] [debug] [vite] connected.
+[2026-03-27T19:59:30.429Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold

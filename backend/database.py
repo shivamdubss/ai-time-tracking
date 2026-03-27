@@ -570,18 +570,18 @@ def insert_activity(session_id: str, app: str, context: str = None, minutes: int
                     narrative: str = None, category: str = None, matter_id: str = None,
                     billable: bool = True, effective_rate: float = None,
                     sort_order: int = 0, start_time: str = None, end_time: str = None,
-                    activity_code: str = None, approval_status: str = "pending") -> dict:
+                    activity_code: str = None) -> dict:
     activity_id = str(uuid.uuid4())[:8]
     now = datetime.now().isoformat()
     conn = get_db()
     conn.execute(
         """INSERT INTO activities (id, session_id, matter_id, app, context, minutes, narrative,
            category, billable, effective_rate, sort_order, created_at,
-           start_time, end_time, activity_code, approval_status)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+           start_time, end_time, activity_code)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (activity_id, session_id, matter_id, app, context, minutes, narrative,
          category, 1 if billable else 0, effective_rate, sort_order, now,
-         start_time, end_time, activity_code, approval_status),
+         start_time, end_time, activity_code),
     )
     conn.commit()
     conn.close()
@@ -590,13 +590,13 @@ def insert_activity(session_id: str, app: str, context: str = None, minutes: int
             "category": category, "billable": billable, "effective_rate": effective_rate,
             "sort_order": sort_order, "created_at": now,
             "start_time": start_time, "end_time": end_time,
-            "activity_code": activity_code, "approval_status": approval_status}
+            "activity_code": activity_code}
 
 
 def update_activity(activity_id: str, **kwargs) -> Optional[dict]:
     conn = get_db()
     allowed = {"matter_id", "narrative", "billable", "effective_rate", "category",
-                "minutes", "activity_code", "approval_status", "start_time", "end_time"}
+                "minutes", "activity_code", "start_time", "end_time"}
     sets = []
     values = []
     for key, val in kwargs.items():
@@ -651,20 +651,6 @@ def get_next_sort_order(session_id: str) -> int:
     ).fetchone()
     conn.close()
     return row["next_order"]
-
-
-def approve_all_activities_for_date(date_str: str) -> int:
-    conn = get_db()
-    cursor = conn.execute(
-        """UPDATE activities SET approval_status = 'approved'
-           WHERE approval_status = 'pending'
-           AND session_id IN (SELECT id FROM sessions WHERE start_time LIKE ?)""",
-        (f"{date_str}%",),
-    )
-    count = cursor.rowcount
-    conn.commit()
-    conn.close()
-    return count
 
 
 def get_activities_for_export(date_str: str) -> list[dict]:

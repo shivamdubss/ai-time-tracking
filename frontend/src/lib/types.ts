@@ -26,7 +26,6 @@ export interface Activity {
   sort_order?: number
   start_time?: string | null
   end_time?: string | null
-  approval_status?: 'pending' | 'approved'
   activity_code?: string | null
 }
 

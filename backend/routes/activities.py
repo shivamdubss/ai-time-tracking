@@ -8,8 +8,7 @@ from typing import Optional
 from ..database import (
     get_activities_for_session, update_activity, get_activity, get_session,
     resolve_rate, get_matter, insert_activity, delete_activity,
-    get_next_sort_order, approve_all_activities_for_date,
-    get_activities_for_export,
+    get_next_sort_order, get_activities_for_export,
 )
 
 router = APIRouter(tags=["activities"])
@@ -22,7 +21,6 @@ class UpdateActivityRequest(BaseModel):
     category: Optional[str] = None
     minutes: Optional[int] = None
     activity_code: Optional[str] = None
-    approval_status: Optional[str] = None
     start_time: Optional[str] = None
     end_time: Optional[str] = None
 
@@ -37,10 +35,6 @@ class CreateActivityRequest(BaseModel):
     start_time: Optional[str] = None
     end_time: Optional[str] = None
     activity_code: Optional[str] = None
-
-
-class BulkApproveRequest(BaseModel):
-    date: str
 
 
 @router.get("/api/sessions/{session_id}/activities")
@@ -107,10 +101,6 @@ async def update_activity_endpoint(activity_id: str, req: UpdateActivityRequest)
         updates["minutes"] = req.minutes
     if req.activity_code is not None:
         updates["activity_code"] = req.activity_code
-    if req.approval_status is not None:
-        if req.approval_status not in ("pending", "approved"):
-            raise HTTPException(status_code=400, detail="approval_status must be 'pending' or 'approved'")
-        updates["approval_status"] = req.approval_status
     if req.start_time is not None:
         updates["start_time"] = req.start_time
     if req.end_time is not None:
@@ -154,12 +144,6 @@ async def delete_activity_endpoint(activity_id: str):
     return {"deleted": True}
 
 
-@router.post("/api/activities/approve-all")
-async def bulk_approve(req: BulkApproveRequest):
-    count = approve_all_activities_for_date(req.date)
-    return {"approved_count": count}
-
-
 @router.get("/api/export")
 async def export_timesheet(date: str = Query(...), format: str = Query("csv")):
     rows = get_activities_for_export(date)
@@ -171,7 +155,7 @@ async def export_timesheet(date: str = Query(...), format: str = Query("csv")):
     writer = csv.writer(output)
     writer.writerow([
         "Date", "Client", "Matter", "Matter Number", "Activity Code",
-        "Category", "Hours", "Narrative", "Rate", "Value", "Status",
+        "Category", "Hours", "Narrative", "Rate", "Value",
     ])
 
     for r in rows:
@@ -190,7 +174,6 @@ async def export_timesheet(date: str = Query(...), format: str = Query("csv")):
             r.get("narrative") or "",
             rate,
             value,
-            r.get("approval_status") or "pending",
         ])
 
     output.seek(0)

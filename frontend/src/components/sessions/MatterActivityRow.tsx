@@ -17,8 +17,6 @@ export function MatterActivityRow({ activity, isLast, onActivityUpdated }: Matte
   const [saveError, setSaveError] = useState(false)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  const isPending = activity.approval_status !== 'approved'
-
   const timeRange = activity.start_time && activity.end_time
     ? formatTimeRange(activity.start_time, activity.end_time)
     : null
@@ -38,16 +36,6 @@ export function MatterActivityRow({ activity, isLast, onActivityUpdated }: Matte
     }
   }
 
-  async function handleApprove() {
-    if (!activity.id) return
-    try {
-      const updated = await api.updateActivity(activity.id, {
-        approval_status: isPending ? 'approved' : 'pending',
-      })
-      onActivityUpdated?.(updated)
-    } catch {}
-  }
-
   return (
     <div className={`py-4 ${!isLast ? 'border-b border-border-subtle' : ''}`}>
       {/* Top row: time range + code + hours + status */}
@@ -64,21 +52,9 @@ export function MatterActivityRow({ activity, isLast, onActivityUpdated }: Matte
             </span>
           )}
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-[22px] font-mono font-semibold text-text-primary tabular-nums">
-            {hours}
-          </span>
-          <button
-            onClick={handleApprove}
-            className={`text-[11px] font-semibold px-2.5 py-1 rounded-[var(--radius-sm)] border transition-colors cursor-pointer ${
-              isPending
-                ? 'border-warning/30 text-warning bg-warning-bg hover:opacity-80'
-                : 'border-success/30 text-success bg-success-bg hover:opacity-80'
-            }`}
-          >
-            {isPending ? 'PENDING REVIEW' : 'APPROVED'}
-          </button>
-        </div>
+        <span className="text-[22px] font-mono font-semibold text-text-primary tabular-nums">
+          {hours}
+        </span>
       </div>
 
       {/* Narrative */}

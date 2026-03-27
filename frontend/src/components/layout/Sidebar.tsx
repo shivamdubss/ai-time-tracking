@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { Clock, Briefcase, Pencil, Moon, Sun } from 'lucide-react'
+import { Clock, Briefcase, Moon, Sun } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface SidebarProps {
@@ -10,7 +10,6 @@ interface SidebarProps {
 const navItems = [
   { to: '/', icon: Clock, label: 'Sessions' },
   { to: '/clients', icon: Briefcase, label: 'Clients & Matters' },
-  { to: '/rules', icon: Pencil, label: 'Rules' },
 ]
 
 export function Sidebar({ theme, onToggleTheme }: SidebarProps) {

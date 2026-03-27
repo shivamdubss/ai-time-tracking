@@ -1,27 +1,206 @@
-[2026-03-27T01:30:08.695Z] [debug] [vite] connecting...
-[2026-03-27T01:30:08.727Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T01:30:08.779Z] [debug] [vite] connected.
-[2026-03-27T01:30:08.940Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.
-[2026-03-27T01:31:55.853Z] [error] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-03-27T01:32:58.578Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
-[2026-03-27T01:32:58.578Z] [debug] [vite] hot updated: /src/index.css
-[2026-03-27T01:33:06.076Z] [debug] [vite] connecting...
-[2026-03-27T01:33:06.138Z] [debug] [vite] connected.
-[2026-03-27T01:33:06.179Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T01:33:06.320Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.
-[2026-03-27T02:02:12.700Z] [debug] [vite] hot updated: /src/index.css
-[2026-03-27T02:02:12.700Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
-[2026-03-27T02:02:12.700Z] [debug] [vite] hot updated: /src/components/ui/CategoryBar.tsx
-[2026-03-27T02:02:12.700Z] [debug] [vite] hot updated: /src/components/ui/CategoryPill.tsx
-[2026-03-27T02:02:21.700Z] [debug] [vite] hot updated: /src/pages/ClientsMattersPage.tsx
-[2026-03-27T02:02:21.700Z] [debug] [vite] hot updated: /src/index.css
-[2026-03-27T02:02:35.993Z] [debug] [vite] hot updated: /src/pages/ClientsMattersPage.tsx
-[2026-03-27T02:02:35.994Z] [debug] [vite] hot updated: /src/index.css
-[2026-03-27T02:02:53.999Z] [debug] [vite] hot updated: /src/pages/ClientsMattersPage.tsx
-[2026-03-27T02:02:53.999Z] [debug] [vite] hot updated: /src/index.css
-[2026-03-27T02:03:16.228Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
-[2026-03-27T02:03:16.228Z] [debug] [vite] hot updated: /src/index.css
-[2026-03-27T02:03:24.209Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
-[2026-03-27T02:03:24.209Z] [debug] [vite] hot updated: /src/index.css
-[2026-03-27T02:04:01.193Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
-[2026-03-27T02:04:01.193Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:07:27.605Z] [debug] [vite] connecting...
+[2026-03-27T03:07:27.622Z] [debug] [vite] connected.
+[2026-03-27T03:07:27.669Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-03-27T03:07:27.942Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.
+[2026-03-27T03:10:49.226Z] [debug] [vite] connecting...
+[2026-03-27T03:10:49.282Z] [debug] [vite] connected.
+[2026-03-27T03:10:49.288Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-03-27T03:10:49.384Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.
+[2026-03-27T03:13:33.247Z] [debug] [vite] connecting...
+[2026-03-27T03:13:33.319Z] [debug] [vite] connected.
+[2026-03-27T03:13:33.340Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-03-27T03:13:33.502Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.
+[2026-03-27T03:15:11.137Z] [debug] [vite] hot updated: /src/components/layout/Sidebar.tsx
+[2026-03-27T03:15:11.137Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:15:16.904Z] [debug] [vite] hot updated: /src/components/sessions/SessionTable.tsx
+[2026-03-27T03:15:16.904Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:15:22.776Z] [debug] [vite] hot updated: /src/components/layout/Header.tsx
+[2026-03-27T03:15:22.776Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:15:40.189Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:15:40.190Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:15:44.966Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:15:44.966Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:15:52.020Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:15:52.021Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:15:56.477Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:15:56.477Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:16:26.559Z] [debug] [vite] hot updated: /src/components/layout/Header.tsx
+[2026-03-27T03:16:26.559Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:16:31.245Z] [debug] [vite] hot updated: /src/components/layout/Header.tsx
+[2026-03-27T03:16:31.245Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:16:43.054Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:16:43.054Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:16:49.488Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:16:49.488Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:17:11.855Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:17:11.856Z] [debug] [vite] hot updated: /src/components/sessions/SessionRow.tsx
+[2026-03-27T03:17:11.856Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
+[2026-03-27T03:17:11.856Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:17:11.856Z] [debug] [vite] hot updated: /src/components/sessions/SessionTable.tsx
+[2026-03-27T03:17:11.857Z] [debug] [vite] hot updated: /src/components/sessions/MatterGroupCard.tsx
+[2026-03-27T03:17:11.857Z] [debug] [vite] hot updated: /src/components/sessions/MatterActivityRow.tsx
+[2026-03-27T03:17:19.446Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:17:19.446Z] [debug] [vite] hot updated: /src/components/sessions/SessionRow.tsx
+[2026-03-27T03:17:19.447Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
+[2026-03-27T03:17:19.447Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:17:19.447Z] [debug] [vite] hot updated: /src/components/sessions/SessionTable.tsx
+[2026-03-27T03:17:19.447Z] [debug] [vite] hot updated: /src/components/sessions/MatterGroupCard.tsx
+[2026-03-27T03:17:19.447Z] [debug] [vite] hot updated: /src/components/sessions/MatterActivityRow.tsx
+[2026-03-27T03:17:32.340Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:17:32.341Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:17:34.148Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:17:34.148Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:17:35.203Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:17:35.203Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:17:37.071Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:17:37.071Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:17:55.965Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:17:55.965Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:18:10.161Z] [debug] [vite] hot updated: /src/components/sessions/SessionRow.tsx
+[2026-03-27T03:18:10.164Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:18:32.532Z] [debug] [vite] hot updated: /src/App.tsx
+[2026-03-27T03:18:32.532Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:18:32.620Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.
+[2026-03-27T03:18:39.815Z] [debug] [vite] hot updated: /src/components/sessions/SessionTable.tsx
+[2026-03-27T03:18:39.815Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:18:48.125Z] [debug] [vite] hot updated: /src/components/sessions/SessionRow.tsx
+[2026-03-27T03:18:48.125Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:18:56.671Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:18:56.671Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:19:02.455Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:19:02.455Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:19:19.682Z] [debug] [vite] connecting...
+[2026-03-27T03:19:19.750Z] [debug] [vite] connected.
+[2026-03-27T03:19:19.798Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-03-27T03:19:19.894Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.
+[2026-03-27T03:19:31.159Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
+[2026-03-27T03:19:31.159Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:19:32.181Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
+[2026-03-27T03:19:32.181Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:19:42.550Z] [debug] [vite] hot updated: /src/components/sessions/MatterActivityRow.tsx
+[2026-03-27T03:19:42.552Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:20:08.205Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:20:08.212Z] [debug] [vite] hot updated: /src/components/layout/Sidebar.tsx
+[2026-03-27T03:20:08.212Z] [debug] [vite] hot updated: /src/pages/ClientsMattersPage.tsx
+[2026-03-27T03:20:08.212Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:20:08.212Z] [debug] [vite] hot updated: /src/components/layout/Header.tsx
+[2026-03-27T03:20:08.212Z] [debug] [vite] hot updated: /src/components/ui/Button.tsx
+[2026-03-27T03:20:08.212Z] [debug] [vite] hot updated: /src/components/sessions/SessionRow.tsx
+[2026-03-27T03:20:08.212Z] [debug] [vite] hot updated: /src/components/sessions/MatterGroupCard.tsx
+[2026-03-27T03:20:20.312Z] [debug] [vite] connecting...
+[2026-03-27T03:20:20.368Z] [debug] [vite] connected.
+[2026-03-27T03:20:20.379Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-03-27T03:20:20.473Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.
+[2026-03-27T03:21:07.068Z] [debug] [vite] hot updated: /src/App.tsx
+[2026-03-27T03:21:07.068Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:21:07.131Z] [warning] %s
+
+%s
+ An error occurred in the <App> component. Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+[2026-03-27T03:21:12.028Z] [debug] [vite] hot updated: /src/App.tsx
+[2026-03-27T03:21:12.028Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:21:12.115Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.
+[2026-03-27T03:21:25.996Z] [debug] [vite] connecting...
+[2026-03-27T03:21:26.034Z] [debug] [vite] connected.
+[2026-03-27T03:21:26.038Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-03-27T03:21:26.088Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.
+[2026-03-27T03:21:53.024Z] [debug] [vite] hot updated: /src/App.tsx
+[2026-03-27T03:21:53.024Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:22:04.471Z] [debug] [vite] connecting...
+[2026-03-27T03:22:04.528Z] [debug] [vite] connected.
+[2026-03-27T03:22:04.534Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-03-27T03:22:04.613Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.
+[2026-03-27T03:23:12.630Z] [debug] [vite] hot updated: /src/pages/ClientsMattersPage.tsx
+[2026-03-27T03:23:12.630Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:23:26.634Z] [debug] [vite] hot updated: /src/components/sessions/AddActivityForm.tsx
+[2026-03-27T03:23:26.634Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:23:30.697Z] [debug] [vite] hot updated: /src/components/sessions/MatterActivityRow.tsx
+[2026-03-27T03:23:30.697Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:23:39.621Z] [debug] [vite] hot updated: /src/components/sessions/MatterActivityRow.tsx
+[2026-03-27T03:23:39.621Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:23:45.874Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
+[2026-03-27T03:23:45.874Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:23:53.459Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
+[2026-03-27T03:23:53.462Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:24:00.151Z] [debug] [vite] hot updated: /src/components/clients/ClientModal.tsx
+[2026-03-27T03:24:00.151Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:24:05.854Z] [debug] [vite] hot updated: /src/components/clients/MatterModal.tsx
+[2026-03-27T03:24:05.854Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:24:13.169Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:24:13.169Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:24:13.231Z] [warning] %s
+
+%s
+ An error occurred in the <SessionsPage> component. Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+[2026-03-27T03:24:13.648Z] [debug] [vite] hot updated: /src/components/ui/Button.tsx
+[2026-03-27T03:24:13.648Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:24:13.719Z] [warning] %s
+
+%s
+ An error occurred in the <SessionsPage> component. Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+[2026-03-27T03:24:14.882Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:24:14.882Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:24:14.961Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.
+[2026-03-27T03:24:16.388Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:24:16.389Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
+[2026-03-27T03:24:16.389Z] [debug] [vite] hot updated: /src/components/ui/CategoryBar.tsx
+[2026-03-27T03:24:16.389Z] [debug] [vite] hot updated: /src/components/ui/CategoryPill.tsx
+[2026-03-27T03:24:16.389Z] [debug] [vite] hot updated: /src/components/sessions/AddActivityForm.tsx
+[2026-03-27T03:24:17.631Z] [debug] [vite] hot updated: /src/App.tsx
+[2026-03-27T03:24:17.631Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:24:17.631Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:24:17.631Z] [debug] [vite] hot updated: /src/pages/ClientsMattersPage.tsx
+[2026-03-27T03:24:17.631Z] [debug] [vite] hot updated: /src/components/clients/MatterModal.tsx
+[2026-03-27T03:24:17.631Z] [debug] [vite] hot updated: /src/components/clients/ClientModal.tsx
+[2026-03-27T03:24:17.631Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
+[2026-03-27T03:24:17.631Z] [debug] [vite] hot updated: /src/components/sessions/AddActivityForm.tsx
+[2026-03-27T03:24:17.631Z] [debug] [vite] hot updated: /src/components/sessions/MatterActivityRow.tsx
+[2026-03-27T03:24:17.655Z] [error] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+[2026-03-27T03:24:19.603Z] [debug] [vite] hot updated: /src/App.tsx
+[2026-03-27T03:24:19.603Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:24:19.603Z] [debug] [vite] hot updated: /src/pages/SessionsPage.tsx
+[2026-03-27T03:24:19.603Z] [debug] [vite] hot updated: /src/pages/ClientsMattersPage.tsx
+[2026-03-27T03:24:19.603Z] [debug] [vite] hot updated: /src/components/clients/MatterModal.tsx
+[2026-03-27T03:24:19.603Z] [debug] [vite] hot updated: /src/components/clients/ClientModal.tsx
+[2026-03-27T03:24:19.603Z] [debug] [vite] hot updated: /src/components/sessions/ActivityRow.tsx
+[2026-03-27T03:24:19.603Z] [debug] [vite] hot updated: /src/components/sessions/AddActivityForm.tsx
+[2026-03-27T03:24:19.603Z] [debug] [vite] hot updated: /src/components/sessions/MatterActivityRow.tsx
+[2026-03-27T03:24:19.640Z] [error] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+[2026-03-27T03:24:30.084Z] [debug] [vite] hot updated: /src/components/sessions/MatterActivityRow.tsx
+[2026-03-27T03:24:30.084Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:24:31.879Z] [debug] [vite] hot updated: /src/components/sessions/MatterActivityRow.tsx
+[2026-03-27T03:24:31.879Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:24:33.474Z] [debug] [vite] hot updated: /src/components/sessions/MatterActivityRow.tsx
+[2026-03-27T03:24:33.474Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:24:41.286Z] [debug] [vite] connecting...
+[2026-03-27T03:24:41.360Z] [debug] [vite] connected.
+[2026-03-27T03:24:41.368Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-03-27T03:24:45.200Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.
+[2026-03-27T03:24:46.351Z] [error] [vite] ReferenceError: Pencil is not defined
+    at http://localhost:5173/src/components/layout/Sidebar.tsx?t=1774581886255:23:25
+[2026-03-27T03:24:46.351Z] [error] [vite] Failed to reload /src/components/layout/Sidebar.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above)
+[2026-03-27T03:24:46.351Z] [debug] [vite] hot updated: /src/components/layout/Sidebar.tsx
+[2026-03-27T03:24:46.351Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:24:47.509Z] [debug] [vite] hot updated: /src/components/layout/Sidebar.tsx
+[2026-03-27T03:24:47.509Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:24:48.921Z] [debug] [vite] hot updated: /src/App.tsx
+[2026-03-27T03:24:48.921Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:24:48.969Z] [warning] %s
+
+%s
+ An error occurred in the <App> component. Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+[2026-03-27T03:24:50.002Z] [debug] [vite] hot updated: /src/App.tsx
+[2026-03-27T03:24:50.003Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:24:50.154Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.
+[2026-03-27T03:24:55.807Z] [error] Failed to load resource: the server responded with a status of 404 (Not Found)
+[2026-03-27T03:24:55.811Z] [error] [vite] Failed to reload /src/pages/PlaceholderPage.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above)
+[2026-03-27T03:24:55.816Z] [debug] [vite] hot updated: /src/pages/PlaceholderPage.tsx
+[2026-03-27T03:24:55.816Z] [debug] [vite] hot updated: /src/index.css
+[2026-03-27T03:24:55.927Z] [debug] [vite] connecting...
+[2026-03-27T03:24:55.966Z] [debug] [vite] connected.
+[2026-03-27T03:24:55.991Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-03-27T03:24:56.086Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=qahNSRdeNM5wf_uAFI2NvYjozGFo8ZfdsmzL7Xp4F40' failed: WebSocket is closed before the connection is established.

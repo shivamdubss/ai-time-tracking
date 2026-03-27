@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { ChevronDown, Plus } from 'lucide-react'
-import type { Session, Matter, Activity } from '@/lib/types'
+import type { Session, Matter, Client, Activity } from '@/lib/types'
 import { formatTimeRange, cn } from '@/lib/utils'
-import { formatSessionHours, roundToDecimalHours } from '@/lib/format'
+import { formatSessionHours } from '@/lib/format'
 import { CategoryBar } from '@/components/ui/CategoryBar'
 import { CategoryPill } from '@/components/ui/CategoryPill'
 import { ActivityRow } from './ActivityRow'
@@ -11,25 +11,18 @@ import { AddActivityForm } from './AddActivityForm'
 interface SessionRowProps {
   session: Session
   matters?: Matter[]
+  clients?: Client[]
   selectedActivities?: Set<string>
   onSelectToggle?: (activityId: string) => void
   onSessionUpdated?: (session: Session) => void
 }
 
-export function SessionRow({ session, matters, selectedActivities, onSelectToggle, onSessionUpdated }: SessionRowProps) {
+export function SessionRow({ session, matters, clients, selectedActivities, onSelectToggle, onSessionUpdated }: SessionRowProps) {
   const [expanded, setExpanded] = useState(false)
   const [isAddingActivity, setIsAddingActivity] = useState(false)
   const hours = formatSessionHours(session.startTime, session.endTime)
 
   const topCategories = session.categories.slice(0, 3)
-
-  // Compute total billable value from activities
-  const totalBillableValue = session.activities.reduce((sum, act) => {
-    if (act.effective_rate != null && act.minutes > 0) {
-      return sum + roundToDecimalHours(act.minutes) * act.effective_rate
-    }
-    return sum
-  }, 0)
 
   function handleActivityUpdated(updatedActivity: Activity) {
     if (!onSessionUpdated) return
@@ -93,11 +86,6 @@ export function SessionRow({ session, matters, selectedActivities, onSelectToggl
         </div>
         <div className="font-mono text-[15px] font-medium text-text-primary tabular-nums pt-0.5">
           <div>{hours}</div>
-          {totalBillableValue > 0 && (
-            <div className="text-xs text-text-muted font-normal">
-              ${totalBillableValue.toFixed(0)}
-            </div>
-          )}
         </div>
         <div className="text-sm leading-relaxed text-text-secondary">{session.summary}</div>
       </div>
@@ -110,6 +98,7 @@ export function SessionRow({ session, matters, selectedActivities, onSelectToggl
               activity={activity}
               isLast={i === session.activities.length - 1 && !isAddingActivity}
               matters={matters}
+              clients={clients}
               selected={activity.id ? selectedActivities?.has(activity.id) : false}
               onSelectToggle={onSelectToggle}
               onActivityUpdated={handleActivityUpdated}

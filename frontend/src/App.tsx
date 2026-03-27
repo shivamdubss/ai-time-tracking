@@ -3,13 +3,14 @@ import { Routes, Route } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Sidebar } from '@/components/layout/Sidebar'
-import { SessionsPage } from '@/pages/SessionsPage'
+import { TimelinePage } from '@/pages/TimelinePage'
+import { TimesheetPage } from '@/pages/TimesheetPage'
 import { ClientsMattersPage } from '@/pages/ClientsMattersPage'
-import { useTheme } from '@/hooks/useTheme'
 import { initAuth } from '@/lib/api'
+import { TrackingProvider } from '@/hooks/useTrackingContext'
+import { Agentation } from 'agentation'
 
 export default function App() {
-  const { theme, toggleTheme } = useTheme()
   const [ready, setReady] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -46,16 +47,20 @@ export default function App() {
         <div className={cn(
           'fixed inset-y-0 left-0 z-40 md:relative',
         )}>
-          <Sidebar theme={theme} onToggleTheme={toggleTheme} />
+          <Sidebar />
         </div>
       </div>
 
       <main className="flex-1 overflow-y-auto">
-        <Routes>
-          <Route path="/" element={<SessionsPage />} />
-          <Route path="/clients" element={<ClientsMattersPage />} />
-        </Routes>
+        <TrackingProvider>
+          <Routes>
+            <Route path="/" element={<TimelinePage />} />
+            <Route path="/timesheet" element={<TimesheetPage />} />
+            <Route path="/clients" element={<ClientsMattersPage />} />
+          </Routes>
+        </TrackingProvider>
       </main>
+      {import.meta.env.DEV && <Agentation />}
     </div>
   )
 }

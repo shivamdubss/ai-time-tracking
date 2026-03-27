@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
-import type { Activity, Matter } from '@/lib/types'
-import { getCategoryBarColor, getCategoryColors } from '@/lib/types'
-import { formatDuration, roundToDecimalHours } from '@/lib/format'
-import { UTBMS_CODE_LIST, utbmsToCategory } from '@/lib/utbms'
+import type { Activity, Matter, Client } from '@/lib/types'
+import { getCategoryBarColor } from '@/lib/types'
+import { formatDuration } from '@/lib/format'
 import { api } from '@/lib/api'
 
 interface ActivityRowProps {
   activity: Activity
   isLast: boolean
   matters?: Matter[]
+  clients?: Client[]
   selected?: boolean
   onSelectToggle?: (activityId: string) => void
   onActivityUpdated?: (activity: Activity) => void
@@ -30,7 +30,7 @@ function getAppAbbrev(app: string): string {
   return app.slice(0, 2)
 }
 
-export function ActivityRow({ activity, isLast, matters, selected, onSelectToggle, onActivityUpdated, onActivityDeleted }: ActivityRowProps) {
+export function ActivityRow({ activity, isLast, matters, clients, selected, onSelectToggle, onActivityUpdated, onActivityDeleted }: ActivityRowProps) {
   const category = activity.category || 'Administrative'
   const color = getCategoryBarColor(category)
   const hours = formatDuration(activity.minutes)
@@ -47,13 +47,9 @@ export function ActivityRow({ activity, isLast, matters, selected, onSelectToggl
     }
   }, [activity.minutes, isEditingHours])
 
-  const matterName = activity.matter_id
-    ? matters?.find(m => m.id === activity.matter_id)?.name || 'Unknown'
-    : null
-
-  const billableValue = activity.effective_rate != null && activity.minutes > 0
-    ? `$${(roundToDecimalHours(activity.minutes) * activity.effective_rate).toFixed(0)}`
-    : null
+  const matter = activity.matter_id ? matters?.find(m => m.id === activity.matter_id) : null
+  const matterName = matter?.name || (activity.matter_id ? 'Unknown' : null)
+  const clientName = matter?.client_id ? clients?.find(c => c.id === matter.client_id)?.name : null
 
   async function handleNarrativeSave() {
     setIsEditingNarrative(false)
@@ -75,14 +71,6 @@ export function ActivityRow({ activity, isLast, matters, selected, onSelectToggl
     const newMatterId = matterId === '' ? null : matterId
     try {
       const updated = await api.updateActivity(activity.id, { matter_id: newMatterId })
-      onActivityUpdated?.(updated)
-    } catch {}
-  }
-
-  async function handleActivityCodeChange(code: string) {
-    if (!activity.id) return
-    try {
-      const updated = await api.updateActivity(activity.id, { activity_code: code || undefined })
       onActivityUpdated?.(updated)
     } catch {}
   }
@@ -143,31 +131,6 @@ export function ActivityRow({ activity, isLast, matters, selected, onSelectToggl
         </div>
         <div className="text-xs text-text-muted mt-0.5 pl-7">{activity.context}</div>
 
-        {/* UTBMS code dropdown + derived category pill */}
-        {activity.id && (
-          <div className="mt-1 pl-7 flex items-center gap-1.5">
-            <select
-              className="text-xs bg-transparent border border-border-subtle rounded px-1.5 py-0.5 text-text-muted cursor-pointer hover:border-border-default transition-colors"
-              value={activity.activity_code || ''}
-              onChange={(e) => handleActivityCodeChange(e.target.value)}
-            >
-              <option value="">No code</option>
-              {UTBMS_CODE_LIST.map(({ code, label }) => (
-                <option key={code} value={code}>{label}</option>
-              ))}
-            </select>
-            <span
-              className="text-[10px] font-semibold px-1.5 py-0.5 rounded"
-              style={{
-                backgroundColor: getCategoryColors(category).bg,
-                color: getCategoryColors(category).text,
-              }}
-            >
-              {category}
-            </span>
-          </div>
-        )}
-
         {/* Matter dropdown */}
         {matters && matters.length > 0 && (() => {
           const active = matters.filter(m => m.status === 'active')
@@ -226,17 +189,13 @@ export function ActivityRow({ activity, isLast, matters, selected, onSelectToggl
             {hours}
           </div>
         )}
-        {billableValue && (
-          <div className="text-xs text-text-faint">{billableValue}</div>
-        )}
-        {activity.billable === false && (
-          <div className="text-[10px] text-text-faint italic font-sans">Non-billable</div>
-        )}
       </div>
 
       <div className="text-[13px] leading-relaxed text-text-secondary">
-        {matterName && (
-          <div className="text-xs text-text-muted mb-1 font-medium">{matterName}</div>
+        {(clientName || matterName) && (
+          <div className="text-xs text-text-muted mb-1 font-medium">
+            {clientName && matterName ? `${clientName} — ${matterName}` : (clientName || matterName)}
+          </div>
         )}
         {isEditingNarrative ? (
           <textarea

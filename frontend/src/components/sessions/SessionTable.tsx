@@ -1,4 +1,4 @@
-import type { Session, Matter } from '@/lib/types'
+import type { Session, Matter, Client } from '@/lib/types'
 import { formatDuration } from '@/lib/format'
 import { SessionRow } from './SessionRow'
 import { EmptyState } from './EmptyState'
@@ -11,13 +11,14 @@ interface SessionTableProps {
   totalBillableValue?: number
   totalNonBillableMinutes?: number
   matters?: Matter[]
+  clients?: Client[]
   selectedActivities?: Set<string>
   onSelectToggle?: (activityId: string) => void
   onSessionUpdated?: (session: Session) => void
   isProcessing?: boolean
 }
 
-export function SessionTable({ sessions, totalHours, totalActivities, totalBillableValue, totalNonBillableMinutes, matters, selectedActivities, onSelectToggle, onSessionUpdated, isProcessing }: SessionTableProps) {
+export function SessionTable({ sessions, totalHours, totalActivities, totalBillableValue, totalNonBillableMinutes, matters, clients, selectedActivities, onSelectToggle, onSessionUpdated, isProcessing }: SessionTableProps) {
   if (sessions.length === 0 && !isProcessing) {
     return <EmptyState />
   }
@@ -41,6 +42,7 @@ export function SessionTable({ sessions, totalHours, totalActivities, totalBilla
           key={session.id}
           session={session}
           matters={matters}
+          clients={clients}
           selectedActivities={selectedActivities}
           onSelectToggle={onSelectToggle}
           onSessionUpdated={onSessionUpdated}

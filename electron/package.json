@@ -40,6 +40,7 @@
       "icon": "../assets/donna.ico"
     },
     "mac": {
+      "artifactName": "Donna.${ext}",
       "target": [
         "dmg",
         "zip"
@@ -54,7 +55,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "artifactName": "DonnaSetup-${version}.${ext}"
+      "artifactName": "DonnaSetup.${ext}"
     },
     "publish": {
       "provider": "github",

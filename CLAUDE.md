@@ -41,13 +41,13 @@ The marketing site lives in `landing/`. Vercel project is linked there.
 - The repo root is NOT the landing page — deploying from root will fail (tries to build the React app).
 
 ## Desktop App Deployment (Windows + Mac)
-The Electron app is built and released via GitHub Actions. **Every release must also update the landing page.**
+The Electron app is built and released via GitHub Actions.
+Artifact filenames are version-free (`DonnaSetup.exe`, `Donna.dmg`) so landing page links never need updating.
 1. Bump version in `electron/package.json`
-2. Update download links in `landing/index.html` to match new version (search for `.exe` and `.dmg`)
-3. Commit and tag: `git tag v<version>`
-4. Push with tags: `git push origin main --tags`
-5. GitHub Actions builds Windows (NSIS installer) and macOS (DMG) automatically — monitor at the Actions tab
-6. **Deploy landing page:** `cd landing && npx vercel --prod` (required every release so download links work)
+2. Commit and tag: `git tag v<version>`
+3. Push with tags: `git push origin main --tags`
+4. GitHub Actions builds Windows (NSIS installer) and macOS (DMG) automatically — monitor at the Actions tab
+5. **Always deploy landing page after any landing/ changes:** `cd landing && npx vercel --prod`
 
 ## Design System
 Always read DESIGN.md before making any visual or UI decisions.

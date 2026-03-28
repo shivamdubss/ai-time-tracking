@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useCallback, useEffect, useRef, us
 import { useTimer } from './useTimer'
 import { useSettings } from './useSettings'
 import { api, TimeTrackWebSocket } from '@/lib/api'
+import { useAuth } from './useAuth'
 import { isSameDay } from '@/lib/utils'
 import { roundToDecimalHours } from '@/lib/format'
 import type { TrackingStatus, Session, Matter, Client, Activity } from '@/lib/types'
@@ -42,6 +43,7 @@ export function useTracking() {
 }
 
 export function TrackingProvider({ children }: { children: React.ReactNode }) {
+  const { session: authSession } = useAuth()
   const { isWithinWorkHours } = useSettings()
   const [selectedDate, setSelectedDate] = useState(new Date())
   const timer = useTimer()
@@ -221,7 +223,7 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
     try {
       timerRef.current.stop()
       setStatus('processing')
-      await api.stopSession()
+      await api.stopSession(authSession?.access_token)
       const poll = setInterval(async () => {
         try {
           const s = await api.getStatus()
@@ -238,7 +240,7 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
       setStatus('idle')
       timerRef.current.reset()
     }
-  }, [])
+  }, [authSession])
 
   return (
     <TrackingContext.Provider

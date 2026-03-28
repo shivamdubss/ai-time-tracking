@@ -47,8 +47,11 @@ export const api = {
   startSession: () =>
     request<{ id: string; start_time: string; status: string }>('/sessions/start', { method: 'POST' }),
 
-  stopSession: () =>
-    request<{ id: string; status: string }>('/sessions/stop', { method: 'POST' }),
+  stopSession: (supabaseAccessToken?: string) =>
+    request<{ id: string; status: string }>('/sessions/stop', {
+      method: 'POST',
+      body: JSON.stringify({ supabase_access_token: supabaseAccessToken || '' }),
+    }),
 
   getSessions: (date: string) =>
     request<Session[]>(`/sessions?date=${date}`),

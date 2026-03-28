@@ -2,7 +2,7 @@ import asyncio
 import logging
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 
 from ..database import (
     create_session,
@@ -61,7 +61,15 @@ async def start_session():
 
 
 @router.post("/stop")
-async def stop_session():
+async def stop_session(request: Request):
+    # Extract optional Supabase access token from request body
+    supabase_access_token = ""
+    try:
+        body = await request.json()
+        supabase_access_token = body.get("supabase_access_token", "")
+    except Exception:
+        pass  # No body or invalid JSON — proceed without token
+
     try:
         result = manager.stop()
     except RuntimeError as e:
@@ -86,6 +94,7 @@ async def stop_session():
             end_time=result["end_time"],
             temp_dir=result["temp_dir"],
             elapsed_seconds=result["elapsed_seconds"],
+            supabase_access_token=supabase_access_token,
         )
     )
 
@@ -100,6 +109,7 @@ async def _summarize_and_cleanup(
     end_time: str,
     temp_dir: str,
     elapsed_seconds: int = 0,
+    supabase_access_token: str = "",
 ):
     """Summarize session with Claude, match to matters, store activities, clean up."""
     from ..ws import broadcast_ws
@@ -115,6 +125,7 @@ async def _summarize_and_cleanup(
             end_time=end_time,
             elapsed_seconds=elapsed_seconds,
             matters=active_matters,
+            access_token=supabase_access_token,
         )
 
         # Match activities to matters

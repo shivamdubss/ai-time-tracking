@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog } from "electron";
+import { app, BrowserWindow, dialog, Menu } from "electron";
 import * as path from "path";
 import * as fs from "fs";
 import { startBackend, stopBackend } from "./sidecar";
@@ -80,6 +80,7 @@ app.on("second-instance", () => {
 });
 
 app.whenReady().then(async () => {
+  Menu.setApplicationMenu(null);
   log("Donna starting up");
   log(`  Platform: ${process.platform}`);
   log(`  Arch: ${process.arch}`);

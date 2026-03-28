@@ -37,13 +37,13 @@ async def lifespan(app: FastAPI):
 
     # Start sync engine if Supabase is configured
     supabase_url = os.environ.get("SUPABASE_URL", "")
-    supabase_key = os.environ.get("SUPABASE_SERVICE_KEY", "")
-    if supabase_url and supabase_key:
+    supabase_anon_key = os.environ.get("SUPABASE_ANON_KEY", "")
+    if supabase_url and supabase_anon_key:
         try:
             from supabase import create_client
-            sb = create_client(supabase_url, supabase_key)
+            sb = create_client(supabase_url, supabase_anon_key)
             sync_engine = SyncEngine(sb, get_db)
-            # user_id will be set when the frontend sends it after auth
+            # user_id + access_token set when frontend sends them after auth
             logger.info("SyncEngine initialized (waiting for user auth)")
         except ImportError:
             logger.warning("supabase-py not installed — sync disabled")
@@ -98,8 +98,10 @@ async def auth_sync_endpoint(body: dict = {}):
     """Notify backend of authenticated user to start sync engine."""
     global sync_engine
     user_id = body.get("user_id")
-    if sync_engine and user_id:
+    access_token = body.get("access_token")
+    if sync_engine and user_id and access_token:
         sync_engine.set_user(user_id)
+        sync_engine.set_access_token(access_token)
         sync_engine.start()
         return {"syncing": True}
     return {"syncing": False}

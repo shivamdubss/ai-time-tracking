@@ -53,6 +53,10 @@ class SyncEngine:
     def set_user(self, user_id: str):
         self._user_id = user_id
 
+    def set_access_token(self, access_token: str):
+        """Set the user's Supabase access token for authenticated sync."""
+        self._supabase.options.headers["Authorization"] = f"Bearer {access_token}"
+
     def start(self):
         if self._thread and self._thread.is_alive():
             return

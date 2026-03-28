@@ -34,17 +34,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
-      if (session?.user && isDesktopMode) {
-        notifySync(session.user.id)
+      if (session?.user && session.access_token && isDesktopMode) {
+        notifySync(session.user.id, session.access_token)
       }
     })
 
-    // Listen for auth state changes
+    // Listen for auth state changes (also fires on TOKEN_REFRESHED)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
-      if (session?.user && isDesktopMode) {
-        notifySync(session.user.id)
+      if (session?.user && session.access_token && isDesktopMode) {
+        notifySync(session.user.id, session.access_token)
       }
     })
 

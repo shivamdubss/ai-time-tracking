@@ -31,7 +31,8 @@ export function ClientsMattersPage() {
       if (internal) {
         setExpandedClients(prev => new Set([...prev, internal.id]))
       }
-    } catch {
+    } catch (e) {
+      console.error('Failed to fetch clients:', e)
       setClients([])
     }
   }, [])

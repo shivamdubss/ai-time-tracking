@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useCallback, useEffect, useRef, us
 import { useTimer } from './useTimer'
 import { useSettings } from './useSettings'
 import { api, TimeTrackWebSocket } from '@/lib/api'
+import { isWebMode } from '@/lib/platform'
 import { useAuth } from './useAuth'
 import { isSameDay } from '@/lib/utils'
 import { roundToDecimalHours } from '@/lib/format'
@@ -160,8 +161,9 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
     })
   }, [])
 
-  // Check tracking status on mount
+  // Check tracking status on mount (desktop only)
   useEffect(() => {
+    if (isWebMode) return
     api.getStatus().then((s) => {
       if (s.status === 'tracking') {
         setStatus('tracking')
@@ -174,8 +176,9 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
     }).catch(() => {})
   }, [])
 
-  // WebSocket for tracking state changes
+  // WebSocket for tracking state changes (desktop only)
   useEffect(() => {
+    if (isWebMode) return
     const ws = new TimeTrackWebSocket()
     ws.connect()
 

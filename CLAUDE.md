@@ -49,6 +49,21 @@ Artifact filenames are version-free (`DonnaSetup.exe`, `Donna.dmg`) so landing p
 4. GitHub Actions builds Windows (NSIS installer) and macOS (DMG) automatically — monitor at the Actions tab
 5. **Always deploy landing page after any landing/ changes:** `cd landing && npx vercel --prod`
 
+## Web App Deployment
+The web app deploys from `frontend/`. Separate Vercel project from the landing page.
+- **Deploy:** `cd frontend && npx vercel --prod`
+- **Build:** `cd frontend && npm run build`
+- Requires `VITE_DEPLOY_TARGET=web` environment variable on Vercel (plus `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`).
+- The web app talks directly to Supabase — no backend needed. Everything works except time tracking (screen capture).
+- After creating the Vercel project, add its URL to Supabase Auth > URL Configuration > Redirect URLs for Google OAuth.
+
+## Supabase Edge Function
+The `summarize` edge function proxies AI calls to Anthropic so users don't need API keys.
+- **Deploy:** `npx supabase functions deploy summarize --project-ref lyicrwtrcanotbffjnfk`
+- **Set secrets:** `npx supabase secrets set ANTHROPIC_API_KEY=<key> --project-ref lyicrwtrcanotbffjnfk`
+- **Code:** `supabase/functions/summarize/index.ts`
+- If you modify the edge function, you must redeploy it separately from the desktop app.
+
 ## Design System
 Always read DESIGN.md before making any visual or UI decisions.
 All font choices, colors, spacing, and aesthetic direction are defined there.

@@ -10,6 +10,7 @@ import { SettingsPage } from '@/pages/SettingsPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
 import { LoginPage } from '@/pages/LoginPage'
 import { initAuth } from '@/lib/api'
+import { isWebMode } from '@/lib/platform'
 import { SettingsProvider } from '@/hooks/useSettings'
 import { TrackingProvider } from '@/hooks/useTrackingContext'
 import { AuthProvider, useAuth } from '@/hooks/useAuth'
@@ -22,7 +23,11 @@ function AppContent() {
   const { user, loading } = useAuth()
 
   useEffect(() => {
-    initAuth().then(() => setReady(true))
+    if (isWebMode) {
+      setReady(true)
+    } else {
+      initAuth().then(() => setReady(true))
+    }
   }, [])
 
   if (loading || !ready) return null

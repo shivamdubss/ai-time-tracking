@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Toggle } from '@/components/ui/Toggle'
 import { formatDateLabel, formatTime } from '@/lib/utils'
+import { isWebMode } from '@/lib/platform'
 import type { TrackingStatus } from '@/lib/types'
 
 interface HeaderProps {
@@ -51,44 +52,46 @@ export function Header({
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        {status === 'tracking' && (
-          <div className="flex items-center gap-2 px-2.5 py-1.5 bg-error-bg border border-error/20 rounded-[var(--radius-sm)]">
-            <span className="w-[7px] h-[7px] rounded-full bg-error animate-pulse-dot" />
-            <span className="font-mono text-[13px] font-medium text-error tabular-nums">
-              {formatTime(elapsed)}
-            </span>
-          </div>
-        )}
+      {!isWebMode && (
+        <div className="flex items-center gap-3">
+          {status === 'tracking' && (
+            <div className="flex items-center gap-2 px-2.5 py-1.5 bg-error-bg border border-error/20 rounded-[var(--radius-sm)]">
+              <span className="w-[7px] h-[7px] rounded-full bg-error animate-pulse-dot" />
+              <span className="font-mono text-[13px] font-medium text-error tabular-nums">
+                {formatTime(elapsed)}
+              </span>
+            </div>
+          )}
 
-        {status === 'paused' && (
-          <div className="flex items-center gap-2 px-2.5 py-1.5 bg-warning-bg border border-warning/20 rounded-[var(--radius-sm)]">
-            <span className="w-[7px] h-[7px] rounded-full bg-warning" />
-            <span className="font-mono text-[13px] font-medium text-warning tabular-nums">
-              {formatTime(elapsed)}
-            </span>
-            <span className="text-xs font-medium text-warning/70 ml-0.5">PAUSED</span>
-          </div>
-        )}
+          {status === 'paused' && (
+            <div className="flex items-center gap-2 px-2.5 py-1.5 bg-warning-bg border border-warning/20 rounded-[var(--radius-sm)]">
+              <span className="w-[7px] h-[7px] rounded-full bg-warning" />
+              <span className="font-mono text-[13px] font-medium text-warning tabular-nums">
+                {formatTime(elapsed)}
+              </span>
+              <span className="text-xs font-medium text-warning/70 ml-0.5">PAUSED</span>
+            </div>
+          )}
 
-        {status === 'processing' && (
-          <div className="flex items-center gap-2 px-2.5 py-1.5 bg-info-bg border border-info/20 rounded-[var(--radius-sm)]">
-            <div className="w-3.5 h-3.5 border-2 border-info/30 border-t-info rounded-full animate-spin" />
-            <span className="text-[13px] font-medium text-info">Processing...</span>
-          </div>
-        )}
+          {status === 'processing' && (
+            <div className="flex items-center gap-2 px-2.5 py-1.5 bg-info-bg border border-info/20 rounded-[var(--radius-sm)]">
+              <div className="w-3.5 h-3.5 border-2 border-info/30 border-t-info rounded-full animate-spin" />
+              <span className="text-[13px] font-medium text-info">Processing...</span>
+            </div>
+          )}
 
-        {workHoursBlocked && (
-          <span className="text-xs text-warning font-medium">Outside work hours</span>
-        )}
+          {workHoursBlocked && (
+            <span className="text-xs text-warning font-medium">Outside work hours</span>
+          )}
 
-        <Toggle
-          checked={status === 'tracking' || status === 'paused'}
-          onChange={(checked) => checked ? onStartTracking() : onStopTracking()}
-          label="Auto Capture"
-          disabled={status === 'processing'}
-        />
-      </div>
+          <Toggle
+            checked={status === 'tracking' || status === 'paused'}
+            onChange={(checked) => checked ? onStartTracking() : onStopTracking()}
+            label="Auto Capture"
+            disabled={status === 'processing'}
+          />
+        </div>
+      )}
     </header>
   )
 }

@@ -1,6 +1,7 @@
 import { useSettings } from '@/hooks/useSettings'
 import { useAuth } from '@/hooks/useAuth'
 import { isSupabaseConfigured } from '@/lib/supabase'
+import { isWebMode } from '@/lib/platform'
 import { Toggle } from '@/components/ui/Toggle'
 
 export function SettingsPage() {
@@ -12,8 +13,8 @@ export function SettingsPage() {
     <div className="flex flex-col gap-6 p-4 md:p-6 flex-1 min-h-0 pt-16 md:pt-6">
       <h1 className="font-display font-bold text-xl text-text-primary">Settings</h1>
 
-      {/* Work Hours */}
-      <div className="bg-surface border border-border rounded-[var(--radius-md)] overflow-hidden max-w-lg">
+      {/* Work Hours (desktop only — controls auto-capture) */}
+      {!isWebMode && <div className="bg-surface border border-border rounded-[var(--radius-md)] overflow-hidden max-w-lg">
         <div className="px-5 py-4 flex items-center justify-between gap-4">
           <div>
             <h2 className="font-display font-semibold text-sm text-text-primary">Work Hours</h2>
@@ -62,7 +63,7 @@ export function SettingsPage() {
             </p>
           </div>
         )}
-      </div>
+      </div>}
 
       {/* Account */}
       {isSupabaseConfigured() && user && (

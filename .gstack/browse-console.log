@@ -1,135 +1,27 @@
-[2026-03-27T22:26:03.967Z] [debug] [vite] connecting...
-[2026-03-27T22:26:04.066Z] [debug] [vite] connected.
-[2026-03-27T22:26:04.603Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:27:32.532Z] [error] WebSocket connection to 'ws://localhost:5173/?token=jbZC8TLDxORp' failed: 
-[2026-03-27T22:27:32.569Z] [log] [vite] server connection lost. Polling for restart...
-[2026-03-27T22:27:32.993Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:27:34.063Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:27:35.021Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:27:36.529Z] [debug] [vite] connecting...
-[2026-03-27T22:27:36.606Z] [debug] [vite] connected.
-[2026-03-27T22:27:37.406Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:27:46.300Z] [debug] [vite] connecting...
-[2026-03-27T22:27:46.343Z] [debug] [vite] connected.
-[2026-03-27T22:27:46.660Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:28:09.392Z] [debug] [vite] connecting...
-[2026-03-27T22:28:09.443Z] [debug] [vite] connected.
-[2026-03-27T22:28:09.568Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:28:34.851Z] [debug] [vite] connecting...
-[2026-03-27T22:28:34.897Z] [debug] [vite] connected.
-[2026-03-27T22:28:34.932Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:28:59.854Z] [debug] [vite] connecting...
-[2026-03-27T22:28:59.889Z] [debug] [vite] connected.
-[2026-03-27T22:28:59.913Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:29:00.237Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: WebSocket is closed before the connection is established.
-[2026-03-27T22:29:14.070Z] [debug] [vite] connecting...
-[2026-03-27T22:29:14.072Z] [debug] [vite] connected.
-[2026-03-27T22:29:14.164Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:29:14.225Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: WebSocket is closed before the connection is established.
-[2026-03-27T22:29:36.016Z] [debug] [vite] connecting...
-[2026-03-27T22:29:36.053Z] [debug] [vite] connected.
-[2026-03-27T22:29:36.080Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:29:36.199Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: WebSocket is closed before the connection is established.
-[2026-03-27T22:29:42.470Z] [debug] [vite] connecting...
-[2026-03-27T22:29:42.520Z] [debug] [vite] connected.
-[2026-03-27T22:29:42.571Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:29:42.696Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: WebSocket is closed before the connection is established.
-[2026-03-27T22:29:42.752Z] [warning] The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[2026-03-27T22:29:42.752Z] [warning] The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[2026-03-27T22:29:42.759Z] [error] Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. Administrative
-[2026-03-27T22:29:42.890Z] [error] Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. Administrative
-[2026-03-27T22:29:42.952Z] [error] Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. Administrative
-[2026-03-27T22:29:42.953Z] [error] Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. Administrative
-[2026-03-27T22:30:11.364Z] [error] WebSocket connection to 'ws://localhost:5173/?token=uuedWEANkl-F' failed: 
-[2026-03-27T22:30:11.365Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: 
-[2026-03-27T22:30:11.375Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: 
-[2026-03-27T22:30:11.378Z] [log] [vite] server connection lost. Polling for restart...
-[2026-03-27T22:30:12.114Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:30:13.153Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:30:14.150Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:30:14.344Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:30:14.355Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:30:15.155Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:30:16.168Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:30:17.178Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:30:17.392Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:30:17.436Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:30:18.261Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:30:19.362Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:30:20.728Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:30:20.938Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:30:21.758Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:30:25.836Z] [debug] [vite] connecting...
-[2026-03-27T22:30:25.878Z] [debug] [vite] connected.
-[2026-03-27T22:30:27.971Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:51:49.147Z] [debug] [vite] connecting...
-[2026-03-27T22:51:49.209Z] [debug] [vite] connected.
-[2026-03-27T22:51:49.246Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:51:49.476Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: WebSocket is closed before the connection is established.
-[2026-03-27T22:51:58.902Z] [debug] [vite] connecting...
-[2026-03-27T22:51:58.904Z] [debug] [vite] connected.
-[2026-03-27T22:51:58.970Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:51:59.058Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: WebSocket is closed before the connection is established.
-[2026-03-27T22:52:01.320Z] [debug] [vite] connecting...
-[2026-03-27T22:52:01.324Z] [debug] [vite] connected.
-[2026-03-27T22:52:01.378Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:52:01.476Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: WebSocket is closed before the connection is established.
-[2026-03-27T22:52:19.694Z] [debug] [vite] connecting...
-[2026-03-27T22:52:19.764Z] [debug] [vite] connected.
-[2026-03-27T22:52:19.804Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:52:19.967Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: WebSocket is closed before the connection is established.
-[2026-03-27T22:52:43.179Z] [debug] [vite] connecting...
-[2026-03-27T22:52:43.262Z] [debug] [vite] connected.
-[2026-03-27T22:52:43.306Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:52:43.397Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: WebSocket is closed before the connection is established.
-[2026-03-27T22:52:54.454Z] [debug] [vite] connecting...
-[2026-03-27T22:52:54.494Z] [debug] [vite] connected.
-[2026-03-27T22:52:54.529Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:52:54.658Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: WebSocket is closed before the connection is established.
-[2026-03-27T22:52:56.772Z] [debug] [vite] connecting...
-[2026-03-27T22:52:56.774Z] [debug] [vite] connected.
-[2026-03-27T22:52:56.781Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:52:56.904Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: WebSocket is closed before the connection is established.
-[2026-03-27T22:53:10.966Z] [debug] [vite] connecting...
-[2026-03-27T22:53:11.033Z] [debug] [vite] connected.
-[2026-03-27T22:53:11.041Z] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[2026-03-27T22:53:11.174Z] [warning] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: WebSocket is closed before the connection is established.
-[2026-03-27T22:53:43.950Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: 
-[2026-03-27T22:53:43.951Z] [error] WebSocket connection to 'ws://localhost:5173/?token=Z2WSk_i06ekK' failed: 
-[2026-03-27T22:53:44.001Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: 
-[2026-03-27T22:53:44.037Z] [log] [vite] server connection lost. Polling for restart...
-[2026-03-27T22:53:44.583Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:53:45.574Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:53:46.588Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:53:46.807Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:53:46.835Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:53:47.617Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:53:48.796Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:53:50.401Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:53:50.404Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:53:50.405Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:53:50.779Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:53:52.163Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:53:53.430Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:53:53.573Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:53:54.682Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:53:58.561Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:53:59.892Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:54:01.642Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:54:02.880Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:54:05.271Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:54:07.051Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:54:07.806Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:54:09.636Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:54:10.786Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:54:12.903Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:54:14.174Z] [error] WebSocket connection to 'ws://localhost:5173/ws?token=0KE8ToSwwWM89OLJqUYRZx6iBgcQ_lfsnC0S23lqL7s' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T22:54:16.460Z] [error] WebSocket connection to 'ws://localhost:5173/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-[2026-03-27T23:32:30.971Z] [debug] [vite] connecting...
-[2026-03-27T23:32:31.056Z] [debug] [vite] connected.
+[2026-03-28T15:59:36.333Z] [verbose] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o
+[2026-03-28T15:59:44.537Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T15:59:47.605Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T15:59:50.698Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T15:59:53.695Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T15:59:56.744Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T15:59:59.796Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:00:02.855Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:00:06.131Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:00:09.212Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:00:12.282Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:00:15.513Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:00:18.708Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:00:21.968Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:00:25.351Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:00:29.195Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:00:35.218Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:00:39.757Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:00:47.671Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:00:54.471Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:00:59.998Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:01:07.229Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:01:14.494Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:01:20.390Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:01:24.908Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:01:32.910Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200
+[2026-03-28T16:01:39.491Z] [error] WebSocket connection to 'wss://frontend-phi-smoky-17.vercel.app/ws' failed: Error during WebSocket handshake: Unexpected response code: 200

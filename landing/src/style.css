@@ -221,9 +221,9 @@ details summary::marker {
 .mockup-chart-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; overflow: hidden; }
 .mockup-chart-title { font-size: 10px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 10px; }
 .mockup-bar-chart { display: flex; align-items: flex-end; gap: 6px; flex: 1; position: relative; padding-bottom: 18px; }
-.mockup-bar { flex: 1; border-radius: 2px 2px 0 0; min-height: 4px; }
+.mockup-bar { border-radius: 2px 2px 0 0; min-height: 4px; }
 .mockup-bar-label { position: absolute; bottom: 0; font-size: 8px; color: var(--color-text-muted); text-align: center; width: 100%; }
-.mockup-bar-group { flex: 1; display: flex; flex-direction: column; align-items: stretch; position: relative; }
+.mockup-bar-group { flex: 1; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-end; align-self: stretch; position: relative; }
 .mockup-bar-target { position: absolute; left: -4px; right: -4px; border-top: 1.5px dashed var(--color-text-faint); pointer-events: none; }
 .mockup-legend-row { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--color-text-secondary); padding: 4px 0; }
 .mockup-legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }

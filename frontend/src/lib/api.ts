@@ -2,13 +2,21 @@ import type {
   Session, TrackingStatus, Client, Matter, Activity,
   AnalyticsSummary, AnalyticsTrendPoint, AnalyticsByMatter, AnalyticsCategoryRow,
 } from './types'
+import { isWebMode } from './platform'
+import {
+  api as webApi,
+  initAuth as webInitAuth,
+  TimeTrackWebSocket as WebTimeTrackWebSocket,
+} from './api-web'
+
+// ─── Desktop implementation (local FastAPI backend) ───────────────────────
 
 const API_BASE = '/api'
 
 // Auth token — fetched once from /api/init on startup
 let authToken: string = ''
 
-export async function initAuth(): Promise<string> {
+async function desktopInitAuth(): Promise<string> {
   try {
     const res = await fetch(`${API_BASE}/init`)
     const data = await res.json()
@@ -39,7 +47,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json()
 }
 
-export const api = {
+const desktopApi = {
   // Sessions
   getStatus: () =>
     request<{ status: TrackingStatus; elapsed_seconds: number; session_id: string | null }>('/status'),
@@ -162,8 +170,7 @@ export const api = {
   },
 }
 
-
-export class TimeTrackWebSocket {
+class DesktopTimeTrackWebSocket {
   private ws: WebSocket | null = null
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null
   private listeners: Map<string, Set<(data: any) => void>> = new Map()
@@ -205,3 +212,9 @@ export class TimeTrackWebSocket {
     this.ws?.close()
   }
 }
+
+// ─── Route exports based on deploy target ─────────────────────────────────
+
+export const api = isWebMode ? webApi : desktopApi
+export const initAuth = isWebMode ? webInitAuth : desktopInitAuth
+export const TimeTrackWebSocket = isWebMode ? WebTimeTrackWebSocket : DesktopTimeTrackWebSocket

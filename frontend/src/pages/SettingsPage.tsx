@@ -66,22 +66,56 @@ export function SettingsPage() {
       </div>}
 
       {/* Account */}
-      {isSupabaseConfigured() && user && (
-        <div className="bg-surface border border-border rounded-[var(--radius-md)] overflow-hidden max-w-lg">
-          <div className="px-5 py-4">
-            <h2 className="font-display font-semibold text-sm text-text-primary">Account</h2>
-            <p className="text-xs text-text-muted mt-0.5">{user.email}</p>
+      {isSupabaseConfigured() && user && (() => {
+        const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'
+        const initial = displayName.charAt(0).toUpperCase()
+        const memberSince = user.created_at
+          ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+          : null
+
+        return (
+          <div className="bg-surface border border-border rounded-[var(--radius-md)] overflow-hidden max-w-lg">
+            {/* Header */}
+            <div className="px-5 py-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-inset border border-border flex items-center justify-center shrink-0">
+                <span className="font-display font-bold text-sm text-text-muted">{initial}</span>
+              </div>
+              <div className="min-w-0">
+                <h2 className="font-display font-semibold text-sm text-text-primary truncate">{displayName}</h2>
+                <p className="text-xs text-text-muted truncate">{user.email}</p>
+              </div>
+            </div>
+
+            {/* Details */}
+            <div className="px-5 py-4 border-t border-border-subtle flex flex-col gap-3">
+              <div className="flex items-baseline justify-between">
+                <span className="text-xs text-text-muted">Full name</span>
+                <span className="text-sm text-text-primary">{displayName}</span>
+              </div>
+              <div className="flex items-baseline justify-between">
+                <span className="text-xs text-text-muted">Email</span>
+                <span className="text-sm text-text-primary">{user.email}</span>
+              </div>
+              {memberSince && (
+                <div className="flex items-baseline justify-between">
+                  <span className="text-xs text-text-muted">Member since</span>
+                  <span className="text-sm text-text-primary">{memberSince}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="px-5 py-4 border-t border-border-subtle">
+              <button
+                onClick={signOut}
+                className="px-4 py-2 text-sm font-medium rounded-[var(--radius-sm)] border border-border text-text-primary hover:bg-surface-hover transition-colors cursor-pointer"
+              >
+                Sign out
+              </button>
+            </div>
           </div>
-          <div className="px-5 py-4 border-t border-border-subtle">
-            <button
-              onClick={signOut}
-              className="px-4 py-2 text-sm font-medium rounded-[var(--radius-sm)] border border-border text-text-primary hover:bg-surface-hover transition-colors cursor-pointer"
-            >
-              Sign out
-            </button>
-          </div>
-        </div>
-      )}
+        )
+      })()}
     </div>
   )
 }

@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { User, Session } from '@supabase/supabase-js'
 import { supabase, isSupabaseConfigured } from '@/lib/supabase'
+import { isDesktopMode } from '@/lib/platform'
+import { notifySync } from '@/lib/api'
 
 interface AuthState {
   user: User | null
@@ -32,12 +34,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
+      if (session?.user && isDesktopMode) {
+        notifySync(session.user.id)
+      }
     })
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
+      if (session?.user && isDesktopMode) {
+        notifySync(session.user.id)
+      }
     })
 
     return () => subscription.unsubscribe()

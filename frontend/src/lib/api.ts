@@ -27,6 +27,16 @@ async function desktopInitAuth(): Promise<string> {
   return authToken
 }
 
+async function notifyDesktopSync(userId: string): Promise<void> {
+  try {
+    await fetch(`${API_BASE}/auth/sync`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId }),
+    })
+  } catch { /* best-effort — don't block auth flow */ }
+}
+
 function authHeaders(): Record<string, string> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
   if (authToken) {
@@ -218,3 +228,4 @@ class DesktopTimeTrackWebSocket {
 export const api = isWebMode ? webApi : desktopApi
 export const initAuth = isWebMode ? webInitAuth : desktopInitAuth
 export const TimeTrackWebSocket = isWebMode ? WebTimeTrackWebSocket : DesktopTimeTrackWebSocket
+export const notifySync = isWebMode ? async (_userId: string) => {} : notifyDesktopSync

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Changelog — Donna</title>
+  <meta name="description" content="See what's new in Donna. Release notes and product updates for AI-powered time tracking built for attorneys." />
+
+  <meta property="og:title" content="Changelog — Donna" />
+  <meta property="og:description" content="Release notes and product updates for Donna." />
+  <meta property="og:type" content="website" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body class="bg-page text-text-primary">
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav id="navbar" class="navbar fixed top-0 left-0 right-0 z-50 border-b border-transparent">
+    <div class="max-w-[1200px] mx-auto px-6 flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-2">
+        <img src="/images/donna-logo.png" alt="Donna" class="h-8" />
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <div class="hidden md:flex items-center gap-8">
+        <a href="/#features" class="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">Features</a>
+        <a href="/#how-it-works" class="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">How It Works</a>
+        <a href="/#privacy" class="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">Privacy</a>
+      </div>
+
+      <!-- Desktop CTA -->
+      <a href="/#cta" class="hidden md:inline-flex items-center px-4 py-2 bg-accent text-text-inverse text-sm font-semibold rounded-[6px] hover:bg-accent-hover transition-colors">
+        Download
+      </a>
+
+      <!-- Mobile Hamburger -->
+      <button id="mobile-menu-btn" class="md:hidden p-2 -mr-2" aria-label="Open menu">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-border bg-surface">
+      <div class="px-6 py-4 flex flex-col gap-4">
+        <a href="/#features" class="text-sm font-medium text-text-secondary hover:text-text-primary">Features</a>
+        <a href="/#how-it-works" class="text-sm font-medium text-text-secondary hover:text-text-primary">How It Works</a>
+        <a href="/#privacy" class="text-sm font-medium text-text-secondary hover:text-text-primary">Privacy</a>
+        <a href="/#cta" class="inline-flex items-center justify-center px-4 py-2 bg-accent text-text-inverse text-sm font-semibold rounded-[6px]">Download</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- ===================== CHANGELOG ===================== -->
+    <section class="pt-32 pb-16 md:pt-40 md:pb-24 px-6">
+      <div class="max-w-[720px] mx-auto">
+
+        <!-- Page Header -->
+        <div class="mb-12 md:mb-16">
+          <p class="font-display text-xs font-semibold uppercase tracking-[0.08em] text-text-muted mb-3">Product Updates</p>
+          <h1 class="font-display font-bold text-3xl md:text-4xl tracking-[-0.02em] text-text-primary">Changelog</h1>
+          <p class="mt-3 text-base text-text-secondary leading-relaxed">New features, improvements, and fixes in every release of Donna.</p>
+        </div>
+
+        <!-- Version Entries -->
+        <div class="space-y-0">
+
+          <!-- v1.0.4 -->
+          <article class="py-8 border-t border-border">
+            <div class="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 mb-4">
+              <span class="font-mono text-sm font-medium text-text-primary">v1.0.4</span>
+              <time class="text-sm text-text-muted" datetime="2026-03-27">March 27, 2026</time>
+            </div>
+            <ul class="space-y-2.5">
+              <li class="flex items-start gap-3 text-sm text-text-secondary leading-relaxed">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-text-muted flex-shrink-0"></span>
+                Cleaner window appearance on Windows — removed the default system menu bar for a more polished experience
+              </li>
+            </ul>
+          </article>
+
+          <!-- v1.0.3 -->
+          <article class="py-8 border-t border-border">
+            <div class="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 mb-4">
+              <span class="font-mono text-sm font-medium text-text-primary">v1.0.3</span>
+              <time class="text-sm text-text-muted" datetime="2026-03-27">March 27, 2026</time>
+            </div>
+            <ul class="space-y-2.5">
+              <li class="flex items-start gap-3 text-sm text-text-secondary leading-relaxed">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-text-muted flex-shrink-0"></span>
+                Stable download links that no longer change between releases
+              </li>
+              <li class="flex items-start gap-3 text-sm text-text-secondary leading-relaxed">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-text-muted flex-shrink-0"></span>
+                Fixed AI-powered narrative generation when using cloud authentication
+              </li>
+            </ul>
+          </article>
+
+          <!-- v1.0.2 -->
+          <article class="py-8 border-t border-border">
+            <div class="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 mb-4">
+              <span class="font-mono text-sm font-medium text-text-primary">v1.0.2</span>
+              <time class="text-sm text-text-muted" datetime="2026-03-27">March 27, 2026</time>
+            </div>
+            <ul class="space-y-2.5">
+              <li class="flex items-start gap-3 text-sm text-text-secondary leading-relaxed">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-text-muted flex-shrink-0"></span>
+                AI summarization now works out of the box — no API key needed during early access
+              </li>
+              <li class="flex items-start gap-3 text-sm text-text-secondary leading-relaxed">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-text-muted flex-shrink-0"></span>
+                Added macOS download support alongside Windows
+              </li>
+            </ul>
+          </article>
+
+          <!-- v1.0.1 -->
+          <article class="py-8 border-t border-border">
+            <div class="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 mb-4">
+              <span class="font-mono text-sm font-medium text-text-primary">v1.0.1</span>
+              <time class="text-sm text-text-muted" datetime="2026-03-27">March 27, 2026</time>
+            </div>
+            <ul class="space-y-2.5">
+              <li class="flex items-start gap-3 text-sm text-text-secondary leading-relaxed">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-text-muted flex-shrink-0"></span>
+                Rebuilt the desktop app with Electron for better performance and cross-platform reliability
+              </li>
+              <li class="flex items-start gap-3 text-sm text-text-secondary leading-relaxed">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-text-muted flex-shrink-0"></span>
+                Redesigned the marketing site with a fresh, modern look
+              </li>
+              <li class="flex items-start gap-3 text-sm text-text-secondary leading-relaxed">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-text-muted flex-shrink-0"></span>
+                Improved Windows installer and app icon
+              </li>
+            </ul>
+          </article>
+
+          <!-- v1.0.0 -->
+          <article class="py-8 border-t border-border">
+            <div class="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 mb-4">
+              <span class="font-mono text-sm font-medium text-text-primary">v1.0.0</span>
+              <time class="text-sm text-text-muted" datetime="2026-03-27">March 27, 2026</time>
+            </div>
+            <ul class="space-y-2.5">
+              <li class="flex items-start gap-3 text-sm text-text-secondary leading-relaxed">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-text-muted flex-shrink-0"></span>
+                Automatic time tracking that runs silently in the background
+              </li>
+              <li class="flex items-start gap-3 text-sm text-text-secondary leading-relaxed">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-text-muted flex-shrink-0"></span>
+                AI-generated billing narratives powered by Claude
+              </li>
+              <li class="flex items-start gap-3 text-sm text-text-secondary leading-relaxed">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-text-muted flex-shrink-0"></span>
+                Client and matter management for organizing your work
+              </li>
+              <li class="flex items-start gap-3 text-sm text-text-secondary leading-relaxed">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-text-muted flex-shrink-0"></span>
+                Revenue analytics dashboard to visualize billable hours
+              </li>
+              <li class="flex items-start gap-3 text-sm text-text-secondary leading-relaxed">
+                <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-text-muted flex-shrink-0"></span>
+                Privacy-first architecture — all data stays on your device
+              </li>
+            </ul>
+          </article>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="bg-text-primary py-12 md:py-16 px-6">
+    <div class="max-w-[1200px] mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <!-- Brand -->
+        <div>
+          <img src="/images/donna-logo.png" alt="Donna" class="h-7 brightness-0 invert mb-4" />
+          <p class="text-sm text-text-faint leading-relaxed">
+            AI-powered time tracking for attorneys. Privacy-first, on-device, built for privilege.
+          </p>
+          <p class="text-xs text-text-faint mt-4">&copy; 2026 Donna AI. All rights reserved.</p>
+        </div>
+
+        <!-- Product -->
+        <div>
+          <h4 class="text-sm font-semibold text-text-inverse mb-4">Product</h4>
+          <ul class="space-y-2.5">
+            <li><a href="/#features" class="text-sm text-text-faint hover:text-text-muted transition-colors">Timeline</a></li>
+            <li><a href="/#features" class="text-sm text-text-faint hover:text-text-muted transition-colors">Timesheet</a></li>
+            <li><a href="/#features" class="text-sm text-text-faint hover:text-text-muted transition-colors">Analytics</a></li>
+            <li><a href="/#features" class="text-sm text-text-faint hover:text-text-muted transition-colors">Clients &amp; Matters</a></li>
+            <li><a href="/changelog" class="text-sm text-text-faint hover:text-text-muted transition-colors">Changelog</a></li>
+          </ul>
+        </div>
+
+        <!-- Legal -->
+        <div>
+          <h4 class="text-sm font-semibold text-text-inverse mb-4">Legal</h4>
+          <ul class="space-y-2.5">
+            <li><a href="/#privacy" class="text-sm text-text-faint hover:text-text-muted transition-colors">Privacy Policy</a></li>
+            <li><a href="/#privacy" class="text-sm text-text-faint hover:text-text-muted transition-colors">Terms of Service</a></li>
+            <li><a href="/#privacy" class="text-sm text-text-faint hover:text-text-muted transition-colors">ABA Rule 1.6 Compliance</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

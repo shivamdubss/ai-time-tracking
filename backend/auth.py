@@ -4,7 +4,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 
 # Routes that don't require auth
-PUBLIC_PATHS = frozenset({"/api/init", "/ws"})
+PUBLIC_PATHS = frozenset({"/api/init", "/ws", "/api/auth/sync"})
 PUBLIC_PREFIXES = ("/assets/", "/static/")
 
 

@@ -200,6 +200,11 @@ async def _summarize_and_cleanup(
             "session_id": session_id,
         })
 
+        # Push completed session to Supabase immediately
+        from ..main import sync_engine as _sync_engine
+        if _sync_engine:
+            _sync_engine.sync_now()
+
     except Exception as e:
         logger.error(f"Summarization failed for session {session_id}: {e}", exc_info=True)
         update_session(

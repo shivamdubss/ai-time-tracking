@@ -10,7 +10,7 @@ from typing import Optional
 
 logger = logging.getLogger("timetrack")
 
-SYNC_INTERVAL = int(os.getenv("TIMETRACK_SYNC_INTERVAL", "300"))  # 5 min default
+SYNC_INTERVAL = int(os.getenv("TIMETRACK_SYNC_INTERVAL", "60"))  # 1 min default
 
 # Tables to sync and their column lists (excluding local-only columns)
 SYNC_TABLES = {

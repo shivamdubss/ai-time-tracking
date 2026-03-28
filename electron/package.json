@@ -53,7 +53,8 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
+      "createStartMenuShortcut": true,
+      "artifactName": "DonnaSetup-${version}.${ext}"
     },
     "publish": {
       "provider": "github",

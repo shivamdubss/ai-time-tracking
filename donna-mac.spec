@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""PyInstaller spec for macOS Donna.app bundle."""
+"""PyInstaller spec for macOS DonnaBackend sidecar binary."""
 
 import sys
 from pathlib import Path
@@ -45,6 +45,7 @@ a = Analysis(
         'backend.summarizer',
         'backend.sync',
         'backend.ws',
+        'backend.models',
         'backend.tracker',
         'backend.tracker.session_manager',
         'backend.tracker.window_tracker',
@@ -60,17 +61,24 @@ a = Analysis(
         'backend.routes.matters',
         'backend.routes.activities',
         'backend.routes.analytics',
-        # pywebview
-        'webview',
         # platformdirs
         'platformdirs',
         # anthropic
         'anthropic',
+        # PIL (screenshots + image processing)
+        'PIL',
+        'PIL.Image',
+        # dotenv (uvicorn may import)
+        'dotenv',
     ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=[
+        # Exclude desktop shell packages (Electron handles these now)
+        'webview',
+        'pystray',
+    ],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
@@ -84,7 +92,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='Donna',
+    name='DonnaBackend',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -105,21 +113,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='Donna',
-)
-
-app = BUNDLE(
-    coll,
-    name='Donna.app',
-    icon=None,  # TODO: Add assets/donna.icns
-    bundle_identifier='com.donna.timetracking',
-    info_plist={
-        'CFBundleName': 'Donna',
-        'CFBundleDisplayName': 'Donna',
-        'CFBundleVersion': '1.0.0',
-        'CFBundleShortVersionString': '1.0.0',
-        'LSUIElement': False,  # Show in dock
-        'NSAccessibilityUsageDescription': 'Donna needs Accessibility access to read window titles for time tracking.',
-        'NSScreenCaptureUsageDescription': 'Donna needs Screen Recording access to capture screenshots for AI-powered session summaries.',
-    },
+    name='DonnaBackend',
 )

@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""PyInstaller spec for Windows Donna.exe."""
+"""PyInstaller spec for Windows DonnaBackend sidecar binary."""
 
 import sys
 from pathlib import Path
@@ -45,6 +45,7 @@ a = Analysis(
         'backend.summarizer',
         'backend.sync',
         'backend.ws',
+        'backend.models',
         'backend.tracker',
         'backend.tracker.session_manager',
         'backend.tracker.window_tracker',
@@ -60,8 +61,6 @@ a = Analysis(
         'backend.routes.matters',
         'backend.routes.activities',
         'backend.routes.analytics',
-        # pywebview
-        'webview',
         # Windows-specific
         'win32gui',
         'win32process',
@@ -75,6 +74,11 @@ a = Analysis(
         'platformdirs',
         # anthropic
         'anthropic',
+        # PIL (screenshots + image processing)
+        'PIL',
+        'PIL.Image',
+        # dotenv (uvicorn may import)
+        'dotenv',
     ],
     hookspath=[],
     hooksconfig={},
@@ -86,6 +90,9 @@ a = Analysis(
         'Foundation',
         'objc',
         'pyobjc',
+        # Exclude desktop shell packages (Electron handles these now)
+        'webview',
+        'pystray',
     ],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
@@ -100,12 +107,12 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='Donna',
+    name='DonnaBackend',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=False,  # No console window
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
@@ -122,5 +129,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='Donna',
+    name='DonnaBackend',
 )

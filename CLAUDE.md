@@ -46,8 +46,9 @@ Artifact filenames are version-free (`DonnaSetup.exe`, `Donna.dmg`) so landing p
 1. Bump version in `electron/package.json`
 2. Commit and tag: `git tag v<version>`
 3. Push with tags: `git push origin main --tags`
-4. GitHub Actions builds Windows (NSIS installer) and macOS (DMG) automatically — monitor at the Actions tab
-5. **Always deploy landing page after any landing/ changes:** `cd landing && npx vercel --prod`
+4. GitHub Actions builds Windows (NSIS installer) and macOS (DMG) automatically
+5. **Always monitor the build** after pushing: `gh run list --limit 1` then `gh run view <run-id>` — check back until all jobs pass
+6. **Always deploy landing page after any landing/ changes:** `cd landing && npx vercel --prod`
 
 ## Web App Deployment
 The web app deploys from `frontend/`. Separate Vercel project from the landing page.

@@ -37,6 +37,9 @@ logger = logging.getLogger("donna")
 # Point the database to the data directory
 os.environ.setdefault("TIMETRACK_DB_DIR", str(DATA_DIR))
 
+# Default to Supabase Edge Function for AI summarization (no API key needed on client)
+os.environ.setdefault("SUPABASE_FUNCTION_URL", "https://lyicrwtrcanotbffjnfk.supabase.co/functions/v1/summarize")
+
 # ---------------------------------------------------------------------------
 # .env loading from data directory
 # ---------------------------------------------------------------------------

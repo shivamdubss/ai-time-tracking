@@ -1,0 +1,64 @@
+{
+  "name": "donna",
+  "version": "1.0.1",
+  "description": "AI-powered time tracking for lawyers",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "unset ELECTRON_RUN_AS_NODE && tsc && electron .",
+    "build": "tsc",
+    "build:win": "tsc && electron-builder --win",
+    "build:mac": "tsc && electron-builder --mac",
+    "pack": "tsc && electron-builder --dir"
+  },
+  "author": "Mesh Solutions",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^25.1.8",
+    "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9"
+  },
+  "build": {
+    "appId": "com.donna.timetracking",
+    "productName": "Donna",
+    "directories": {
+      "output": "../dist-electron"
+    },
+    "extraResources": [
+      {
+        "from": "../dist-backend",
+        "to": "backend",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "../assets/donna.ico"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "entitlements.mac.plist",
+      "entitlementsInherit": "entitlements.mac.plist"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "shivamdubss",
+      "repo": "ai-time-tracking"
+    }
+  }
+}

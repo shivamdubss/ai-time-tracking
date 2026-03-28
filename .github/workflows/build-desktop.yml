@@ -3,62 +3,10 @@ name: Build Desktop Apps
 on:
   push:
     tags:
-      - 'v*'  # Trigger on version tags (e.g., v1.0.0)
-  workflow_dispatch:  # Allow manual trigger
+      - 'v*'
+  workflow_dispatch:
 
 jobs:
-  build-macos:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      # Build frontend
-      - name: Install frontend dependencies
-        working-directory: frontend
-        run: npm ci
-
-      - name: Build frontend
-        working-directory: frontend
-        run: npx vite build
-
-      # Install Python dependencies
-      - name: Install Python dependencies
-        run: |
-          pip install -r backend/requirements-darwin.txt
-          pip install pyinstaller pywebview pystray
-
-      # Build app
-      - name: Run PyInstaller
-        run: pyinstaller donna-mac.spec --noconfirm
-
-      # Create DMG
-      - name: Create DMG
-        run: |
-          npm install -g create-dmg || true
-          create-dmg 'dist/Donna.app' dist/ || true
-          # Rename to consistent name
-          mv dist/*.dmg dist/Donna.dmg 2>/dev/null || true
-          # Fallback: zip if create-dmg fails
-          if [ ! -f dist/Donna.dmg ]; then
-            cd dist && zip -r Donna-macOS.zip Donna.app
-          fi
-
-      - name: Upload macOS artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: donna-macos
-          path: |
-            dist/Donna.dmg
-            dist/Donna-macOS.zip
-
   build-windows:
     runs-on: windows-latest
     steps:
@@ -72,40 +20,109 @@ jobs:
         with:
           node-version: '20'
 
-      # Build frontend
+      # 1. Build frontend
       - name: Install frontend dependencies
         working-directory: frontend
         run: npm ci
 
       - name: Build frontend
         working-directory: frontend
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: npx vite build
 
-      # Install Python dependencies
+      # 2. Build Python sidecar
       - name: Install Python dependencies
         run: |
           pip install -r backend/requirements-win32.txt
-          pip install pyinstaller pywebview pystray
+          pip install pyinstaller
 
-      # Build exe
-      - name: Run PyInstaller
+      - name: Build Python sidecar
         run: pyinstaller donna-win.spec --noconfirm
 
-      # Create installer
-      - name: Install Inno Setup
-        run: choco install innosetup -y
+      - name: Move sidecar to dist-backend
+        run: |
+          if (Test-Path dist-backend) { Remove-Item -Recurse dist-backend }
+          Move-Item dist/DonnaBackend dist-backend
 
-      - name: Build installer
-        run: iscc donna.iss
+      # 3. Build Electron app
+      - name: Install Electron dependencies
+        working-directory: electron
+        run: npm ci
+
+      - name: Build Electron app (Windows)
+        working-directory: electron
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build:win
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
           name: donna-windows
-          path: Output/DonnaSetup.exe
+          path: dist-electron/*.exe
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 1. Build frontend
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: npx vite build
+
+      # 2. Build Python sidecar
+      - name: Install Python dependencies
+        run: |
+          pip install -r backend/requirements-darwin.txt
+          pip install pyinstaller
+
+      - name: Build Python sidecar
+        run: pyinstaller donna-mac.spec --noconfirm
+
+      - name: Move sidecar to dist-backend
+        run: |
+          rm -rf dist-backend
+          mv dist/DonnaBackend dist-backend
+
+      # 3. Build Electron app
+      - name: Install Electron dependencies
+        working-directory: electron
+        run: npm ci
+
+      - name: Build Electron app (macOS)
+        working-directory: electron
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build:mac
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: donna-macos
+          path: |
+            dist-electron/*.dmg
+            dist-electron/*.zip
 
   release:
-    needs: [build-windows]
+    needs: [build-windows, build-macos]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     permissions:
@@ -119,4 +136,5 @@ jobs:
         with:
           files: |
             donna-windows/*
+            donna-macos/*
           generate_release_notes: true

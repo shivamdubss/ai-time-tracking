@@ -6,7 +6,7 @@ import tempfile
 import threading
 import time
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Optional
 
@@ -54,7 +54,7 @@ class SessionManager:
                 return 0
             total = self._accumulated_seconds
             if self._segment_start is not None:  # not paused
-                total += (datetime.now() - self._segment_start).total_seconds()
+                total += (datetime.now(timezone.utc) - self._segment_start).total_seconds()
             return int(total)
 
     def set_state_change_callback(self, callback: Callable):
@@ -65,7 +65,7 @@ class SessionManager:
             if not self.is_tracking or self._paused:
                 return
             self._paused = True
-            now = datetime.now()
+            now = datetime.now(timezone.utc)
             self._accumulated_seconds += (now - self._segment_start).total_seconds()
             self._segment_start = None
             self._pause_intervals.append({"start": now.isoformat(), "end": None, "reason": reason})
@@ -83,9 +83,9 @@ class SessionManager:
             if not self.is_tracking or not self._paused:
                 return
             self._paused = False
-            self._segment_start = datetime.now()
+            self._segment_start = datetime.now(timezone.utc)
             if self._pause_intervals and self._pause_intervals[-1]["end"] is None:
-                self._pause_intervals[-1]["end"] = datetime.now().isoformat()
+                self._pause_intervals[-1]["end"] = datetime.now(timezone.utc).isoformat()
             logger.info("Session resumed")
             if self.window_tracker:
                 self.window_tracker.set_paused(False)
@@ -100,7 +100,7 @@ class SessionManager:
                 raise RuntimeError("Already tracking")
 
             self.current_session_id = str(uuid.uuid4())[:8]
-            self.start_time = datetime.now()
+            self.start_time = datetime.now(timezone.utc)
 
             # Reset accumulator state
             self._accumulated_seconds = 0.0
@@ -150,12 +150,12 @@ class SessionManager:
 
             # Finalize accumulated time if not paused
             if self._segment_start is not None:
-                self._accumulated_seconds += (datetime.now() - self._segment_start).total_seconds()
+                self._accumulated_seconds += (datetime.now(timezone.utc) - self._segment_start).total_seconds()
                 self._segment_start = None
 
             # Close any open pause interval
             if self._pause_intervals and self._pause_intervals[-1]["end"] is None:
-                self._pause_intervals[-1]["end"] = datetime.now().isoformat()
+                self._pause_intervals[-1]["end"] = datetime.now(timezone.utc).isoformat()
 
             # Stop trackers
             self.window_tracker.stop()
@@ -175,7 +175,7 @@ class SessionManager:
             result = {
                 "session_id": self.current_session_id,
                 "start_time": self.start_time.isoformat(),
-                "end_time": datetime.now().isoformat(),
+                "end_time": datetime.now(timezone.utc).isoformat(),
                 "temp_dir": str(self.temp_dir),
                 "window_entries": self.window_tracker.get_entries(),
                 "screenshots": [str(p) for p in self.screenshot_capture.get_screenshots()],

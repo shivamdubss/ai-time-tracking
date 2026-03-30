@@ -9,7 +9,7 @@ import { api } from '@/lib/api'
 import type { Session } from '@/lib/types'
 
 export function TimelinePage() {
-  const { selectedDate, isToday, goBack, goForward, status, elapsed, handleStart, handleStop, workHoursBlocked } = useTracking()
+  const { selectedDate, isToday, goBack, goForward, status, elapsed, handleStart, handleStop, workHoursBlocked, refreshMatters } = useTracking()
   const {
     sessions, setSessions, matters, clients,
     totalHours, totalActivities, totalBillableValue, totalBillableMinutes, totalNonBillableMinutes,
@@ -42,10 +42,16 @@ export function TimelinePage() {
     if (!window.confirm(`Delete ${selectedActivities.size} selected ${selectedActivities.size === 1 ? 'activity' : 'activities'}?`)) return
     const ids = Array.from(selectedActivities)
     await Promise.allSettled(ids.map(id => api.deleteActivity(id)))
-    setSessions(prev => prev.map(s => ({
-      ...s,
-      activities: s.activities.filter(a => !a.id || !selectedActivities.has(a.id)),
-    })))
+    setSessions(prev => {
+      const updated = prev.map(s => ({
+        ...s,
+        activities: s.activities.filter(a => !a.id || !selectedActivities.has(a.id)),
+      }))
+      updated.filter(s => s.activities.length === 0).forEach(s => {
+        if (s.id) api.deleteSession(s.id)
+      })
+      return updated.filter(s => s.activities.length > 0)
+    })
     setSelectedActivities(new Set())
   }
 
@@ -107,6 +113,7 @@ export function TimelinePage() {
         onSelectToggle={handleSelectToggle}
         onSelectSession={handleSelectSession}
         onSessionUpdated={handleSessionUpdated}
+        onDataRefresh={refreshMatters}
         isProcessing={status === 'processing'}
       />
     </div>

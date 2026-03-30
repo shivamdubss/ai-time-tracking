@@ -19,6 +19,12 @@
 ### Client & Matter Hierarchy
 Replace the flat session model with a legal-native Client > Matter structure. Every time entry must be assignable to a specific matter. Clients have: name, contact info, billing address, default rate, and an optional IOLTA trust indicator. Matters have: matter name, matter number, client reference, status (active/closed/pending), date opened, practice area, and billing type (hourly/flat/contingency). The sidebar navigation adds a "Matters" section showing active matters grouped by client. Unassigned time entries appear in an "Unbilled" bucket for later classification.
 
+### Bulk Client & Matter Import (CSV)
+A small firm with 20 clients and 50 active matters should not have to fill out 70+ forms one by one. Every legal billing system (Clio, LEAP, PracticePanther, TimeSolv) supports CSV export, and most lawyers have client lists in spreadsheets already. Add a CSV Import wizard to the Clients & Matters page with three steps: (1) drag-and-drop or paste CSV data, (2) auto-detect and map columns (client name, matter name, matter number, practice area, billing type, hourly rate, keywords), (3) preview data grouped by client with inline editing, then bulk-create in a single transaction. Provide a downloadable template CSV with example rows. Deduplicate against existing clients by name. This single feature collapses onboarding from 30 minutes of form-filling to one file drop.
+
+### AI-Powered Quick Setup
+For lawyers who do not have a clean spreadsheet but can quickly describe their practice, add an AI text parser alongside the CSV import. A single large textarea where the lawyer types or pastes client/matter information in any format — "Johnson Corp - litigation - $450/hr, Smith Estate - probate - $350/hr" or even copied from an email or Word document. The AI parses the freeform text into structured client/matter records using the same Anthropic API integration already in the summarizer. The parsed results feed into the same review-and-confirm step as the CSV import, so the lawyer always verifies before anything is created. This is the "magic" onboarding moment: paste a list, click parse, review, done.
+
 ### Legal Activity Categories
 Replace the five developer categories (Coding, Communication, Research, Meetings, Browsing) with legal practice categories:
 - **Legal Research** (Westlaw, LexisNexis, Fastcase, Google Scholar, court websites)

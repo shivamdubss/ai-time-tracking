@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
+import { isDesktopMode } from '@/lib/platform'
 
 interface WorkHoursSettings {
   enabled: boolean
@@ -8,6 +9,7 @@ interface WorkHoursSettings {
 
 export interface AppSettings {
   workHours: WorkHoursSettings
+  defaultHourlyRate: number | null
 }
 
 interface SettingsContextValue {
@@ -24,6 +26,7 @@ const DEFAULT_SETTINGS: AppSettings = {
     startTime: '09:00',
     endTime: '17:00',
   },
+  defaultHourlyRate: null,
 }
 
 function loadSettings(): AppSettings {
@@ -45,6 +48,16 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
   }, [settings])
+
+  // Sync defaultHourlyRate to desktop backend when it changes
+  useEffect(() => {
+    if (!isDesktopMode) return
+    fetch('/api/settings/default-hourly-rate', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rate: settings.defaultHourlyRate }),
+    }).catch(() => {})
+  }, [settings.defaultHourlyRate])
 
   const updateSettings = useCallback((update: Partial<AppSettings>) => {
     setSettings((prev) => ({

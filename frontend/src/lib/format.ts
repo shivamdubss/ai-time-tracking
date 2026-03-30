@@ -46,11 +46,22 @@ export function roundToDecimalHours(minutes: number): number {
 /**
  * Join activity narratives into a single draft string.
  * Filters empties, deduplicates exact matches, joins with "; ".
+ * If one narrative already contains all others (from a prior consolidation),
+ * returns that single narrative to avoid double-display.
  */
 export function joinNarratives(narratives: string[]): string {
   const cleaned = narratives
     .map(n => n.trim())
     .filter(n => n.length > 0)
   const unique = [...new Set(cleaned)]
+  if (unique.length <= 1) return unique[0] || ''
+
+  // Check if any single narrative already subsumes all others
+  for (const candidate of unique) {
+    if (unique.every(n => n === candidate || candidate.includes(n))) {
+      return candidate
+    }
+  }
+
   return unique.join('; ')
 }

@@ -96,13 +96,12 @@ async def create_manual_entry(req: ManualEntryRequest):
     sort_order = get_next_sort_order(session_id)
 
     billable = True
-    effective_rate = None
+    effective_rate = resolve_rate(req.matter_id)
     if req.matter_id:
         matter = get_matter(req.matter_id)
         if matter and matter.get("billing_type") == "non-billable":
             billable = False
-        else:
-            effective_rate = resolve_rate(req.matter_id)
+            effective_rate = None
 
     category = utbms_to_category(req.activity_code) if req.activity_code else req.category
 
@@ -139,13 +138,12 @@ async def create_activity_endpoint(session_id: str, req: CreateActivityRequest):
     sort_order = get_next_sort_order(session_id)
 
     billable = True
-    effective_rate = None
+    effective_rate = resolve_rate(req.matter_id)
     if req.matter_id:
         matter = get_matter(req.matter_id)
         if matter and matter.get("billing_type") == "non-billable":
             billable = False
-        else:
-            effective_rate = resolve_rate(req.matter_id)
+            effective_rate = None
 
     category = utbms_to_category(req.activity_code) if req.activity_code else req.category
 
@@ -213,9 +211,9 @@ async def update_activity_endpoint(activity_id: str, req: UpdateActivityRequest)
                 updates["billable"] = True
                 updates["effective_rate"] = resolve_rate(new_matter_id)
         else:
-            # Unassigned: revert to default billable, no rate
+            # Unassigned: revert to default billable, use default rate
             updates["billable"] = True
-            updates["effective_rate"] = None
+            updates["effective_rate"] = resolve_rate(None)
 
     result = update_activity(activity_id, **updates)
     if not result:

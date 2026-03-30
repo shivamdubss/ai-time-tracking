@@ -16,10 +16,11 @@ interface SessionTableProps {
   onSelectToggle?: (activityId: string) => void
   onSessionUpdated?: (session: Session) => void
   onSelectSession?: (activityIds: string[], select: boolean) => void
+  onDataRefresh?: () => void
   isProcessing?: boolean
 }
 
-export function SessionTable({ sessions, totalHours, totalActivities, totalBillableValue, totalNonBillableMinutes, matters, clients, selectedActivities, onSelectToggle, onSelectSession, onSessionUpdated, isProcessing }: SessionTableProps) {
+export function SessionTable({ sessions, totalHours, totalActivities, totalBillableValue, totalNonBillableMinutes, matters, clients, selectedActivities, onSelectToggle, onSelectSession, onSessionUpdated, onDataRefresh, isProcessing }: SessionTableProps) {
   if (sessions.length === 0 && !isProcessing) {
     return <EmptyState />
   }
@@ -48,6 +49,7 @@ export function SessionTable({ sessions, totalHours, totalActivities, totalBilla
           onSelectToggle={onSelectToggle}
           onSessionUpdated={onSessionUpdated}
           onSelectSession={onSelectSession}
+          onDataRefresh={onDataRefresh}
         />
       ))}
 

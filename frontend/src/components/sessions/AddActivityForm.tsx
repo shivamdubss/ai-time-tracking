@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Activity, Matter } from '@/lib/types'
-import { UTBMS_CODE_LIST, utbmsToCategory } from '@/lib/utbms'
+
 import { api } from '@/lib/api'
 
 interface AddActivityFormProps {
@@ -14,7 +14,7 @@ export function AddActivityForm({ sessionId, matters, onActivityAdded, onCancel 
   const [narrative, setNarrative] = useState('')
   const [hours, setHours] = useState('0.1')
   const [matterId, setMatterId] = useState('')
-  const [activityCode, setActivityCode] = useState('')
+
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -36,9 +36,7 @@ export function AddActivityForm({ sessionId, matters, onActivityAdded, onCancel 
         context: 'Offline work',
         minutes,
         narrative: narrative.trim(),
-        category: utbmsToCategory(activityCode),
         matter_id: matterId || undefined,
-        activity_code: activityCode || undefined,
       })
       onActivityAdded(result)
     } catch {
@@ -77,18 +75,6 @@ export function AddActivityForm({ sessionId, matters, onActivityAdded, onCancel 
               step="0.1"
             />
           </div>
-
-          {/* Activity code */}
-          <select
-            className="text-xs bg-transparent border border-border-subtle rounded px-1.5 py-0.5 text-text-muted cursor-pointer hover:border-border-default transition-colors"
-            value={activityCode}
-            onChange={(e) => setActivityCode(e.target.value)}
-          >
-            <option value="">No code</option>
-            {UTBMS_CODE_LIST.map(({ code, label }) => (
-              <option key={code} value={code}>{label}</option>
-            ))}
-          </select>
 
           {/* Matter */}
           <select

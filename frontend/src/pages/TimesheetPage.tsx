@@ -8,7 +8,7 @@ import { api } from '@/lib/api'
 import { Download, CheckCircle2, Undo2 } from 'lucide-react'
 
 export function TimesheetPage() {
-  const { selectedDate, dateStr, isToday, goBack, goForward, status, elapsed, handleStart, handleStop, workHoursBlocked, refreshSessions } = useTracking()
+  const { selectedDate, dateStr, isToday, goBack, goForward, status, elapsed, handleStart, handleStop, workHoursBlocked, refreshSessions, refreshMatters } = useTracking()
   const {
     sessions, matters, clients,
     totalHours, totalBillableValue, totalBillableMinutes, totalNonBillableMinutes,
@@ -88,6 +88,7 @@ export function TimesheetPage() {
         onActivityUpdated={handleActivityUpdated}
         onActivityDeleted={handleActivityDeleted}
         onEntryAdded={refreshSessions}
+        onDataRefresh={refreshMatters}
       />
     </div>
   )

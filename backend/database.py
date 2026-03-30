@@ -3,7 +3,7 @@ import json
 import logging
 import os
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -147,6 +147,14 @@ def init_db():
     except sqlite3.OperationalError:
         conn.execute("ALTER TABLE activities ADD COLUMN activity_code TEXT")
 
+    # Settings table (key-value store for app settings)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS settings (
+            key TEXT PRIMARY KEY,
+            value TEXT
+        )
+    """)
+
     # Add sync columns to all tables (user_id, synced_at, updated_at)
     _sync_columns = {
         "sessions": ["user_id TEXT", "synced_at TEXT", "updated_at TEXT"],
@@ -202,7 +210,7 @@ INTERNAL_MATTERS = [
 
 def _seed_internal_client():
     """Create the built-in Firm / Internal client and non-billable matters if they don't exist."""
-    now = datetime.now().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     conn = get_db()
     conn.execute(
         """INSERT OR IGNORE INTO clients (id, name, is_internal, created_at, updated_at)
@@ -271,7 +279,7 @@ def _migrate_activities(conn: sqlite3.Connection):
 
 def prune_old_sessions():
     """Delete sessions older than 90 days."""
-    cutoff = (datetime.now() - timedelta(days=90)).isoformat()
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=90)).isoformat()
     conn = get_db()
     # Delete activities for those sessions first
     conn.execute(
@@ -321,9 +329,16 @@ def get_session(session_id: str) -> Optional[dict]:
 
 def get_sessions_by_date(date_str: str) -> list[dict]:
     conn = get_db()
+    # Match both old naive timestamps (LIKE prefix) and new UTC timestamps (range)
+    from datetime import date as date_type
+    local_date = date_type.fromisoformat(date_str)
+    local_start = datetime(local_date.year, local_date.month, local_date.day)
+    local_end = local_start + timedelta(days=1)
+    utc_start = local_start.astimezone(timezone.utc).isoformat()
+    utc_end = local_end.astimezone(timezone.utc).isoformat()
     rows = conn.execute(
-        "SELECT * FROM sessions WHERE start_time LIKE ? ORDER BY start_time DESC",
-        (f"{date_str}%",),
+        "SELECT * FROM sessions WHERE (start_time LIKE ? OR (start_time >= ? AND start_time < ?)) ORDER BY start_time DESC",
+        (f"{date_str}%", utc_start, utc_end),
     ).fetchall()
 
     sessions = []
@@ -366,7 +381,7 @@ def _session_row_to_dict(row: sqlite3.Row) -> dict:
 def create_client(name: str, contact_info: str = None, billing_address: str = None,
                   default_rate: float = None, notes: str = None) -> dict:
     client_id = str(uuid.uuid4())[:8]
-    now = datetime.now().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     conn = get_db()
     conn.execute(
         """INSERT INTO clients (id, name, contact_info, billing_address, default_rate, notes, created_at, updated_at)
@@ -415,7 +430,7 @@ def update_client(client_id: str, **kwargs) -> Optional[dict]:
     conn = get_db()
     allowed = {"name", "contact_info", "billing_address", "default_rate", "notes"}
     sets = ["updated_at = ?"]
-    values = [datetime.now().isoformat()]
+    values = [datetime.now(timezone.utc).isoformat()]
     for key, val in kwargs.items():
         if key in allowed:
             sets.append(f"{key} = ?")
@@ -470,7 +485,7 @@ def create_matter(client_id: str, name: str, matter_number: str = None,
                   key_people: list = None, team_members: list = None,
                   notes: str = None) -> dict:
     matter_id = str(uuid.uuid4())[:8]
-    now = datetime.now().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     conn = get_db()
 
     # App-level FK check
@@ -527,7 +542,7 @@ def update_matter(matter_id: str, **kwargs) -> Optional[dict]:
     allowed = {"name", "matter_number", "status", "practice_area", "billing_type",
                "hourly_rate", "keywords", "key_people", "team_members", "notes"}
     sets = ["updated_at = ?"]
-    values = [datetime.now().isoformat()]
+    values = [datetime.now(timezone.utc).isoformat()]
     for key, val in kwargs.items():
         if key in allowed:
             sets.append(f"{key} = ?")
@@ -562,7 +577,7 @@ def delete_matter(matter_id: str) -> tuple[bool, str]:
     if has_activities["cnt"] > 0:
         # Soft-delete: set status to closed
         conn.execute("UPDATE matters SET status = 'closed', updated_at = ? WHERE id = ?",
-                      (datetime.now().isoformat(), matter_id))
+                      (datetime.now(timezone.utc).isoformat(), matter_id))
         conn.commit()
         conn.close()
         return True, ""
@@ -601,7 +616,7 @@ def insert_activity(session_id: str, app: str, context: str = None, minutes: int
                     sort_order: int = 0, start_time: str = None, end_time: str = None,
                     activity_code: str = None) -> dict:
     activity_id = str(uuid.uuid4())[:8]
-    now = datetime.now().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     conn = get_db()
     conn.execute(
         """INSERT INTO activities (id, session_id, matter_id, app, context, minutes, narrative,
@@ -964,19 +979,53 @@ def get_activities_for_export(date_str: str) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
+# Settings
+# ---------------------------------------------------------------------------
+
+def get_setting(key: str) -> Optional[str]:
+    conn = get_db()
+    row = conn.execute("SELECT value FROM settings WHERE key = ?", (key,)).fetchone()
+    conn.close()
+    return row["value"] if row else None
+
+
+def set_setting(key: str, value: Optional[str]):
+    conn = get_db()
+    if value is None:
+        conn.execute("DELETE FROM settings WHERE key = ?", (key,))
+    else:
+        conn.execute(
+            "INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = ?",
+            (key, value, value),
+        )
+    conn.commit()
+    conn.close()
+
+
+def get_default_hourly_rate() -> Optional[float]:
+    val = get_setting("default_hourly_rate")
+    if val is not None:
+        try:
+            return float(val)
+        except ValueError:
+            pass
+    return None
+
+
+# ---------------------------------------------------------------------------
 # Rate resolution
 # ---------------------------------------------------------------------------
 
 def resolve_rate(matter_id: str = None) -> Optional[float]:
-    """Resolve the effective hourly rate: matter rate > client rate > None.
+    """Resolve the effective hourly rate: matter rate > client rate > default rate > None.
     Non-billable matters always return None."""
     if not matter_id:
-        return None
+        return get_default_hourly_rate()
     conn = get_db()
     matter = conn.execute("SELECT hourly_rate, client_id, billing_type FROM matters WHERE id = ?", (matter_id,)).fetchone()
     if not matter:
         conn.close()
-        return None
+        return get_default_hourly_rate()
     if matter["billing_type"] == "non-billable":
         conn.close()
         return None
@@ -987,4 +1036,4 @@ def resolve_rate(matter_id: str = None) -> Optional[float]:
     conn.close()
     if client and client["default_rate"] is not None:
         return client["default_rate"]
-    return None
+    return get_default_hourly_rate()

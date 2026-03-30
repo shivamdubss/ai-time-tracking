@@ -14,6 +14,7 @@ interface TimesheetMatterListProps {
   onActivityUpdated: (activity: Activity) => void
   onActivityDeleted: (activityId: string) => void
   onEntryAdded: () => void
+  onDataRefresh?: () => void
 }
 
 interface MatterGroup {
@@ -24,7 +25,7 @@ interface MatterGroup {
   totalMinutes: number
 }
 
-export function TimesheetMatterList({ sessions, matters, clients, dateStr, onActivityUpdated, onActivityDeleted, onEntryAdded }: TimesheetMatterListProps) {
+export function TimesheetMatterList({ sessions, matters, clients, dateStr, onActivityUpdated, onActivityDeleted, onEntryAdded, onDataRefresh }: TimesheetMatterListProps) {
   const [isAddingEntry, setIsAddingEntry] = useState(false)
   const clientMap = useMemo(
     () => new Map(clients.map(c => [c.id, c])),
@@ -128,6 +129,7 @@ export function TimesheetMatterList({ sessions, matters, clients, dateStr, onAct
           clients={clients}
           onActivityUpdated={onActivityUpdated}
           onActivityDeleted={onActivityDeleted}
+          onDataRefresh={onDataRefresh}
         />
       ))}
 

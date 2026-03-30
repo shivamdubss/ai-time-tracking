@@ -65,6 +65,32 @@ export function SettingsPage() {
         )}
       </div>}
 
+      {/* Default Hourly Rate */}
+      <div className="bg-surface border border-border rounded-[var(--radius-md)] overflow-hidden max-w-lg">
+        <div className="px-5 py-4">
+          <h2 className="font-display font-semibold text-sm text-text-primary">Default Hourly Rate</h2>
+          <p className="text-xs text-text-muted mt-0.5">
+            Fallback rate for activities without a matter or client rate
+          </p>
+          <div className="flex items-center gap-2 mt-3">
+            <span className="text-sm text-text-muted">$</span>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="e.g., 350"
+              value={settings.defaultHourlyRate ?? ''}
+              onChange={(e) => {
+                const val = e.target.value
+                updateSettings({ defaultHourlyRate: val === '' ? null : parseFloat(val) })
+              }}
+              className="bg-page border border-border rounded-[var(--radius-sm)] px-3 py-2 text-sm font-mono text-text-primary focus:outline-none focus:ring-1 focus:ring-text-faint w-32"
+            />
+            <span className="text-xs text-text-muted">/ hr</span>
+          </div>
+        </div>
+      </div>
+
       {/* Account */}
       {isSupabaseConfigured() && user && (() => {
         const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'

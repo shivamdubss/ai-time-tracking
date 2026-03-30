@@ -9,7 +9,6 @@ interface PeriodSelectorProps {
 }
 
 const PRESETS: { key: PeriodPreset; label: string }[] = [
-  { key: 'today', label: 'Today' },
   { key: 'this_week', label: 'This Week' },
   { key: 'this_month', label: 'This Month' },
   { key: 'last_month', label: 'Last Month' },
@@ -25,8 +24,6 @@ function getPresetDates(preset: PeriodPreset): { start: string; end: string } {
   const fmt = (dt: Date) => dt.toISOString().slice(0, 10)
 
   switch (preset) {
-    case 'today':
-      return { start: fmt(now), end: fmt(now) }
     case 'this_week': {
       const day = now.getDay()
       const mon = new Date(y, m, d - (day === 0 ? 6 : day - 1))
@@ -77,34 +74,36 @@ export function PeriodSelector({ startDate, endDate, onPeriodChange }: PeriodSel
           {p.label}
         </button>
       ))}
-      <button
-        onClick={() => { setShowCustom(!showCustom); setActivePreset('custom') }}
-        className={cn(
-          'px-3 py-1.5 text-xs font-medium rounded-[var(--radius-sm)] transition-colors cursor-pointer',
-          activePreset === 'custom'
-            ? 'bg-text-primary text-white dark:bg-white dark:text-black'
-            : 'bg-surface border border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover',
+      <div className="relative">
+        <button
+          onClick={() => { setShowCustom(!showCustom); setActivePreset('custom') }}
+          className={cn(
+            'px-3 py-1.5 text-xs font-medium rounded-[var(--radius-sm)] transition-colors cursor-pointer',
+            activePreset === 'custom'
+              ? 'bg-text-primary text-white dark:bg-white dark:text-black'
+              : 'bg-surface border border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover',
+          )}
+        >
+          Custom
+        </button>
+        {showCustom && (
+          <div className="absolute top-full right-0 mt-1 z-10 flex items-center gap-2 px-3 py-2 bg-surface border border-border rounded-[var(--radius-sm)] shadow-md">
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => onPeriodChange(e.target.value, endDate)}
+              className="px-2 py-1 text-xs border border-border rounded-[var(--radius-sm)] bg-surface text-text-primary"
+            />
+            <span className="text-xs text-text-muted">to</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => onPeriodChange(startDate, e.target.value)}
+              className="px-2 py-1 text-xs border border-border rounded-[var(--radius-sm)] bg-surface text-text-primary"
+            />
+          </div>
         )}
-      >
-        Custom
-      </button>
-      {showCustom && (
-        <div className="flex items-center gap-2 ml-2">
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => onPeriodChange(e.target.value, endDate)}
-            className="px-2 py-1 text-xs border border-border rounded-[var(--radius-sm)] bg-surface text-text-primary"
-          />
-          <span className="text-xs text-text-muted">to</span>
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => onPeriodChange(startDate, e.target.value)}
-            className="px-2 py-1 text-xs border border-border rounded-[var(--radius-sm)] bg-surface text-text-primary"
-          />
-        </div>
-      )}
+      </div>
     </div>
   )
 }

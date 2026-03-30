@@ -15,11 +15,12 @@ interface TimesheetMatterCardProps {
   clients: Client[]
   onActivityUpdated: (activity: Activity) => void
   onActivityDeleted: (activityId: string) => void
+  onDataRefresh?: () => void
 }
 
 export function TimesheetMatterCard({
   matter, client, activities, isFirst,
-  matters, clients, onActivityUpdated, onActivityDeleted,
+  matters, clients, onActivityUpdated, onActivityDeleted, onDataRefresh,
 }: TimesheetMatterCardProps) {
   const totalMinutes = activities.reduce((sum, a) => sum + a.minutes, 0)
   const narrative = joinNarratives(activities.map(a => a.narrative))
@@ -33,6 +34,10 @@ export function TimesheetMatterCard({
   const [expanded, setExpanded] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [isEditingMatterName, setIsEditingMatterName] = useState(false)
+  const [matterNameValue, setMatterNameValue] = useState(matter?.name || '')
+  const [isEditingClientName, setIsEditingClientName] = useState(false)
+  const [clientNameValue, setClientNameValue] = useState(client?.name || '')
   const narrativeRef = useRef<HTMLTextAreaElement>(null)
 
   // Sync external changes
@@ -46,6 +51,40 @@ export function TimesheetMatterCard({
   function showError(msg: string) {
     setSaveError(msg)
     setTimeout(() => setSaveError(null), 3000)
+  }
+
+  // Matter name rename
+  async function handleMatterNameSave() {
+    setIsEditingMatterName(false)
+    if (!matter || matterNameValue.trim() === matter.name) return
+    if (!matterNameValue.trim()) { setMatterNameValue(matter.name); return }
+    setIsSaving(true)
+    try {
+      await api.updateMatter(matter.id, { name: matterNameValue.trim() })
+      onDataRefresh?.()
+    } catch {
+      showError('Failed to rename matter')
+      setMatterNameValue(matter.name)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  // Client name rename
+  async function handleClientNameSave() {
+    setIsEditingClientName(false)
+    if (!client || clientNameValue.trim() === client.name) return
+    if (!clientNameValue.trim()) { setClientNameValue(client.name); return }
+    setIsSaving(true)
+    try {
+      await api.updateClient(client.id, { name: clientNameValue.trim() })
+      onDataRefresh?.()
+    } catch {
+      showError('Failed to rename client')
+      setClientNameValue(client.name)
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   // Matter reassignment
@@ -86,17 +125,12 @@ export function TimesheetMatterCard({
         const updated = await api.updateActivity(activities[0].id, { narrative: narrativeValue })
         onActivityUpdated(updated)
       } else {
-        // Save full text to first activity, clear the rest
-        const [first, ...rest] = activities
-        const results = await Promise.allSettled([
-          api.updateActivity(first.id, { narrative: narrativeValue }),
-          ...rest.map(a => api.updateActivity(a.id, { narrative: '' })),
-        ])
-        for (const r of results) {
-          if (r.status === 'fulfilled') onActivityUpdated(r.value)
-        }
-        const failed = results.filter(r => r.status === 'rejected').length
-        if (failed > 0) showError('Some entries failed to update')
+        // Save combined text to first activity; leave others untouched so
+        // individual narratives survive reassignment and CSV export.
+        // joinNarratives() handles dedup on next render via subsumption check.
+        const first = activities[0]
+        const updated = await api.updateActivity(first.id, { narrative: narrativeValue })
+        onActivityUpdated(updated)
       }
     } catch {
       showError('Failed to save narrative')
@@ -219,16 +253,37 @@ export function TimesheetMatterCard({
                 </optgroup>
               )}
             </select>
+          ) : isEditingMatterName && matter ? (
+            <input
+              className="text-sm bg-surface border border-border rounded-[var(--radius-sm)] px-2 py-1 font-display font-bold text-text-primary focus:outline-none focus:ring-1 focus:ring-text-faint max-w-[240px]"
+              value={matterNameValue}
+              onChange={(e) => setMatterNameValue(e.target.value)}
+              onBlur={handleMatterNameSave}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') { setMatterNameValue(matter.name); setIsEditingMatterName(false) }
+                if (e.key === 'Enter') { e.preventDefault(); handleMatterNameSave() }
+              }}
+              autoFocus
+              placeholder="Matter name"
+            />
           ) : (
-            <div
-              className="group flex items-center gap-1 cursor-pointer hover:bg-surface-hover rounded px-1 -mx-1 transition-colors min-w-0"
-              onClick={() => setIsEditingMatter(true)}
-              title="Click to change matter"
-            >
-              <span className="font-display font-bold text-sm text-text-primary truncate">
+            <div className="group flex items-center gap-1 min-w-0">
+              <span
+                className="font-display font-bold text-sm text-text-primary truncate cursor-pointer hover:bg-surface-hover rounded px-1 -mx-1 transition-colors"
+                onClick={() => setIsEditingMatter(true)}
+                title="Click to change matter"
+              >
                 {matter?.name || 'Unassigned'}
               </span>
-              <Pencil size={12} className="shrink-0 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+              {matter && (
+                <span title="Rename matter">
+                  <Pencil
+                    size={12}
+                    className="shrink-0 text-text-faint hover:text-text-muted opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    onClick={() => { setMatterNameValue(matter.name); setIsEditingMatterName(true) }}
+                  />
+                </span>
+              )}
             </div>
           )}
           {!isEditingMatter && matter?.matter_number && (
@@ -284,10 +339,32 @@ export function TimesheetMatterCard({
         </div>
       </div>
 
-      {/* Client name */}
+      {/* Client name — click to rename */}
       {client && (
-        <div className="ml-4 mt-0.5 text-xs text-text-muted">
-          {client.name}
+        <div className="ml-4 mt-0.5">
+          {isEditingClientName ? (
+            <input
+              className="text-xs bg-surface border border-border rounded-[var(--radius-sm)] px-1.5 py-0.5 text-text-muted focus:outline-none focus:ring-1 focus:ring-text-faint"
+              value={clientNameValue}
+              onChange={(e) => setClientNameValue(e.target.value)}
+              onBlur={handleClientNameSave}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') { setClientNameValue(client.name); setIsEditingClientName(false) }
+                if (e.key === 'Enter') { e.preventDefault(); handleClientNameSave() }
+              }}
+              autoFocus
+              placeholder="Client name"
+            />
+          ) : (
+            <span
+              className="text-xs text-text-muted cursor-pointer hover:bg-surface-hover rounded px-1 -mx-1 transition-colors inline-flex items-center gap-1 group"
+              onClick={() => { setClientNameValue(client.name); setIsEditingClientName(true) }}
+              title="Click to rename client"
+            >
+              {client.name}
+              <Pencil size={10} className="shrink-0 text-text-faint opacity-0 group-hover:opacity-100 transition-opacity" />
+            </span>
+          )}
         </div>
       )}
 

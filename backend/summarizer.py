@@ -26,8 +26,7 @@ Return ONLY valid JSON with this exact schema:
       "start_time": "2026-03-26T09:15:00",
       "end_time": "2026-03-26T09:55:00",
       "narrative": "Drafted and revised motion to compel discovery responses in Smith v. Jones",
-      "category": "Document Drafting",
-      "activity_code": "L160"
+      "category": "Document Drafting"
     }
   ]
 }
@@ -43,46 +42,26 @@ Rules:
 - Percentages must sum to 100
 - Minutes should be approximate based on the time spent in each app
 - start_time and end_time must be ISO 8601 timestamps derived from the window activity timeline
-- Narratives should follow legal billing format: action verb + what + why/for whom
-- Narratives should be specific and descriptive, not vague (avoid "worked on case")
-- Context should briefly describe the work being performed (e.g., "drafting motion to compel", "researching case law", "email correspondence"), NOT the specific document name, file path, or case reference
+- Narratives must "tell a story" so the client understands what was done and why it mattered to their case
+- Format: action verb + specific work product + purpose or connection to case strategy
+- Good narratives:
+  "Researched case law on scope of discovery obligations to support motion to compel production of financial records in Smith v. Jones"
+  "Reviewed and annotated opposing counsel's expert report to identify inconsistencies for cross-examination preparation"
+  "Drafted correspondence to client summarizing settlement offer terms and recommending next steps"
+  "Attended case management conference to set discovery schedule and address outstanding motion timelines"
+- Bad narratives (would fail billing review):
+  "Research" — no topic, no purpose
+  "Reviewed documents" — which documents, for what purpose?
+  "Correspondence with client" — about what?
+  "Attend court" — what hearing, what purpose?
+  "Worked on case" — completely generic
+- Scale narrative detail to time spent: entries under 12 min need one concise clause; entries 12-60 min should include what was done and why; entries over 60 min should include specific sub-tasks or progression of work to justify the time
+- Write narratives as if the client will read them on their bill — avoid app names, file paths, internal jargon, and technical references
+- When work relates to a specific matter, connect the activity to the matter's purpose or current phase (not just "Drafted motion" but "Drafted motion to compel to advance discovery deadlines in [Matter Name]")
+- Context is an internal-only field for matter-matching — briefly describe the work type (e.g., "drafting motion to compel", "researching case law"). Put all billing-quality detail in the narrative, not the context
 - Group related activities by app (e.g., multiple Word windows = one activity)
 - Summary should be 1-2 sentences, specific about what was accomplished
-- Each activity MUST include a category field matching one of the six categories above
-- Each activity MUST include an activity_code from the UTBMS Litigation Code Set:
-  L100: Case Assessment, Development and Administration
-  L110: Fact Investigation/Development
-  L120: Analysis/Strategy
-  L130: Experts/Consultants
-  L140: Document/File Management
-  L150: Budgeting
-  L160: Settlement/Non-Binding ADR
-  L190: Other Case Assessment
-  L200: Pre-Trial Pleadings and Motions
-  L210: Pleadings
-  L220: Preliminary Injunctions/Provisional Remedies
-  L230: Court Mandated Conferences
-  L240: Dispositive Motions
-  L250: Other Written Motions and Submissions
-  L300: Discovery
-  L310: Written Discovery
-  L320: Document Production
-  L330: Depositions
-  L340: Expert Discovery
-  L400: Trial Preparation and Trial
-  L410: Fact Witnesses
-  L420: Expert Witnesses
-  L430: Written Motions and Submissions
-  L440: Hearing/Trial Attendance
-  L500: Appeal
-  L510: Appellate Briefs and Written Motions
-  L520: Appellate Court Attendance
-  A101: Plan and Prepare for, and Attend, Meeting
-  A102: Communicate (includes Telephone Calls, Emails, Letters)
-  A103: Draft/Revise
-  A104: Review/Analyze
-  A106: File/Serve
-  Choose the most specific applicable code. Default to L140 for file management, A102 for communication, A103 for drafting, A104 for review/analysis."""
+"""
 
 
 def build_timeline(window_entries: list[dict], idle_threshold_seconds: float = 300) -> str:
@@ -166,18 +145,22 @@ def _build_matters_context(matters: list[dict]) -> str:
 
     lines = []
     if billable:
-        lines.append("\nActive client matters (use these to add specificity to narratives):")
+        lines.append("\nActive client matters (use these to connect narratives to specific case work — reference the matter name and relate the activity to the matter's current phase or purpose):")
         for m in billable:
             keywords = m.get("keywords", [])
             kw_str = f" (keywords: {', '.join(keywords)})" if keywords else ""
-            lines.append(f"- {m['name']}{kw_str}")
+            notes = m.get("notes", "")
+            notes_str = f" — {notes}" if notes else ""
+            lines.append(f"- {m['name']}{kw_str}{notes_str}")
 
     if non_billable:
         lines.append("\nNon-billable internal matters (for admin, training, business development, pro bono):")
         for m in non_billable:
             keywords = m.get("keywords", [])
             kw_str = f" (keywords: {', '.join(keywords)})" if keywords else ""
-            lines.append(f"- {m['name']}{kw_str}")
+            notes = m.get("notes", "")
+            notes_str = f" — {notes}" if notes else ""
+            lines.append(f"- {m['name']}{kw_str}{notes_str}")
 
     return "\n".join(lines)
 

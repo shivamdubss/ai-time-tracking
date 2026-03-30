@@ -187,4 +187,4 @@ export interface AnalyticsByMatter {
   unassigned: { hours: number; revenue: number }
 }
 
-export type PeriodPreset = 'today' | 'this_week' | 'this_month' | 'last_month' | 'this_quarter' | 'ytd'
+export type PeriodPreset = 'this_week' | 'this_month' | 'last_month' | 'this_quarter' | 'ytd'

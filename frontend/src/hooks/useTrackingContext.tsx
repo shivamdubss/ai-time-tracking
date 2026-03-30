@@ -32,6 +32,7 @@ interface TrackingContextValue {
   handleActivityUpdated: (activity: Activity) => void
   handleActivityDeleted: (activityId: string) => void
   refreshSessions: () => void
+  refreshMatters: () => void
   workHoursBlocked: boolean
 }
 
@@ -124,7 +125,12 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
   }, [sessions])
 
   function handleSessionUpdated(updatedSession: Session) {
-    setSessions(prev => prev.map(s => s.id === updatedSession.id ? updatedSession : s))
+    if (updatedSession.activities.length === 0) {
+      if (updatedSession.id) api.deleteSession(updatedSession.id)
+      setSessions(prev => prev.filter(s => s.id !== updatedSession.id))
+    } else {
+      setSessions(prev => prev.map(s => s.id === updatedSession.id ? updatedSession : s))
+    }
   }
 
   function handleActivityUpdated(updatedActivity: Activity) {
@@ -135,14 +141,31 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
   }
 
   function handleActivityDeleted(activityId: string) {
-    setSessions(prev => prev.map(s => ({
-      ...s,
-      activities: s.activities.filter(a => a.id !== activityId),
-    })))
+    setSessions(prev => {
+      const updated = prev.map(s => ({
+        ...s,
+        activities: s.activities.filter(a => a.id !== activityId),
+      }))
+      updated.filter(s => s.activities.length === 0).forEach(s => {
+        if (s.id) api.deleteSession(s.id)
+      })
+      return updated.filter(s => s.activities.length > 0)
+    })
   }
 
   const refreshSessions = useCallback(() => {
     setRefreshKey(k => k + 1)
+  }, [])
+
+  const refreshMatters = useCallback(async () => {
+    try {
+      const [newMatters, newClients] = await Promise.all([
+        api.getMatters({ status: 'active' }),
+        api.getClients(),
+      ])
+      setMatters(newMatters)
+      setClients(newClients)
+    } catch {}
   }, [])
 
   const goBack = useCallback(() => {
@@ -267,6 +290,7 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
         handleActivityUpdated,
         handleActivityDeleted,
         refreshSessions,
+        refreshMatters,
         workHoursBlocked,
       }}
     >

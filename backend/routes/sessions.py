@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException, Request
 
@@ -133,24 +133,17 @@ async def _summarize_and_cleanup(
         matched_activities = match_activities_to_matters(raw_activities, active_matters)
 
         # Category-based fallback: unmatched activities are assigned to
-        # the best-matching internal/non-billable matter so nothing stays unassigned
-        from ..database import INTERNAL_CLIENT_ID
-        _category_fallback = {
-            "Administrative": "nb-admin",
-            "Legal Research": "nb-admin",
-            "Document Drafting": "nb-admin",
-            "Client Communication": "nb-admin",
-            "Court & Hearings": "nb-admin",
-            "Case Review": "nb-admin",
-        }
-        internal_matter_ids = {m["id"] for m in active_matters if m.get("client_id") == INTERNAL_CLIENT_ID}
-        for act in matched_activities:
-            if not act.get("matter_id"):
-                fallback_id = _category_fallback.get(act.get("category"))
-                if fallback_id and fallback_id in internal_matter_ids:
-                    act["matter_id"] = fallback_id
-                elif "nb-admin" in internal_matter_ids:
-                    act["matter_id"] = "nb-admin"
+        # the Administrative non-billable matter so nothing stays unassigned
+        admin_matter = next(
+            (m for m in active_matters
+             if m["name"] == "Administrative" and m.get("billing_type") == "non-billable"),
+            None,
+        )
+        admin_id = admin_matter["id"] if admin_matter else None
+        if admin_id:
+            for act in matched_activities:
+                if not act.get("matter_id"):
+                    act["matter_id"] = admin_id
 
         # Auto-derive category from UTBMS code when available
         from .activities import utbms_to_category
@@ -162,13 +155,12 @@ async def _summarize_and_cleanup(
         for i, act in enumerate(matched_activities):
             matter_id = act.get("matter_id")
             billable = True
-            effective_rate = None
+            effective_rate = resolve_rate(matter_id)
             if matter_id:
                 matched_matter = next((m for m in active_matters if m["id"] == matter_id), None)
                 if matched_matter and matched_matter.get("billing_type") == "non-billable":
                     billable = False
-                else:
-                    effective_rate = resolve_rate(matter_id)
+                    effective_rate = None
 
             insert_activity(
                 session_id=session_id,
@@ -224,7 +216,7 @@ async def _summarize_and_cleanup(
 @router.get("")
 async def list_sessions(date: str | None = None):
     if date is None:
-        date = datetime.now().strftime("%Y-%m-%d")
+        date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     sessions = get_sessions_by_date(date)
     return sessions
 

@@ -38,14 +38,25 @@ function dayBoundsUTC(date: string): { start: string; end: string } {
   return { start: localStart.toISOString(), end: localEnd.toISOString() }
 }
 
+function getDefaultHourlyRate(): number | null {
+  try {
+    const raw = localStorage.getItem('timetrack-settings')
+    if (raw) {
+      const rate = JSON.parse(raw).defaultHourlyRate
+      return rate != null ? rate : null
+    }
+  } catch {}
+  return null
+}
+
 async function resolveRate(matterId: string | null | undefined): Promise<number | null> {
-  if (!matterId) return null
+  if (!matterId) return getDefaultHourlyRate()
   const { data: matter } = await supabase
     .from('matters')
     .select('hourly_rate, client_id, billing_type')
     .eq('id', matterId)
     .single()
-  if (!matter) return null
+  if (!matter) return getDefaultHourlyRate()
   if (matter.billing_type === 'non-billable') return null
   if (matter.hourly_rate != null) return matter.hourly_rate
   const { data: client } = await supabase
@@ -54,7 +65,7 @@ async function resolveRate(matterId: string | null | undefined): Promise<number 
     .eq('id', matter.client_id)
     .single()
   if (client && client.default_rate != null) return client.default_rate
-  return null
+  return getDefaultHourlyRate()
 }
 
 function utbmsToCategory(code: string | null | undefined): string {
@@ -288,6 +299,8 @@ async function createActivity(sessionId: string, input: {
     } else {
       effectiveRate = await resolveRate(input.matter_id)
     }
+  } else {
+    effectiveRate = getDefaultHourlyRate()
   }
 
   const category = input.activity_code ? utbmsToCategory(input.activity_code) : (input.category || 'Administrative')
@@ -400,7 +413,7 @@ async function updateActivity(id: string, updates: {
       }
     } else {
       patch.billable = true
-      patch.effective_rate = null
+      patch.effective_rate = getDefaultHourlyRate()
     }
   }
 

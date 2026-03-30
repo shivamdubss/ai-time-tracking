@@ -15,9 +15,10 @@ interface SessionRowProps {
   onSelectToggle?: (activityId: string) => void
   onSessionUpdated?: (session: Session) => void
   onSelectSession?: (activityIds: string[], select: boolean) => void
+  onDataRefresh?: () => void
 }
 
-export function SessionRow({ session, matters, clients, selectedActivities, onSelectToggle, onSessionUpdated, onSelectSession }: SessionRowProps) {
+export function SessionRow({ session, matters, clients, selectedActivities, onSelectToggle, onSessionUpdated, onSelectSession, onDataRefresh }: SessionRowProps) {
   const [expanded, setExpanded] = useState(false)
   const hours = formatSessionHours(session.startTime, session.endTime)
   const checkboxRef = useRef<HTMLInputElement>(null)
@@ -122,6 +123,7 @@ export function SessionRow({ session, matters, clients, selectedActivities, onSe
               onSelectToggle={onSelectToggle}
               onActivityUpdated={handleActivityUpdated}
               onActivityDeleted={handleActivityDeleted}
+              onDataRefresh={onDataRefresh}
             />
           ))}
         </div>

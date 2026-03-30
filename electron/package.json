@@ -1,6 +1,6 @@
 {
   "name": "donna",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "AI-powered time tracking for lawyers",
   "main": "dist/main.js",
   "scripts": {

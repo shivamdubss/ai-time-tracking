@@ -8,7 +8,12 @@ import time
 from datetime import datetime, timezone
 from typing import Optional
 
+from .database import INTERNAL_CLIENT_ID, INTERNAL_MATTERS
+
 logger = logging.getLogger("timetrack")
+
+# Generic IDs used by desktop seeding (before user login)
+_GENERIC_INTERNAL_IDS = {INTERNAL_CLIENT_ID} | {m["id"] for m in INTERNAL_MATTERS}
 
 SYNC_INTERVAL = int(os.getenv("TIMETRACK_SYNC_INTERVAL", "60"))  # 1 min default
 
@@ -84,9 +89,71 @@ class SyncEngine:
         """Trigger an immediate sync (called after session stop, etc.)."""
         threading.Thread(target=self._sync_all, daemon=True).start()
 
+    def _remap_internal_ids(self):
+        """One-time migration: rename generic desktop IDs to user-scoped IDs.
+
+        Desktop seeds matters as 'nb-admin', Supabase seeds as 'nb-admin-{userId}'.
+        This renames the local rows so sync doesn't create duplicates.
+        """
+        conn = self._get_db()
+        row = conn.execute(
+            "SELECT id FROM clients WHERE id = ?", (INTERNAL_CLIENT_ID,)
+        ).fetchone()
+        if not row:
+            conn.close()
+            return  # Already remapped or web-only user
+
+        uid = self._user_id
+        now = datetime.now(timezone.utc).isoformat()
+
+        # Remap internal client ID
+        new_client_id = f"{INTERNAL_CLIENT_ID}-{uid}"
+        conn.execute(
+            "UPDATE clients SET id = ?, updated_at = ?, synced_at = NULL WHERE id = ?",
+            (new_client_id, now, INTERNAL_CLIENT_ID),
+        )
+        conn.execute(
+            "UPDATE matters SET client_id = ?, updated_at = ? WHERE client_id = ?",
+            (new_client_id, now, INTERNAL_CLIENT_ID),
+        )
+
+        # Remap each internal matter ID and update FK references
+        for m in INTERNAL_MATTERS:
+            old_id = m["id"]
+            new_id = f"{old_id}-{uid}"
+            conn.execute(
+                "UPDATE matters SET id = ?, synced_at = NULL WHERE id = ?",
+                (new_id, old_id),
+            )
+            conn.execute(
+                "UPDATE activities SET matter_id = ? WHERE matter_id = ?",
+                (new_id, old_id),
+            )
+            conn.execute(
+                "UPDATE sessions SET matter_id = ? WHERE matter_id = ?",
+                (new_id, old_id),
+            )
+
+        conn.commit()
+        conn.close()
+
+        # Clean up stale generic-ID rows from Supabase (if previously pushed)
+        for old_id in [INTERNAL_CLIENT_ID] + [m["id"] for m in INTERNAL_MATTERS]:
+            table = "clients" if old_id == INTERNAL_CLIENT_ID else "matters"
+            try:
+                self._supabase.table(table).delete().eq(
+                    "id", old_id
+                ).eq("user_id", uid).execute()
+            except Exception:
+                pass  # Row may not exist remotely — that's fine
+
+        logger.info("Remapped internal IDs to user-scoped format")
+
     def _sync_all(self):
         if not self._user_id or not self._supabase:
             return
+
+        self._remap_internal_ids()
 
         for table in SYNC_TABLES:
             try:
@@ -114,6 +181,8 @@ class SyncEngine:
             conn.close()
             return
 
+        timestamp_cols = {"start_time", "end_time", "created_at", "updated_at"}
+
         for row in rows:
             record = {}
             for col in columns:
@@ -127,6 +196,16 @@ class SyncEngine:
                 # Convert SQLite boolean integers to actual booleans
                 if col in ("is_internal", "billable") and val is not None:
                     val = bool(val)
+                # Normalize naive timestamps: treat as local time, convert to UTC
+                if col in timestamp_cols and isinstance(val, str) and val:
+                    if not val.endswith("Z") and "+" not in val[10:] and "-" not in val[19:]:
+                        try:
+                            naive_dt = datetime.fromisoformat(val)
+                            if naive_dt.tzinfo is None:
+                                utc_dt = naive_dt.astimezone(timezone.utc)
+                                val = utc_dt.isoformat()
+                        except (ValueError, TypeError):
+                            pass
                 record[col] = val
 
             record["user_id"] = self._user_id
@@ -152,7 +231,7 @@ class SyncEngine:
         columns = SYNC_TABLES[table]
         last_pull = self._last_pull.get(table)
 
-        query = self._supabase.table(table).select("*").eq("user_id", self._user_id)
+        query = self._supabase.table(table).select("*")
 
         if last_pull:
             query = query.gt("updated_at", last_pull)
@@ -190,7 +269,7 @@ class SyncEngine:
                     val = int(val)
                 values[col] = val
 
-            values["user_id"] = self._user_id
+            values["user_id"] = record.get("user_id")
             values["synced_at"] = now
 
             placeholders = ", ".join(["?"] * len(values))

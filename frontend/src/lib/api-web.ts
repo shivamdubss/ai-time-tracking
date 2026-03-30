@@ -31,6 +31,13 @@ function nowISO(): string {
   return new Date().toISOString()
 }
 
+/** Convert a local YYYY-MM-DD date to UTC start/end ISO strings for that local day. */
+function dayBoundsUTC(date: string): { start: string; end: string } {
+  const localStart = new Date(date + 'T00:00:00')
+  const localEnd = new Date(date + 'T23:59:59.999')
+  return { start: localStart.toISOString(), end: localEnd.toISOString() }
+}
+
 async function resolveRate(matterId: string | null | undefined): Promise<number | null> {
   if (!matterId) return null
   const { data: matter } = await supabase
@@ -78,13 +85,12 @@ function utbmsToCategory(code: string | null | undefined): string {
 // ─── Sessions ────���────────────────────────────────────────────────────────
 
 async function getSessions(date: string): Promise<Session[]> {
-  const userId = await getUserId()
+  const { start, end } = dayBoundsUTC(date)
   const { data: sessions, error } = await supabase
     .from('sessions')
     .select('*')
-    .eq('user_id', userId)
-    .gte('start_time', `${date}T00:00:00`)
-    .lt('start_time', `${date}T23:59:59.999`)
+    .gte('start_time', start)
+    .lt('start_time', end)
     .order('start_time', { ascending: false })
 
   if (error) throw new Error(error.message)
@@ -136,11 +142,9 @@ async function deleteSession(id: string) {
 // ─── Clients ──────────────────────────────────────────────────────────────
 
 async function getClients(): Promise<Client[]> {
-  const userId = await getUserId()
   const { data, error } = await supabase
     .from('clients')
     .select('*')
-    .eq('user_id', userId)
     .order('name')
   if (error) throw new Error(error.message)
   return (data || []).map(c => ({ ...c, is_internal: Boolean(c.is_internal) }))
@@ -187,8 +191,7 @@ async function deleteClient(id: string) {
 // ─── Matters ─────���────────────────────────────────────────────────────────
 
 async function getMatters(params?: { status?: string; client_id?: string }): Promise<Matter[]> {
-  const userId = await getUserId()
-  let query = supabase.from('matters').select('*').eq('user_id', userId).order('name')
+  let query = supabase.from('matters').select('*').order('name')
   if (params?.status) query = query.eq('status', params.status)
   if (params?.client_id) query = query.eq('client_id', params.client_id)
   const { data, error } = await query
@@ -324,12 +327,13 @@ async function createManualEntry(input: {
   const userId = await getUserId()
 
   // Find existing session for this date or create one
+  const { start: dayStart, end: dayEnd } = dayBoundsUTC(input.date)
   const { data: sessions } = await supabase
     .from('sessions')
     .select('id')
     .eq('user_id', userId)
-    .gte('start_time', `${input.date}T00:00:00`)
-    .lt('start_time', `${input.date}T23:59:59.999`)
+    .gte('start_time', dayStart)
+    .lt('start_time', dayEnd)
     .order('start_time', { ascending: false })
     .limit(1)
 
@@ -338,7 +342,7 @@ async function createManualEntry(input: {
     sessionId = sessions[0].id
   } else {
     sessionId = generateId()
-    const startTime = `${input.date}T09:00:00`
+    const startTime = new Date(input.date + 'T09:00:00').toISOString()
     const now = nowISO()
     const { error } = await supabase.from('sessions').insert({
       id: sessionId,
@@ -419,16 +423,15 @@ async function deleteActivity(id: string) {
 // ─── Analytics ──────���─────────────────────────────────────────────────────
 
 async function fetchActivitiesForAnalytics(startDate: string, endDate: string) {
-  const userId = await getUserId()
-
-  // Fetch completed sessions in range
+  // Fetch completed sessions in range (convert local dates to UTC bounds)
+  const { start: rangeStart } = dayBoundsUTC(startDate)
+  const { end: rangeEnd } = dayBoundsUTC(endDate)
   const { data: sessions } = await supabase
     .from('sessions')
     .select('id, start_time')
-    .eq('user_id', userId)
     .eq('status', 'completed')
-    .gte('start_time', `${startDate}T00:00:00`)
-    .lte('start_time', `${endDate}T23:59:59.999`)
+    .gte('start_time', rangeStart)
+    .lte('start_time', rangeEnd)
 
   if (!sessions || sessions.length === 0) return []
   const sessionIds = sessions.map(s => s.id)
@@ -475,14 +478,12 @@ async function getAnalyticsByCategory(startDate: string, endDate: string): Promi
 // ─── CSV Export ────��──────────────────────────────────────────────────────
 
 async function exportTimesheet(date: string) {
-  const userId = await getUserId()
-
+  const { start, end } = dayBoundsUTC(date)
   const { data: sessions } = await supabase
     .from('sessions')
     .select('id')
-    .eq('user_id', userId)
-    .gte('start_time', `${date}T00:00:00`)
-    .lt('start_time', `${date}T23:59:59.999`)
+    .gte('start_time', start)
+    .lt('start_time', end)
 
   if (!sessions || sessions.length === 0) return
 

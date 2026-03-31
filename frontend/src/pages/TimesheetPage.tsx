@@ -1,48 +1,68 @@
-import { Header } from '@/components/layout/Header'
+import { useState } from 'react'
+import { TimesheetToolbar, getTimesheetPresetDates } from '@/components/sessions/TimesheetToolbar'
 import { TimesheetMatterList } from '@/components/sessions/TimesheetMatterList'
 import { SummaryStats } from '@/components/sessions/SummaryStats'
 import { useTracking } from '@/hooks/useTrackingContext'
-import { useSessionData } from '@/hooks/useSessionData'
+import { useTimesheetData } from '@/hooks/useTimesheetData'
 import { useTimesheetStatus } from '@/hooks/useTimesheetStatus'
 import { api } from '@/lib/api'
-import { useSettings } from '@/hooks/useSettings'
-import { Download, CheckCircle2, Undo2 } from 'lucide-react'
+import type { TimesheetPreset } from '@/lib/types'
+import { Download, CheckCircle2, Undo2, Loader2 } from 'lucide-react'
 
 export function TimesheetPage() {
-  const { selectedDate, dateStr, isToday, goBack, goForward, status, elapsed, handleStart, handleStop, workHoursBlocked, refreshSessions, refreshMatters } = useTracking()
+  const { matters, clients, refreshMatters } = useTracking()
+
+  // Period state — default to today
+  const todayStr = new Date().toISOString().slice(0, 10)
+  const [startDate, setStartDate] = useState(todayStr)
+  const [endDate, setEndDate] = useState(todayStr)
+  const [activePreset, setActivePreset] = useState<TimesheetPreset>('today')
+
+  // Filter state
+  const [clientFilter, setClientFilter] = useState<string[]>([])
+  const [matterFilter, setMatterFilter] = useState<string[]>([])
+
+  // Data
   const {
-    sessions, matters, clients,
-    totalHours, totalBillableValue, totalBillableMinutes, totalNonBillableMinutes,
+    sessions, stats, loading, refresh,
     handleActivityUpdated, handleActivityDeleted,
-  } = useSessionData()
-  const { isReleased, release, unrelease } = useTimesheetStatus(dateStr)
-  const { settings } = useSettings()
+  } = useTimesheetData(startDate, endDate, { clientIds: clientFilter, matterIds: matterFilter }, matters, clients)
+
+  // Release status
+  const { isReleased, release, unrelease } = useTimesheetStatus(startDate, endDate)
+
+  function handlePeriodChange(start: string, end: string, preset: TimesheetPreset) {
+    setStartDate(start)
+    setEndDate(end)
+    setActivePreset(preset)
+  }
 
   function handleExport() {
-    api.exportTimesheet(dateStr)
+    api.exportTimesheet(startDate, endDate)
   }
 
   return (
     <div className="flex flex-col gap-4 md:gap-6 p-4 md:p-6 flex-1 min-h-0 pt-16 md:pt-6">
       <h1 className="sr-only">Timesheet</h1>
-      <Header
-        selectedDate={selectedDate}
-        isToday={isToday}
-        onGoBack={goBack}
-        onGoForward={goForward}
-        status={status}
-        elapsed={elapsed}
-        onStartTracking={handleStart}
-        onStopTracking={handleStop}
-        workHoursBlocked={workHoursBlocked}
-        demoMode={settings.demoMode}
+
+      <TimesheetToolbar
+        startDate={startDate}
+        endDate={endDate}
+        onPeriodChange={handlePeriodChange}
+        activePreset={activePreset}
+        clients={clients}
+        matters={matters}
+        clientFilter={clientFilter}
+        matterFilter={matterFilter}
+        onClientFilterChange={setClientFilter}
+        onMatterFilterChange={setMatterFilter}
       />
 
       <SummaryStats
-        totalHours={totalHours}
-        totalBillableMinutes={totalBillableMinutes}
-        totalBillableValue={totalBillableValue}
-        totalNonBillableMinutes={totalNonBillableMinutes}
+        totalHours={stats.totalHours}
+        totalBillableMinutes={stats.totalBillableMinutes}
+        totalBillableValue={stats.totalBillableValue}
+        totalNonBillableMinutes={stats.totalNonBillableMinutes}
       />
 
       {/* Action bar */}
@@ -52,6 +72,12 @@ export function TimesheetPage() {
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-[var(--radius-sm)]">
               <CheckCircle2 size={13} />
               Released
+            </span>
+          )}
+          {loading && (
+            <span className="inline-flex items-center gap-1.5 text-xs text-text-muted">
+              <Loader2 size={13} className="animate-spin" />
+              Loading...
             </span>
           )}
         </div>
@@ -87,10 +113,11 @@ export function TimesheetPage() {
         sessions={sessions}
         matters={matters}
         clients={clients}
-        dateStr={dateStr}
+        startDate={startDate}
+        endDate={endDate}
         onActivityUpdated={handleActivityUpdated}
         onActivityDeleted={handleActivityDeleted}
-        onEntryAdded={refreshSessions}
+        onEntryAdded={refresh}
         onDataRefresh={refreshMatters}
       />
     </div>

@@ -74,6 +74,9 @@ const desktopApi = {
   getSessions: (date: string) =>
     request<Session[]>(`/sessions?date=${date}`),
 
+  getSessionsForRange: (startDate: string, endDate: string) =>
+    request<Session[]>(`/sessions?start_date=${startDate}&end_date=${endDate}`),
+
   getSession: (id: string) =>
     request<Session>(`/sessions/${id}`),
 
@@ -166,15 +169,20 @@ const desktopApi = {
   getAnalyticsByCategory: (startDate: string, endDate: string) =>
     request<{ data: AnalyticsCategoryRow[] }>(`/analytics/by-category?start_date=${startDate}&end_date=${endDate}`),
 
-  exportTimesheet: async (date: string) => {
-    const res = await fetch(`${API_BASE}/export?date=${date}&format=csv`, {
+  exportTimesheet: async (startDate: string, endDate?: string) => {
+    const effectiveEnd = endDate || startDate
+    const qs = startDate === effectiveEnd
+      ? `date=${startDate}&format=csv`
+      : `start_date=${startDate}&end_date=${effectiveEnd}&format=csv`
+    const res = await fetch(`${API_BASE}/export?${qs}`, {
       headers: authHeaders(),
     })
     const blob = await res.blob()
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `timesheet-${date}.csv`
+    const filename = startDate === effectiveEnd ? `timesheet-${startDate}.csv` : `timesheet-${startDate}-to-${effectiveEnd}.csv`
+    a.download = filename
     a.click()
     URL.revokeObjectURL(url)
   },

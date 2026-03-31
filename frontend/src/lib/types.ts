@@ -188,3 +188,5 @@ export interface AnalyticsByMatter {
 }
 
 export type PeriodPreset = 'this_week' | 'this_month' | 'last_month' | 'this_quarter' | 'ytd'
+
+export type TimesheetPreset = 'today' | 'yesterday' | 'this_week' | 'last_week' | 'this_month' | 'last_month' | 'custom'

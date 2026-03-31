@@ -1,11 +1,19 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 
-export function useTimesheetStatus(dateStr: string) {
-  const key = `timesheet-status-${dateStr}`
+export function useTimesheetStatus(startDate: string, endDate?: string) {
+  const effectiveEnd = endDate || startDate
+  const key = startDate === effectiveEnd
+    ? `timesheet-status-${startDate}`
+    : `timesheet-released-${startDate}-${effectiveEnd}`
 
   const [isReleased, setIsReleased] = useState(() => {
     return localStorage.getItem(key) === 'released'
   })
+
+  // Re-check when key changes (date range changed)
+  useEffect(() => {
+    setIsReleased(localStorage.getItem(key) === 'released')
+  }, [key])
 
   const release = useCallback(() => {
     localStorage.setItem(key, 'released')

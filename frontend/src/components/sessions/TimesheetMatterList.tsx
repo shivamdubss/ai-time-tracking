@@ -10,7 +10,8 @@ interface TimesheetMatterListProps {
   sessions: Session[]
   matters: Matter[]
   clients: Client[]
-  dateStr: string
+  startDate: string
+  endDate: string
   onActivityUpdated: (activity: Activity) => void
   onActivityDeleted: (activityId: string) => void
   onEntryAdded: () => void
@@ -25,7 +26,7 @@ interface MatterGroup {
   totalMinutes: number
 }
 
-export function TimesheetMatterList({ sessions, matters, clients, dateStr, onActivityUpdated, onActivityDeleted, onEntryAdded, onDataRefresh }: TimesheetMatterListProps) {
+export function TimesheetMatterList({ sessions, matters, clients, startDate, endDate, onActivityUpdated, onActivityDeleted, onEntryAdded, onDataRefresh }: TimesheetMatterListProps) {
   const [isAddingEntry, setIsAddingEntry] = useState(false)
   const clientMap = useMemo(
     () => new Map(clients.map(c => [c.id, c])),
@@ -102,7 +103,7 @@ export function TimesheetMatterList({ sessions, matters, clients, dateStr, onAct
       {/* Inline add entry form */}
       {isAddingEntry && (
         <TimesheetAddEntryForm
-          dateStr={dateStr}
+          dateStr={startDate === endDate ? startDate : new Date().toISOString().slice(0, 10)}
           matters={matters}
           onEntryAdded={() => {
             onEntryAdded()

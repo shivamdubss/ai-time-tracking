@@ -133,6 +133,45 @@ async function getSessions(date: string): Promise<Session[]> {
   }))
 }
 
+async function getSessionsForRange(startDate: string, endDate: string): Promise<Session[]> {
+  const { start } = dayBoundsUTC(startDate)
+  const { end } = dayBoundsUTC(endDate)
+  const { data: sessions, error } = await supabase
+    .from('sessions')
+    .select('*')
+    .gte('start_time', start)
+    .lt('start_time', end)
+    .order('start_time', { ascending: false })
+
+  if (error) throw new Error(error.message)
+  if (!sessions || sessions.length === 0) return []
+
+  const sessionIds = sessions.map(s => s.id)
+  const { data: activities } = await supabase
+    .from('activities')
+    .select('*')
+    .in('session_id', sessionIds)
+    .order('sort_order', { ascending: true })
+
+  const actsBySession = new Map<string, Activity[]>()
+  for (const a of (activities || [])) {
+    const list = actsBySession.get(a.session_id) || []
+    list.push(a)
+    actsBySession.set(a.session_id, list)
+  }
+
+  return sessions.map(s => ({
+    id: s.id,
+    start_time: s.start_time,
+    end_time: s.end_time,
+    status: s.status,
+    summary: s.summary || '',
+    categories: s.categories || [],
+    activities: actsBySession.get(s.id) || [],
+    matter_id: s.matter_id,
+  }))
+}
+
 async function getSession(id: string) {
   const { data, error } = await supabase
     .from('sessions')
@@ -490,17 +529,20 @@ async function getAnalyticsByCategory(startDate: string, endDate: string): Promi
 
 // ─── CSV Export ────��──────────────────────────────────────────────────────
 
-async function exportTimesheet(date: string) {
-  const { start, end } = dayBoundsUTC(date)
+async function exportTimesheet(startDate: string, endDate?: string) {
+  const effectiveEnd = endDate || startDate
+  const { start } = dayBoundsUTC(startDate)
+  const { end } = dayBoundsUTC(effectiveEnd)
   const { data: sessions } = await supabase
     .from('sessions')
-    .select('id')
+    .select('id, start_time')
     .gte('start_time', start)
     .lt('start_time', end)
 
   if (!sessions || sessions.length === 0) return
 
-  const sessionIds = sessions.map(s => s.id)
+  const sessionIds = sessions.map((s: any) => s.id)
+  const sessionStartMap = new Map(sessions.map((s: any) => [s.id, s.start_time]))
   const { data: activities } = await supabase
     .from('activities')
     .select('*, matters(name, matter_number, client_id, clients(name))')
@@ -514,11 +556,15 @@ async function exportTimesheet(date: string) {
   ]
 
   for (const a of activities) {
+    const sessionStart = sessionStartMap.get(a.session_id) as string | undefined
+    const actDate = a.start_time
+      ? new Date(a.start_time).toISOString().slice(0, 10)
+      : (sessionStart ? new Date(sessionStart).toISOString().slice(0, 10) : startDate)
     const hours = (a.minutes || 0) > 0 ? Math.max(Math.round((a.minutes || 0) / 60 * 10) / 10, 0.1) : 0
     const rate = a.effective_rate || ''
     const value = a.effective_rate ? Math.round(hours * a.effective_rate * 100) / 100 : ''
     rows.push([
-      date,
+      actDate,
       a.matters?.clients?.name || 'Unassigned',
       a.matters?.name || 'Unassigned',
       a.matters?.matter_number || '',
@@ -536,7 +582,8 @@ async function exportTimesheet(date: string) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = `timesheet-${date}.csv`
+  const filename = startDate === effectiveEnd ? `timesheet-${startDate}.csv` : `timesheet-${startDate}-to-${effectiveEnd}.csv`
+  a.download = filename
   a.click()
   URL.revokeObjectURL(url)
 }
@@ -558,6 +605,7 @@ export const api = {
 
   // Sessions
   getSessions: getSessions as (date: string) => Promise<Session[]>,
+  getSessionsForRange: getSessionsForRange as (startDate: string, endDate: string) => Promise<Session[]>,
   getSession,
   deleteSession,
 

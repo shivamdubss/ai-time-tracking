@@ -407,32 +407,60 @@ export function TimesheetMatterCard({
       {expanded && (
         <div className="ml-4 mt-2 animate-in fade-in duration-200">
           <div className="border-t border-border-subtle pt-2">
-            {[...activities]
-              .sort((a, b) => {
+            {(() => {
+              const sorted = [...activities].sort((a, b) => {
                 if (!a.start_time || !b.start_time) return 0
                 return new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
               })
-              .map((activity, i) => (
-                <div
-                  key={activity.id || i}
-                  className={cn(
-                    'flex items-baseline gap-3 py-1.5 text-[13px]',
-                    i > 0 && 'border-t border-border-subtle',
-                  )}
-                >
-                  <span className="font-mono text-text-muted tabular-nums shrink-0 text-xs">
-                    {activity.start_time && activity.end_time
-                      ? formatTimeRange(activity.start_time, activity.end_time)
-                      : '---'}
-                  </span>
-                  <span className="font-mono text-text-primary tabular-nums shrink-0 text-xs font-semibold">
-                    {formatDuration(activity.minutes)}
-                  </span>
-                  <span className="text-text-secondary truncate text-xs">
-                    {activity.narrative || activity.app}
-                  </span>
-                </div>
-              ))}
+
+              // Check if activities span multiple days
+              const dates = new Set(sorted.map(a =>
+                a.start_time ? new Date(a.start_time).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : ''
+              ).filter(Boolean))
+              const isMultiDay = dates.size > 1
+
+              let lastDateLabel = ''
+              return sorted.map((activity, i) => {
+                const dateLabel = activity.start_time
+                  ? new Date(activity.start_time).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+                  : ''
+                const showDateHeader = isMultiDay && dateLabel && dateLabel !== lastDateLabel
+                if (dateLabel) lastDateLabel = dateLabel
+
+                return (
+                  <div key={activity.id || i}>
+                    {showDateHeader && (
+                      <div className={cn(
+                        'flex items-center gap-2 py-1.5 text-[11px] font-medium text-text-muted uppercase tracking-wider',
+                        i > 0 && 'mt-1 border-t border-border-subtle pt-2',
+                      )}>
+                        <span className="h-px flex-1 bg-border-subtle" />
+                        <span>{dateLabel}</span>
+                        <span className="h-px flex-1 bg-border-subtle" />
+                      </div>
+                    )}
+                    <div
+                      className={cn(
+                        'flex items-baseline gap-3 py-1.5 text-[13px]',
+                        !showDateHeader && i > 0 && 'border-t border-border-subtle',
+                      )}
+                    >
+                      <span className="font-mono text-text-muted tabular-nums shrink-0 text-xs">
+                        {activity.start_time && activity.end_time
+                          ? formatTimeRange(activity.start_time, activity.end_time)
+                          : '---'}
+                      </span>
+                      <span className="font-mono text-text-primary tabular-nums shrink-0 text-xs font-semibold">
+                        {formatDuration(activity.minutes)}
+                      </span>
+                      <span className="text-text-secondary truncate text-xs">
+                        {activity.narrative || activity.app}
+                      </span>
+                    </div>
+                  </div>
+                )
+              })
+            })()}
           </div>
         </div>
       )}

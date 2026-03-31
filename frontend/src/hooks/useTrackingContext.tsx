@@ -46,7 +46,7 @@ export function useTracking() {
 
 export function TrackingProvider({ children }: { children: React.ReactNode }) {
   const { session: authSession } = useAuth()
-  const { isWithinWorkHours } = useSettings()
+  const { isWithinWorkHours, settings } = useSettings()
   const [selectedDate, setSelectedDate] = useState(new Date())
   const timer = useTimer()
   const [status, setStatus] = useState<TrackingStatus>('idle')
@@ -231,6 +231,11 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const handleStart = useCallback(async () => {
+    if (settings.demoMode) {
+      setStatus('tracking')
+      timerRef.current.start()
+      return
+    }
     if (!isWithinWorkHours()) {
       setWorkHoursBlocked(true)
       setTimeout(() => setWorkHoursBlocked(false), 3000)
@@ -243,9 +248,15 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
     } catch (e: any) {
       console.error('Failed to start session:', e.message)
     }
-  }, [isWithinWorkHours])
+  }, [isWithinWorkHours, settings.demoMode])
 
   const handleStop = useCallback(async () => {
+    if (settings.demoMode) {
+      timerRef.current.stop()
+      timerRef.current.reset()
+      setStatus('idle')
+      return
+    }
     try {
       timerRef.current.stop()
       setStatus('processing')

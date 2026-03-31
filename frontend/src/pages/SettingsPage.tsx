@@ -91,6 +91,24 @@ export function SettingsPage() {
         </div>
       </div>
 
+      {/* Demo Mode — admin only */}
+      {user?.email === 'shivam@donnaanswers.com' && (
+        <div className="bg-surface border border-border rounded-[var(--radius-md)] overflow-hidden max-w-lg">
+          <div className="px-5 py-4 flex items-center justify-between gap-4">
+            <div>
+              <h2 className="font-display font-semibold text-sm text-text-primary">Demo Mode</h2>
+              <p className="text-xs text-text-muted mt-0.5">
+                Show a demo indicator across the app
+              </p>
+            </div>
+            <Toggle
+              checked={settings.demoMode}
+              onChange={(demoMode) => updateSettings({ demoMode })}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Account */}
       {isSupabaseConfigured() && user && (() => {
         const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'

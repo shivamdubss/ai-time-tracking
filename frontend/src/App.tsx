@@ -16,6 +16,7 @@ import { TrackingProvider } from '@/hooks/useTrackingContext'
 import { AuthProvider, useAuth } from '@/hooks/useAuth'
 import { isSupabaseConfigured } from '@/lib/supabase'
 import { Agentation } from 'agentation'
+import { DemoBanner } from '@/components/ui/DemoBanner'
 
 function AppContent() {
   const [ready, setReady] = useState(false)
@@ -78,6 +79,7 @@ function AppContent() {
               <Route path="/clients" element={<ClientsMattersPage />} />
               <Route path="/settings" element={<SettingsPage />} />
             </Routes>
+            <DemoBanner />
           </TrackingProvider>
         </SettingsProvider>
       </main>

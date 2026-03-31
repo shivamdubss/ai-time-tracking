@@ -10,6 +10,7 @@ interface WorkHoursSettings {
 export interface AppSettings {
   workHours: WorkHoursSettings
   defaultHourlyRate: number | null
+  demoMode: boolean
 }
 
 interface SettingsContextValue {
@@ -27,6 +28,7 @@ const DEFAULT_SETTINGS: AppSettings = {
     endTime: '17:00',
   },
   defaultHourlyRate: null,
+  demoMode: false,
 }
 
 function loadSettings(): AppSettings {

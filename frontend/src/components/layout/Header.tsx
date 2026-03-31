@@ -14,6 +14,7 @@ interface HeaderProps {
   onStartTracking: () => void
   onStopTracking: () => void
   workHoursBlocked?: boolean
+  demoMode?: boolean
 }
 
 export function Header({
@@ -26,6 +27,7 @@ export function Header({
   onStartTracking,
   onStopTracking,
   workHoursBlocked,
+  demoMode,
 }: HeaderProps) {
   return (
     <header className="flex items-center justify-between">
@@ -52,7 +54,7 @@ export function Header({
         </div>
       </div>
 
-      {!isWebMode && (
+      {(!isWebMode || demoMode) && (
         <div className="flex items-center gap-3">
           {status === 'tracking' && (
             <div className="flex items-center gap-2 px-2.5 py-1.5 bg-error-bg border border-error/20 rounded-[var(--radius-sm)]">

@@ -5,6 +5,7 @@ import { useTracking } from '@/hooks/useTrackingContext'
 import { useSessionData } from '@/hooks/useSessionData'
 import { useTimesheetStatus } from '@/hooks/useTimesheetStatus'
 import { api } from '@/lib/api'
+import { useSettings } from '@/hooks/useSettings'
 import { Download, CheckCircle2, Undo2 } from 'lucide-react'
 
 export function TimesheetPage() {
@@ -15,6 +16,7 @@ export function TimesheetPage() {
     handleActivityUpdated, handleActivityDeleted,
   } = useSessionData()
   const { isReleased, release, unrelease } = useTimesheetStatus(dateStr)
+  const { settings } = useSettings()
 
   function handleExport() {
     api.exportTimesheet(dateStr)
@@ -33,6 +35,7 @@ export function TimesheetPage() {
         onStartTracking={handleStart}
         onStopTracking={handleStop}
         workHoursBlocked={workHoursBlocked}
+        demoMode={settings.demoMode}
       />
 
       <SummaryStats

@@ -155,7 +155,7 @@ async function deleteSession(id: string) {
 async function getClients(): Promise<Client[]> {
   const { data, error } = await supabase
     .from('clients')
-    .select('*')
+    .select('*, matters(*)')
     .order('name')
   if (error) throw new Error(error.message)
   return (data || []).map(c => ({ ...c, is_internal: Boolean(c.is_internal) }))

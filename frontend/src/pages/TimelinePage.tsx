@@ -6,10 +6,12 @@ import { useTracking } from '@/hooks/useTrackingContext'
 import { useSessionData } from '@/hooks/useSessionData'
 import { Trash2 } from 'lucide-react'
 import { api } from '@/lib/api'
+import { useSettings } from '@/hooks/useSettings'
 import type { Session } from '@/lib/types'
 
 export function TimelinePage() {
   const { selectedDate, isToday, goBack, goForward, status, elapsed, handleStart, handleStop, workHoursBlocked, refreshMatters } = useTracking()
+  const { settings } = useSettings()
   const {
     sessions, setSessions, matters, clients,
     totalHours, totalActivities, totalBillableValue, totalBillableMinutes, totalNonBillableMinutes,
@@ -68,6 +70,7 @@ export function TimelinePage() {
         onStartTracking={handleStart}
         onStopTracking={handleStop}
         workHoursBlocked={workHoursBlocked}
+        demoMode={settings.demoMode}
       />
 
       <SummaryStats

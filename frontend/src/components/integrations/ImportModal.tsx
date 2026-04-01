@@ -218,19 +218,6 @@ export function ImportModal({ open, onClose }: ImportModalProps) {
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
               </div>
-              <div className="flex items-center gap-2 mt-0.5">
-                <input
-                  type="date"
-                  defaultValue="2026-03-25"
-                  className="flex-1 bg-page border border-border rounded-[var(--radius-sm)] px-3 py-2 text-sm font-mono text-text-primary focus:outline-none focus:ring-1 focus:ring-text-faint"
-                />
-                <span className="text-xs text-text-muted shrink-0">to</span>
-                <input
-                  type="date"
-                  defaultValue="2026-04-01"
-                  className="flex-1 bg-page border border-border rounded-[var(--radius-sm)] px-3 py-2 text-sm font-mono text-text-primary focus:outline-none focus:ring-1 focus:ring-text-faint"
-                />
-              </div>
             </div>
 
             {/* Sources */}

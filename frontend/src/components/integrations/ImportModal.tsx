@@ -104,7 +104,6 @@ export function ImportModal({ open, onClose }: ImportModalProps) {
   const [entries, setEntries] = useState<ProposedEntry[]>(MOCK_ENTRIES)
   const [approvedCount, setApprovedCount] = useState(0)
   const [fetchStep, setFetchStep] = useState(0)
-  const [preset, setPreset] = useState('last_7')
   const [calEnabled, setCalEnabled] = useState(true)
   const [emailEnabled, setEmailEnabled] = useState(true)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -205,18 +204,18 @@ export function ImportModal({ open, onClose }: ImportModalProps) {
             {/* Date range */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium text-text-muted">Date range</label>
-              <div className="relative">
-                <select
-                  value={preset}
-                  onChange={e => setPreset(e.target.value)}
-                  className="w-full appearance-none bg-page border border-border rounded-[var(--radius-sm)] px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-text-faint pr-8 cursor-pointer"
-                >
-                  <option value="last_7">Last 7 days</option>
-                  <option value="this_week">This week</option>
-                  <option value="last_week">Last week</option>
-                  <option value="this_month">This month</option>
-                </select>
-                <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  defaultValue="March 25, 2026"
+                  className="flex-1 bg-page border border-border rounded-[var(--radius-sm)] px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-text-faint"
+                />
+                <span className="text-xs text-text-muted shrink-0">to</span>
+                <input
+                  type="text"
+                  defaultValue="April 1, 2026"
+                  className="flex-1 bg-page border border-border rounded-[var(--radius-sm)] px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-text-faint"
+                />
               </div>
             </div>
 

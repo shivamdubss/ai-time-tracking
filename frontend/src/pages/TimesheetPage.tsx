@@ -7,7 +7,8 @@ import { useTimesheetData } from '@/hooks/useTimesheetData'
 import { useTimesheetStatus } from '@/hooks/useTimesheetStatus'
 import { api } from '@/lib/api'
 import type { TimesheetPreset } from '@/lib/types'
-import { Download, CheckCircle2, Undo2, Loader2 } from 'lucide-react'
+import { Download, CheckCircle2, Undo2, Loader2, ArrowDownToLine } from 'lucide-react'
+import { ImportModal } from '@/components/integrations/ImportModal'
 
 export function TimesheetPage() {
   const { matters, clients, refreshMatters } = useTracking()
@@ -30,6 +31,7 @@ export function TimesheetPage() {
 
   // Release status
   const { isReleased, release, unrelease } = useTimesheetStatus(startDate, endDate)
+  const [importOpen, setImportOpen] = useState(false)
 
   function handlePeriodChange(start: string, end: string, preset: TimesheetPreset) {
     setStartDate(start)
@@ -83,6 +85,13 @@ export function TimesheetPage() {
         </div>
         <div className="flex items-center gap-2">
           <button
+            onClick={() => setImportOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-secondary bg-surface border border-border rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer"
+          >
+            <ArrowDownToLine size={14} />
+            Import
+          </button>
+          <button
             onClick={handleExport}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-secondary bg-surface border border-border rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer"
           >
@@ -120,6 +129,8 @@ export function TimesheetPage() {
         onEntryAdded={refresh}
         onDataRefresh={refreshMatters}
       />
+
+      <ImportModal open={importOpen} onClose={() => setImportOpen(false)} />
     </div>
   )
 }

@@ -1,13 +1,17 @@
+import { useState } from 'react'
 import { useSettings } from '@/hooks/useSettings'
 import { useAuth } from '@/hooks/useAuth'
 import { isSupabaseConfigured } from '@/lib/supabase'
 import { isWebMode } from '@/lib/platform'
 import { Toggle } from '@/components/ui/Toggle'
+import { Calendar, Mail, CheckCircle2 } from 'lucide-react'
 
 export function SettingsPage() {
   const { settings, updateSettings, isWithinWorkHours } = useSettings()
   const { user, signOut } = useAuth()
   const { workHours } = settings
+  const [calConnected, setCalConnected] = useState(false)
+  const [m365Connected, setM365Connected] = useState(false)
 
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6 flex-1 min-h-0 pt-16 md:pt-6">
@@ -108,6 +112,87 @@ export function SettingsPage() {
           </div>
         </div>
       )}
+
+      {/* Integrations */}
+      <div className="bg-surface border border-border rounded-[var(--radius-md)] overflow-hidden max-w-lg">
+        <div className="px-5 py-4 border-b border-border-subtle">
+          <h2 className="font-display font-semibold text-sm text-text-primary">Integrations</h2>
+          <p className="text-xs text-text-muted mt-0.5">
+            Connect external accounts to import calendar events and emails as time entries
+          </p>
+        </div>
+        <div className="px-5 py-4 flex flex-col gap-3">
+          {/* Google Calendar */}
+          <div className="flex items-center justify-between gap-4 py-2">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-[var(--radius-sm)] bg-inset border border-border flex items-center justify-center shrink-0">
+                <Calendar size={16} style={{ color: '#15803D' }} />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-text-primary">Google Calendar</p>
+                {calConnected
+                  ? <p className="text-xs text-text-muted">shivani@smithlegal.com</p>
+                  : <p className="text-xs text-text-muted">Import court sessions and prep blocks</p>
+                }
+              </div>
+            </div>
+            {calConnected ? (
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} className="text-emerald-600" />
+                <button
+                  onClick={() => setCalConnected(false)}
+                  className="text-xs text-text-muted hover:text-text-primary underline cursor-pointer"
+                >
+                  Disconnect
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setCalConnected(true)}
+                className="px-3 py-1.5 text-xs font-medium text-text-secondary border border-border rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer shrink-0"
+              >
+                Connect
+              </button>
+            )}
+          </div>
+
+          <div className="border-t border-border-subtle" />
+
+          {/* Microsoft 365 */}
+          <div className="flex items-center justify-between gap-4 py-2">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-[var(--radius-sm)] bg-inset border border-border flex items-center justify-center shrink-0">
+                <Mail size={16} style={{ color: '#2563EB' }} />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-text-primary">Microsoft 365</p>
+                {m365Connected
+                  ? <p className="text-xs text-text-muted">shivani@smithlegal.com</p>
+                  : <p className="text-xs text-text-muted">Import sent items and inbox</p>
+                }
+              </div>
+            </div>
+            {m365Connected ? (
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} className="text-emerald-600" />
+                <button
+                  onClick={() => setM365Connected(false)}
+                  className="text-xs text-text-muted hover:text-text-primary underline cursor-pointer"
+                >
+                  Disconnect
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setM365Connected(true)}
+                className="px-3 py-1.5 text-xs font-medium text-text-secondary border border-border rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer shrink-0"
+              >
+                Connect
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Account */}
       {isSupabaseConfigured() && user && (() => {

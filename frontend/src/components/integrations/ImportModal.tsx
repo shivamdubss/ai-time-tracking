@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
-import { X, Calendar, Mail, Check, Trash2, AlertTriangle, ChevronDown } from 'lucide-react'
+import { X, Calendar, Mail, Check, ChevronDown } from 'lucide-react'
 import { getCategoryColors, LEGAL_CATEGORIES } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
 type Stage = 'configure' | 'fetching' | 'review'
-type FilterTab = 'all' | 'needs_review' | 'calendar' | 'email'
 type Confidence = 'high' | 'medium' | 'low'
 type Source = 'calendar' | 'email'
 
@@ -100,9 +99,9 @@ interface ImportModalProps {
 
 export function ImportModal({ open, onClose }: ImportModalProps) {
   const [stage, setStage] = useState<Stage>('configure')
-  const [activeTab, setActiveTab] = useState<FilterTab>('all')
   const [entries, setEntries] = useState<ProposedEntry[]>(MOCK_ENTRIES)
-  const [approvedCount, setApprovedCount] = useState(0)
+  const [approvedIds, setApprovedIds] = useState<Set<string>>(new Set())
+  const [deniedIds, setDeniedIds] = useState<Set<string>>(new Set())
   const [fetchStep, setFetchStep] = useState(0)
   const [calEnabled, setCalEnabled] = useState(true)
   const [emailEnabled, setEmailEnabled] = useState(true)
@@ -113,9 +112,9 @@ export function ImportModal({ open, onClose }: ImportModalProps) {
     if (open) {
       setStage('configure')
       setEntries(MOCK_ENTRIES)
-      setApprovedCount(0)
+      setApprovedIds(new Set())
+      setDeniedIds(new Set())
       setFetchStep(0)
-      setActiveTab('all')
       setEditingId(null)
       setEditingField(null)
     }
@@ -133,47 +132,44 @@ export function ImportModal({ open, onClose }: ImportModalProps) {
   }, [stage, fetchStep])
 
   function approveEntry(id: string) {
-    setEntries(prev => prev.filter(e => e.id !== id))
-    setApprovedCount(c => c + 1)
+    setApprovedIds(prev => new Set([...prev, id]))
+    setDeniedIds(prev => { const s = new Set(prev); s.delete(id); return s })
   }
 
-  function removeEntry(id: string) {
-    setEntries(prev => prev.filter(e => e.id !== id))
+  function denyEntry(id: string) {
+    setDeniedIds(prev => new Set([...prev, id]))
+    setApprovedIds(prev => { const s = new Set(prev); s.delete(id); return s })
+  }
+
+  function undoEntry(id: string) {
+    setApprovedIds(prev => { const s = new Set(prev); s.delete(id); return s })
+    setDeniedIds(prev => { const s = new Set(prev); s.delete(id); return s })
   }
 
   function approveAllConfident() {
-    const count = entries.filter(e => e.confidence === 'high').length
-    setEntries(prev => prev.filter(e => e.confidence !== 'high'))
-    setApprovedCount(c => c + count)
+    const confidentIds = entries.filter(e => e.confidence === 'high').map(e => e.id)
+    setApprovedIds(prev => new Set([...prev, ...confidentIds]))
+    setDeniedIds(prev => { const s = new Set(prev); confidentIds.forEach(id => s.delete(id)); return s })
   }
 
   function updateEntry(id: string, field: keyof ProposedEntry, value: string | number | null) {
     setEntries(prev => prev.map(e => e.id === id ? { ...e, [field]: value } : e))
   }
 
-  const filtered = entries.filter(e => {
-    if (activeTab === 'needs_review') return e.confidence !== 'high'
-    if (activeTab === 'calendar') return e.source === 'calendar'
-    if (activeTab === 'email') return e.source === 'email'
-    return true
-  })
-
   // Group: named matters first (in original order), then unassigned
   const matterOrder = Array.from(new Set(MOCK_ENTRIES.filter(e => e.matter).map(e => e.matter as string)))
   const grouped: Record<string, ProposedEntry[]> = {}
   for (const m of matterOrder) {
-    const rows = filtered.filter(e => e.matter === m)
+    const rows = entries.filter(e => e.matter === m)
     if (rows.length) grouped[m] = rows
   }
-  const unassigned = filtered.filter(e => e.matter === null)
+  const unassigned = entries.filter(e => e.matter === null)
   if (unassigned.length) grouped['__unassigned__'] = unassigned
 
-  const highCount = entries.filter(e => e.confidence === 'high').length
-  const needsReviewCount = entries.filter(e => e.confidence !== 'high').length
-  const calCount = entries.filter(e => e.source === 'calendar').length
-  const emailCount = entries.filter(e => e.source === 'email').length
-  const totalMockMinutes = MOCK_ENTRIES.reduce((s, e) => s + e.duration, 0)
-  const mockMatterCount = new Set(MOCK_ENTRIES.filter(e => e.matter).map(e => e.matter)).size
+  const highCount = entries.filter(e => e.confidence === 'high' && !approvedIds.has(e.id) && !deniedIds.has(e.id)).length
+  const approvedCount = approvedIds.size
+  const deniedCount = deniedIds.size
+  const pendingCount = entries.length - approvedCount - deniedCount
 
   if (!open) return null
 
@@ -298,43 +294,16 @@ export function ImportModal({ open, onClose }: ImportModalProps) {
         {stage === 'review' && (
           <>
             {/* Review sub-header */}
-            <div className="px-5 py-3 border-b border-border shrink-0 flex flex-col gap-2.5">
-              <div className="flex items-center justify-between gap-4">
-                <p className="text-xs text-text-muted font-mono">
-                  {entries.length} proposed · {mockMatterCount} matters · {fmtDuration(totalMockMinutes)}
-                </p>
-                {highCount > 0 && (
-                  <button
-                    onClick={approveAllConfident}
-                    className="text-xs font-medium text-text-secondary border border-border px-2.5 py-1 rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer shrink-0"
-                  >
-                    Approve all confident ({highCount})
-                  </button>
-                )}
+            {highCount > 0 && (
+              <div className="px-5 py-3 border-b border-border shrink-0 flex items-center justify-end">
+                <button
+                  onClick={approveAllConfident}
+                  className="text-xs font-medium text-text-secondary border border-border px-2.5 py-1 rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer"
+                >
+                  Approve all confident ({highCount})
+                </button>
               </div>
-              {/* Filter tabs */}
-              <div className="flex items-center gap-1">
-                {([
-                  ['all', `All (${entries.length})`],
-                  ['needs_review', `Needs review (${needsReviewCount})`],
-                  ['calendar', `Calendar (${calCount})`],
-                  ['email', `Email (${emailCount})`],
-                ] as [FilterTab, string][]).map(([tab, label]) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={cn(
-                      'px-2.5 py-1 text-xs rounded-[var(--radius-sm)] transition-colors cursor-pointer',
-                      activeTab === tab
-                        ? 'bg-inset text-text-primary font-medium'
-                        : 'text-text-muted hover:text-text-primary hover:bg-surface-hover'
-                    )}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            )}
 
             {/* Entry list */}
             <div className="overflow-y-auto flex-1 min-h-0">
@@ -353,20 +322,21 @@ export function ImportModal({ open, onClose }: ImportModalProps) {
                     </div>
 
                     {/* Rows */}
-                    {rows.map(entry => (
+                    {rows.map(entry => {
+                      const isApproved = approvedIds.has(entry.id)
+                      const isDenied = deniedIds.has(entry.id)
+                      return (
                       <div
                         key={entry.id}
                         className={cn(
-                          'border-b border-border-subtle last:border-0 transition-colors',
-                          entry.overlap ? 'bg-amber-50/50' : 'hover:bg-surface-hover/40',
-                          entry.overlap && 'pl-8'
+                          'border-b border-border-subtle last:border-0 transition-colors relative',
+                          isApproved && 'bg-emerald-50/60',
+                          isDenied && 'bg-neutral-50 opacity-50',
+                          !isApproved && !isDenied && 'hover:bg-surface-hover/40',
                         )}
                       >
-                        {entry.overlap && (
-                          <div className="flex items-center gap-1.5 px-5 pt-2 pb-0">
-                            <AlertTriangle size={11} className="text-amber-500 shrink-0" />
-                            <span className="text-xs text-amber-600">May already be covered by calendar event above</span>
-                          </div>
+                        {isApproved && (
+                          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-emerald-500 rounded-full" />
                         )}
                         <div className="flex items-start gap-3 px-5 py-3">
                           {/* Confidence dot */}
@@ -456,25 +426,40 @@ export function ImportModal({ open, onClose }: ImportModalProps) {
                           )}
 
                           {/* Actions */}
-                          <div className="flex items-center gap-1 shrink-0">
-                            <button
-                              onClick={() => approveEntry(entry.id)}
-                              title="Approve"
-                              className="p-1.5 rounded-[var(--radius-sm)] text-text-muted hover:text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer"
-                            >
-                              <Check size={14} />
-                            </button>
-                            <button
-                              onClick={() => removeEntry(entry.id)}
-                              title="Remove"
-                              className="p-1.5 rounded-[var(--radius-sm)] text-text-muted hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
-                            >
-                              <Trash2 size={14} />
-                            </button>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {isApproved ? (
+                              <>
+                                <span className="flex items-center gap-1 text-xs font-medium text-emerald-700">
+                                  <Check size={12} />
+                                  Approved
+                                </span>
+                                <button onClick={() => undoEntry(entry.id)} className="text-xs text-text-muted hover:text-text-primary underline cursor-pointer ml-1">Undo</button>
+                              </>
+                            ) : isDenied ? (
+                              <>
+                                <span className="text-xs font-medium text-text-muted">Denied</span>
+                                <button onClick={() => undoEntry(entry.id)} className="text-xs text-text-muted hover:text-text-primary underline cursor-pointer ml-1">Undo</button>
+                              </>
+                            ) : (
+                              <>
+                                <button
+                                  onClick={() => approveEntry(entry.id)}
+                                  className="px-2.5 py-1 text-xs font-medium text-emerald-700 border border-emerald-200 bg-emerald-50 rounded-[var(--radius-sm)] hover:bg-emerald-100 transition-colors cursor-pointer"
+                                >
+                                  Approve
+                                </button>
+                                <button
+                                  onClick={() => denyEntry(entry.id)}
+                                  className="px-2.5 py-1 text-xs font-medium text-text-muted border border-border rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer"
+                                >
+                                  Deny
+                                </button>
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>
-                    ))}
+                    )})}
                   </div>
                 ))
               )}
@@ -482,11 +467,10 @@ export function ImportModal({ open, onClose }: ImportModalProps) {
 
             {/* Review footer */}
             <div className="px-5 py-4 border-t border-border shrink-0 flex items-center justify-between gap-4">
-              <span className="text-xs text-text-muted">
-                {approvedCount > 0 && (
-                  <span className="text-emerald-700 font-medium">{approvedCount} approved · </span>
-                )}
-                {entries.length} remaining
+              <span className="text-xs text-text-muted flex items-center gap-2">
+                {approvedCount > 0 && <span className="text-emerald-700 font-medium">{approvedCount} approved</span>}
+                {deniedCount > 0 && <span className="text-text-muted">{deniedCount} denied</span>}
+                {pendingCount > 0 && <span>{pendingCount} pending</span>}
               </span>
               <div className="flex items-center gap-2">
                 <button

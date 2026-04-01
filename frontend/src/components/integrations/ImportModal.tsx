@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { X, Calendar, Mail, Check, ChevronDown } from 'lucide-react'
-import { getCategoryColors, LEGAL_CATEGORIES } from '@/lib/types'
+import { LEGAL_CATEGORIES } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
 type Stage = 'configure' | 'fetching' | 'review'
@@ -50,21 +50,6 @@ function fmtDuration(minutes: number) {
   return (minutes / 60).toFixed(2) + 'h'
 }
 
-function ConfidenceDot({ confidence }: { confidence: Confidence }) {
-  if (confidence === 'high') {
-    return <span className="w-2 h-2 rounded-full shrink-0 mt-0.5" style={{ backgroundColor: '#15803D' }} />
-  }
-  if (confidence === 'medium') {
-    return <span className="w-2 h-2 rounded-full shrink-0 mt-0.5" style={{ backgroundColor: '#D97706' }} />
-  }
-  return (
-    <span
-      className="w-2 h-2 rounded-full shrink-0 mt-0.5 border"
-      style={{ borderColor: '#A3A3A3', backgroundColor: 'transparent' }}
-    />
-  )
-}
-
 function SourceIcon({ source }: { source: Source }) {
   if (source === 'calendar') {
     return <Calendar size={13} className="shrink-0" style={{ color: '#15803D' }} />
@@ -72,25 +57,6 @@ function SourceIcon({ source }: { source: Source }) {
   return <Mail size={13} className="shrink-0" style={{ color: '#2563EB' }} />
 }
 
-function CategoryChip({ name }: { name: string }) {
-  const colors = getCategoryColors(name)
-  const SHORT: Record<string, string> = {
-    'Client Communication': 'Comms',
-    'Legal Research': 'Research',
-    'Document Drafting': 'Drafting',
-    'Court & Hearings': 'Court',
-    'Case Review': 'Review',
-    'Administrative': 'Admin',
-  }
-  return (
-    <span
-      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold shrink-0"
-      style={{ backgroundColor: colors.bg, color: colors.text }}
-    >
-      {SHORT[name] ?? name}
-    </span>
-  )
-}
 
 interface ImportModalProps {
   open: boolean
@@ -339,11 +305,6 @@ export function ImportModal({ open, onClose }: ImportModalProps) {
                           <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-emerald-500 rounded-full" />
                         )}
                         <div className="flex items-start gap-3 px-5 py-3">
-                          {/* Confidence dot */}
-                          <div className="flex items-center pt-0.5">
-                            <ConfidenceDot confidence={entry.confidence} />
-                          </div>
-
                           {/* Source + time */}
                           <div className="flex flex-col gap-0.5 shrink-0 w-36">
                             <div className="flex items-center gap-1.5">
@@ -379,11 +340,6 @@ export function ImportModal({ open, onClose }: ImportModalProps) {
                             )}
                           </div>
 
-                          {/* Category */}
-                          <div className="shrink-0">
-                            <CategoryChip name={entry.category} />
-                          </div>
-
                           {/* Narrative */}
                           <div className="flex-1 min-w-0">
                             {editingId === entry.id && editingField === 'narrative' ? (
@@ -408,22 +364,20 @@ export function ImportModal({ open, onClose }: ImportModalProps) {
                             )}
                           </div>
 
-                          {/* Matter reassignment for medium/low confidence */}
-                          {(entry.confidence === 'medium' || entry.confidence === 'low') && (
-                            <div className="shrink-0 w-36">
-                              <div className="relative">
-                                <select
-                                  value={entry.matter ?? ''}
-                                  onChange={e => updateEntry(entry.id, 'matter', e.target.value || null)}
-                                  className="w-full appearance-none bg-page border border-border rounded px-2 py-1 text-xs text-text-primary focus:outline-none focus:ring-1 focus:ring-text-faint pr-5 cursor-pointer"
-                                >
-                                  {entry.matter === null && <option value="">Select matter…</option>}
-                                  {MATTERS.map(m => <option key={m} value={m}>{m}</option>)}
-                                </select>
-                                <ChevronDown size={11} className="absolute right-1.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
-                              </div>
+                          {/* Matter dropdown — all rows */}
+                          <div className="shrink-0 w-36">
+                            <div className="relative">
+                              <select
+                                value={entry.matter ?? ''}
+                                onChange={e => updateEntry(entry.id, 'matter', e.target.value || null)}
+                                className="w-full appearance-none bg-page border border-border rounded px-2 py-1 text-xs text-text-primary focus:outline-none focus:ring-1 focus:ring-text-faint pr-5 cursor-pointer"
+                              >
+                                {entry.matter === null && <option value="">Select matter…</option>}
+                                {MATTERS.map(m => <option key={m} value={m}>{m}</option>)}
+                              </select>
+                              <ChevronDown size={11} className="absolute right-1.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
                             </div>
-                          )}
+                          </div>
 
                           {/* Actions */}
                           <div className="flex items-center gap-1.5 shrink-0">

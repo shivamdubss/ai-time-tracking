@@ -1,17 +1,16 @@
-import { useState } from 'react'
 import { useSettings } from '@/hooks/useSettings'
 import { useAuth } from '@/hooks/useAuth'
 import { isSupabaseConfigured } from '@/lib/supabase'
 import { isWebMode } from '@/lib/platform'
 import { Toggle } from '@/components/ui/Toggle'
 import { Calendar, Mail, CheckCircle2 } from 'lucide-react'
+import { useIntegrations } from '@/hooks/useIntegrations'
 
 export function SettingsPage() {
   const { settings, updateSettings, isWithinWorkHours } = useSettings()
   const { user, signOut } = useAuth()
   const { workHours } = settings
-  const [calConnected, setCalConnected] = useState(false)
-  const [m365Connected, setM365Connected] = useState(false)
+  const { status: integrationStatus, connectGoogle, disconnectGoogle, connectM365, disconnectM365 } = useIntegrations()
 
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6 flex-1 min-h-0 pt-16 md:pt-6">
@@ -130,27 +129,20 @@ export function SettingsPage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-text-primary">Google Calendar</p>
-                {calConnected
-                  ? <p className="text-xs text-text-muted">shivani@smithlegal.com</p>
-                  : <p className="text-xs text-text-muted">Import court sessions and prep blocks</p>
-                }
+                <p className="text-xs text-text-muted">
+                  {integrationStatus.google ? integrationStatus.google_email : 'Import court sessions and prep blocks'}
+                </p>
               </div>
             </div>
-            {calConnected ? (
+            {integrationStatus.google ? (
               <div className="flex items-center gap-2">
                 <CheckCircle2 size={14} className="text-emerald-600" />
-                <button
-                  onClick={() => setCalConnected(false)}
-                  className="text-xs text-text-muted hover:text-text-primary underline cursor-pointer"
-                >
+                <button onClick={disconnectGoogle} className="text-xs text-text-muted hover:text-text-primary underline cursor-pointer">
                   Disconnect
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => setCalConnected(true)}
-                className="px-3 py-1.5 text-xs font-medium text-text-secondary border border-border rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer shrink-0"
-              >
+              <button onClick={connectGoogle} className="px-3 py-1.5 text-xs font-medium text-text-secondary border border-border rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer shrink-0">
                 Connect
               </button>
             )}
@@ -166,27 +158,20 @@ export function SettingsPage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-text-primary">Microsoft 365</p>
-                {m365Connected
-                  ? <p className="text-xs text-text-muted">shivani@smithlegal.com</p>
-                  : <p className="text-xs text-text-muted">Import sent items and inbox</p>
-                }
+                <p className="text-xs text-text-muted">
+                  {integrationStatus.m365 ? integrationStatus.m365_email : 'Import sent items and inbox'}
+                </p>
               </div>
             </div>
-            {m365Connected ? (
+            {integrationStatus.m365 ? (
               <div className="flex items-center gap-2">
                 <CheckCircle2 size={14} className="text-emerald-600" />
-                <button
-                  onClick={() => setM365Connected(false)}
-                  className="text-xs text-text-muted hover:text-text-primary underline cursor-pointer"
-                >
+                <button onClick={disconnectM365} className="text-xs text-text-muted hover:text-text-primary underline cursor-pointer">
                   Disconnect
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => setM365Connected(true)}
-                className="px-3 py-1.5 text-xs font-medium text-text-secondary border border-border rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer shrink-0"
-              >
+              <button onClick={connectM365} className="px-3 py-1.5 text-xs font-medium text-text-secondary border border-border rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer shrink-0">
                 Connect
               </button>
             )}

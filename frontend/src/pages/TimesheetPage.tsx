@@ -130,7 +130,7 @@ export function TimesheetPage() {
         onDataRefresh={refreshMatters}
       />
 
-      <ImportModal open={importOpen} onClose={() => setImportOpen(false)} />
+      <ImportModal open={importOpen} onClose={() => setImportOpen(false)} onImported={refresh} />
     </div>
   )
 }

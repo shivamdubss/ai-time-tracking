@@ -25,16 +25,13 @@ interface ProposedEntry {
 }
 
 function fmtDuration(minutes: number) {
-  return (minutes / 60).toFixed(2) + 'h'
+  // Round to nearest 0.1h (6-minute) billing increment
+  const tenths = Math.max(1, Math.round(minutes / 6))
+  return (tenths / 10).toFixed(1) + 'h'
 }
 
-function fmtDateToISO(display: string): string {
-  // "March 25, 2026" → "2026-03-25"
-  try {
-    return new Date(display).toISOString().slice(0, 10)
-  } catch {
-    return new Date().toISOString().slice(0, 10)
-  }
+function toISO(d: Date): string {
+  return d.toISOString().slice(0, 10)
 }
 
 function SourceIcon({ source }: { source: Source }) {
@@ -58,8 +55,8 @@ export function ImportModal({ open, onClose, onImported }: ImportModalProps) {
   const [deniedIds, setDeniedIds] = useState<Set<string>>(new Set())
   const [calEnabled, setCalEnabled] = useState(true)
   const [emailEnabled, setEmailEnabled] = useState(true)
-  const [startDateDisplay, setStartDateDisplay] = useState('')
-  const [endDateDisplay, setEndDateDisplay] = useState('')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
   const [fetchStatus, setFetchStatus] = useState<'idle' | 'fetching' | 'analyzing' | 'done' | 'error'>('idle')
   const [fetchError, setFetchError] = useState<string | null>(null)
   const [confirming, setConfirming] = useState(false)
@@ -72,9 +69,8 @@ export function ImportModal({ open, onClose, onImported }: ImportModalProps) {
       const end = new Date()
       const start = new Date()
       start.setDate(end.getDate() - 6)
-      const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-      setStartDateDisplay(fmt(start))
-      setEndDateDisplay(fmt(end))
+      setStartDate(toISO(start))
+      setEndDate(toISO(end))
       setStage('configure')
       setEntries([])
       setApprovedIds(new Set())
@@ -91,8 +87,8 @@ export function ImportModal({ open, onClose, onImported }: ImportModalProps) {
     if (calEnabled) sources.push('calendar')
     if (emailEnabled) sources.push('email')
 
-    const startISO = fmtDateToISO(startDateDisplay)
-    const endISO = fmtDateToISO(endDateDisplay)
+    const startISO = startDate
+    const endISO = endDate
 
     setFetchError(null)
     setStage('fetching')
@@ -148,8 +144,8 @@ export function ImportModal({ open, onClose, onImported }: ImportModalProps) {
     setApprovedIds(prev => { const s = new Set(prev); s.delete(id); return s })
     setDeniedIds(prev => { const s = new Set(prev); s.delete(id); return s })
   }
-  function approveAllConfident() {
-    const ids = entries.filter(e => e.confidence === 'high' && !approvedIds.has(e.id) && !deniedIds.has(e.id)).map(e => e.id)
+  function approveAll() {
+    const ids = entries.filter(e => !approvedIds.has(e.id) && !deniedIds.has(e.id)).map(e => e.id)
     setApprovedIds(prev => new Set([...prev, ...ids]))
   }
   function updateEntry(id: string, field: keyof ProposedEntry, value: string | number | null) {
@@ -166,7 +162,7 @@ export function ImportModal({ open, onClose, onImported }: ImportModalProps) {
   const unassigned = entries.filter(e => !e.matter)
   if (unassigned.length) grouped['__unassigned__'] = unassigned
 
-  const highCount = entries.filter(e => e.confidence === 'high' && !approvedIds.has(e.id) && !deniedIds.has(e.id)).length
+  const unapprovedCount = entries.filter(e => !approvedIds.has(e.id) && !deniedIds.has(e.id)).length
   const approvedCount = approvedIds.size
   const deniedCount = deniedIds.size
   const pendingCount = entries.length - approvedCount - deniedCount
@@ -199,17 +195,19 @@ export function ImportModal({ open, onClose, onImported }: ImportModalProps) {
               <label className="text-xs font-medium text-text-muted">Date range</label>
               <div className="flex items-center gap-2">
                 <input
-                  type="text"
-                  value={startDateDisplay}
-                  onChange={e => setStartDateDisplay(e.target.value)}
-                  className="flex-1 bg-page border border-border rounded-[var(--radius-sm)] px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-text-faint"
+                  type="date"
+                  value={startDate}
+                  max={endDate}
+                  onChange={e => setStartDate(e.target.value)}
+                  className="flex-1 bg-page border border-border rounded-[var(--radius-sm)] px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-text-faint cursor-pointer"
                 />
                 <span className="text-xs text-text-muted shrink-0">to</span>
                 <input
-                  type="text"
-                  value={endDateDisplay}
-                  onChange={e => setEndDateDisplay(e.target.value)}
-                  className="flex-1 bg-page border border-border rounded-[var(--radius-sm)] px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-text-faint"
+                  type="date"
+                  value={endDate}
+                  min={startDate}
+                  onChange={e => setEndDate(e.target.value)}
+                  className="flex-1 bg-page border border-border rounded-[var(--radius-sm)] px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-text-faint cursor-pointer"
                 />
               </div>
             </div>
@@ -300,10 +298,10 @@ export function ImportModal({ open, onClose, onImported }: ImportModalProps) {
         {/* ── Stage 3: Review ── */}
         {stage === 'review' && (
           <>
-            {highCount > 0 && (
+            {unapprovedCount > 0 && (
               <div className="px-5 py-3 border-b border-border shrink-0 flex items-center justify-end">
-                <button onClick={approveAllConfident} className="text-xs font-medium text-text-secondary border border-border px-2.5 py-1 rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer">
-                  Approve all confident ({highCount})
+                <button onClick={approveAll} className="text-xs font-medium text-text-secondary border border-border px-2.5 py-1 rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer">
+                  Approve all ({unapprovedCount})
                 </button>
               </div>
             )}

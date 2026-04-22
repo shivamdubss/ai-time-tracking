@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Toggle } from '@/components/ui/Toggle'
 import { formatDateLabel, formatTime } from '@/lib/utils'
@@ -9,6 +10,7 @@ interface HeaderProps {
   isToday: boolean
   onGoBack: () => void
   onGoForward: () => void
+  onGoToDate?: (date: Date) => void
   status: TrackingStatus
   elapsed: number
   onStartTracking: () => void
@@ -17,11 +19,19 @@ interface HeaderProps {
   demoMode?: boolean
 }
 
+function toInputValue(d: Date): string {
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
 export function Header({
   selectedDate,
   isToday,
   onGoBack,
   onGoForward,
+  onGoToDate,
   status,
   elapsed,
   onStartTracking,
@@ -29,6 +39,8 @@ export function Header({
   workHoursBlocked,
   demoMode,
 }: HeaderProps) {
+  const dateInputRef = useRef<HTMLInputElement>(null)
+  const maxDate = toInputValue(new Date())
   return (
     <header className="flex items-center justify-between">
       <div className="flex items-center gap-4">
@@ -40,9 +52,40 @@ export function Header({
           >
             <ChevronLeft size={16} />
           </button>
-          <span className="font-display font-semibold text-[15px] text-text-primary min-w-[140px] text-center">
-            {formatDateLabel(selectedDate)}
-          </span>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                const el = dateInputRef.current
+                if (!el) return
+                // Prefer the modern showPicker() API; fall back to focus + click for older browsers
+                const anyEl = el as HTMLInputElement & { showPicker?: () => void }
+                if (typeof anyEl.showPicker === 'function') anyEl.showPicker()
+                else { el.focus(); el.click() }
+              }}
+              aria-label="Pick a date"
+              title="Pick a date"
+              className="font-display font-semibold text-[15px] text-text-primary min-w-[140px] text-center px-2 py-1 rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer"
+            >
+              {formatDateLabel(selectedDate)}
+            </button>
+            <input
+              ref={dateInputRef}
+              type="date"
+              value={toInputValue(selectedDate)}
+              max={maxDate}
+              onChange={(e) => {
+                if (!onGoToDate || !e.target.value) return
+                // Parse "YYYY-MM-DD" as local time (not UTC)
+                const [y, m, d] = e.target.value.split('-').map(Number)
+                if (!y || !m || !d) return
+                onGoToDate(new Date(y, m - 1, d))
+              }}
+              className="sr-only absolute left-0 bottom-0 w-0 h-0 opacity-0 pointer-events-none"
+              tabIndex={-1}
+              aria-hidden="true"
+            />
+          </div>
           <button
             onClick={onGoForward}
             disabled={isToday}

@@ -13,6 +13,7 @@ interface TrackingContextValue {
   dateStr: string
   goBack: () => void
   goForward: () => void
+  goToDate: (date: Date) => void
   isToday: boolean
   status: TrackingStatus
   elapsed: number
@@ -184,6 +185,10 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
     })
   }, [])
 
+  const goToDate = useCallback((date: Date) => {
+    setSelectedDate(date)
+  }, [])
+
   // Check tracking status on mount (desktop only)
   useEffect(() => {
     if (isWebMode) return
@@ -286,6 +291,7 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
         dateStr,
         goBack,
         goForward,
+        goToDate,
         isToday,
         status,
         elapsed: timer.elapsed,

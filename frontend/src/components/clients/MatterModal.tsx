@@ -1,18 +1,22 @@
 import { useState } from 'react'
-import { X, Plus } from 'lucide-react'
+import { X } from 'lucide-react'
 import { api } from '@/lib/api'
-import type { Matter } from '@/lib/types'
+import type { Matter, Client } from '@/lib/types'
 import { Button } from '@/components/ui/Button'
 
 interface MatterModalProps {
-  clientId: string
+  clientId?: string
   matter: Matter | null
   onClose: () => void
-  onSaved: () => void
+  onSaved: (matter: Matter) => void
+  clients?: Client[]
 }
 
-export function MatterModal({ clientId, matter, onClose, onSaved }: MatterModalProps) {
+export function MatterModal({ clientId, matter, onClose, onSaved, clients }: MatterModalProps) {
   const isEditing = matter !== null
+  const needsClientPicker = !isEditing && !clientId
+  const billableClients = (clients || []).filter(c => !c.is_internal)
+  const [selectedClientId, setSelectedClientId] = useState(clientId || '')
   const [name, setName] = useState(matter?.name || '')
   const [matterNumber, setMatterNumber] = useState(matter?.matter_number || '')
   const [practiceArea, setPracticeArea] = useState(matter?.practice_area || '')
@@ -28,6 +32,11 @@ export function MatterModal({ clientId, matter, onClose, onSaved }: MatterModalP
       setError('Matter name is required')
       return
     }
+    const effectiveClientId = clientId || selectedClientId
+    if (!isEditing && !effectiveClientId) {
+      setError('Client is required')
+      return
+    }
     setSaving(true)
     setError('')
 
@@ -38,7 +47,7 @@ export function MatterModal({ clientId, matter, onClose, onSaved }: MatterModalP
 
     try {
       const data = {
-        client_id: clientId,
+        client_id: effectiveClientId,
         name: name.trim(),
         matter_number: matterNumber.trim() || undefined,
         practice_area: practiceArea.trim() || undefined,
@@ -47,12 +56,10 @@ export function MatterModal({ clientId, matter, onClose, onSaved }: MatterModalP
         keywords: keywords.length > 0 ? keywords : undefined,
         notes: notes.trim() || undefined,
       }
-      if (isEditing) {
-        await api.updateMatter(matter.id, data)
-      } else {
-        await api.createMatter(data)
-      }
-      onSaved()
+      const saved = isEditing
+        ? await api.updateMatter(matter.id, data)
+        : await api.createMatter(data)
+      onSaved(saved)
     } catch (e: any) {
       setError(e.message)
     } finally {
@@ -76,6 +83,27 @@ export function MatterModal({ clientId, matter, onClose, onSaved }: MatterModalP
         </div>
 
         <div className="flex flex-col gap-4">
+          {needsClientPicker && (
+            <div>
+              <label className="text-xs font-medium text-text-muted mb-1 block">Client *</label>
+              <select
+                className="w-full bg-bg-page border border-border-default rounded-[var(--radius-sm)] px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-text-faint"
+                value={selectedClientId}
+                onChange={(e) => setSelectedClientId(e.target.value)}
+              >
+                <option value="">Select a client…</option>
+                {billableClients.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+              {billableClients.length === 0 && (
+                <div className="text-xs text-text-faint mt-1">
+                  No clients yet. Create one from the Clients & Matters page.
+                </div>
+              )}
+            </div>
+          )}
+
           <div>
             <label className="text-xs font-medium text-text-muted mb-1 block">Matter Name *</label>
             <input
@@ -83,7 +111,7 @@ export function MatterModal({ clientId, matter, onClose, onSaved }: MatterModalP
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., Smith v. Jones"
-              autoFocus
+              autoFocus={!needsClientPicker}
             />
           </div>
 

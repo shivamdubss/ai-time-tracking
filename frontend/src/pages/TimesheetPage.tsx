@@ -63,7 +63,6 @@ export function TimesheetPage() {
       <SummaryStats
         totalHours={stats.totalHours}
         totalBillableMinutes={stats.totalBillableMinutes}
-        totalBillableValue={stats.totalBillableValue}
         totalNonBillableMinutes={stats.totalNonBillableMinutes}
       />
 

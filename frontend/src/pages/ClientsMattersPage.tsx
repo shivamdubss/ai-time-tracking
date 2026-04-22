@@ -241,6 +241,7 @@ export function ClientsMattersPage() {
           onSaved={() => { setShowMatterModal(false); fetchClients() }}
         />
       )}
+
     </div>
   )
 }

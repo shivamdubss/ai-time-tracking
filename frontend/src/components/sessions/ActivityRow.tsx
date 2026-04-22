@@ -1,9 +1,11 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import type { Activity, Matter, Client } from '@/lib/types'
 import { getCategoryBarColor } from '@/lib/types'
 import { formatDuration } from '@/lib/format'
+import { formatTimeRange } from '@/lib/utils'
 import { api } from '@/lib/api'
-import { Pencil } from 'lucide-react'
+import { Select, type SelectOption } from '@/components/ui/Select'
+import { MatterModal } from '@/components/clients/MatterModal'
 
 interface ActivityRowProps {
   activity: Activity
@@ -32,7 +34,19 @@ function getAppAbbrev(app: string): string {
   return app.slice(0, 2)
 }
 
-export function ActivityRow({ activity, isLast, matters, clients, selected, onSelectToggle, onActivityUpdated, onActivityDeleted, onDataRefresh }: ActivityRowProps) {
+function extractHHMM(iso?: string | null): string {
+  if (!iso) return ''
+  // Expecting "YYYY-MM-DDTHH:MM:SS" — take positions 11..16 for HH:MM
+  const match = iso.match(/T(\d{2}:\d{2})/)
+  return match?.[1] || ''
+}
+
+function extractDatePart(iso?: string | null): string {
+  if (!iso) return ''
+  return iso.slice(0, 10)
+}
+
+export function ActivityRow({ activity, isLast, matters, clients, selected, onSelectToggle, onActivityUpdated, onDataRefresh }: ActivityRowProps) {
   const category = activity.category || 'Administrative'
   const color = getCategoryBarColor(category)
   const hours = formatDuration(activity.minutes)
@@ -40,19 +54,34 @@ export function ActivityRow({ activity, isLast, matters, clients, selected, onSe
   const [narrativeValue, setNarrativeValue] = useState(activity.narrative)
   const [isEditingHours, setIsEditingHours] = useState(false)
   const [hoursValue, setHoursValue] = useState(formatDuration(activity.minutes))
+  const [isEditingTime, setIsEditingTime] = useState(false)
+  const [startTimeValue, setStartTimeValue] = useState(extractHHMM(activity.start_time))
+  const [endTimeValue, setEndTimeValue] = useState(extractHHMM(activity.end_time))
   const [saveError, setSaveError] = useState(false)
-  const [isEditingMatterName, setIsEditingMatterName] = useState(false)
-  const [matterNameValue, setMatterNameValue] = useState('')
-  const [isEditingClientName, setIsEditingClientName] = useState(false)
-  const [clientNameValue, setClientNameValue] = useState('')
+  const [showMatterModal, setShowMatterModal] = useState(false)
   const inputRef = useRef<HTMLTextAreaElement>(null)
-  const clientMap = new Map(clients?.map(c => [c.id, c]) || [])
+
+  const clientMap = useMemo(() => new Map(clients?.map(c => [c.id, c]) || []), [clients])
+  const matterMap = useMemo(() => new Map(matters?.map(m => [m.id, m]) || []), [matters])
+  const selectedMatter = activity.matter_id ? matterMap.get(activity.matter_id) || null : null
+  const selectedClientId = selectedMatter?.client_id || ''
+
+  // Optional client filter — derived from the matter, but user can override to filter matter options
+  const [clientFilter, setClientFilter] = useState<string>(selectedClientId)
+  useEffect(() => { setClientFilter(selectedClientId) }, [selectedClientId])
 
   useEffect(() => {
     if (!isEditingHours) {
       setHoursValue(formatDuration(activity.minutes))
     }
   }, [activity.minutes, isEditingHours])
+
+  useEffect(() => {
+    if (!isEditingTime) {
+      setStartTimeValue(extractHHMM(activity.start_time))
+      setEndTimeValue(extractHHMM(activity.end_time))
+    }
+  }, [activity.start_time, activity.end_time, isEditingTime])
 
   async function handleNarrativeSave() {
     setIsEditingNarrative(false)
@@ -78,6 +107,15 @@ export function ActivityRow({ activity, isLast, matters, clients, selected, onSe
     } catch {}
   }
 
+  function handleClientChange(clientId: string) {
+    setClientFilter(clientId)
+    if (clientId && selectedMatter && selectedMatter.client_id !== clientId) {
+      handleMatterChange('')
+    } else if (!clientId && selectedMatter) {
+      handleMatterChange('')
+    }
+  }
+
   async function handleHoursSave() {
     setIsEditingHours(false)
     const parsed = parseFloat(hoursValue)
@@ -99,42 +137,86 @@ export function ActivityRow({ activity, isLast, matters, clients, selected, onSe
     }
   }
 
-  const selectedMatter = matters?.find(m => m.id === activity.matter_id) || null
-  const selectedClient = selectedMatter ? clientMap.get(selectedMatter.client_id) || null : null
+  async function handleTimeSave() {
+    if (!activity.id) { setIsEditingTime(false); return }
 
-  async function handleMatterNameSave() {
-    setIsEditingMatterName(false)
-    if (!selectedMatter || matterNameValue.trim() === selectedMatter.name) return
-    if (!matterNameValue.trim()) { setMatterNameValue(selectedMatter.name); return }
+    const origStart = extractHHMM(activity.start_time)
+    const origEnd = extractHHMM(activity.end_time)
+    const unchanged = startTimeValue === origStart && endTimeValue === origEnd
+    if (unchanged) { setIsEditingTime(false); return }
+
+    if (!/^\d{2}:\d{2}$/.test(startTimeValue) || !/^\d{2}:\d{2}$/.test(endTimeValue)) {
+      setStartTimeValue(origStart)
+      setEndTimeValue(origEnd)
+      setIsEditingTime(false)
+      return
+    }
+
+    const datePart = extractDatePart(activity.start_time) || extractDatePart(activity.end_time)
+    if (!datePart) { setIsEditingTime(false); return }
+
+    const newStart = `${datePart}T${startTimeValue}:00`
+    const newEnd = `${datePart}T${endTimeValue}:00`
+    const startMs = new Date(newStart).getTime()
+    const endMs = new Date(newEnd).getTime()
+    if (!isFinite(startMs) || !isFinite(endMs) || endMs <= startMs) {
+      setStartTimeValue(origStart)
+      setEndTimeValue(origEnd)
+      setIsEditingTime(false)
+      setSaveError(true)
+      setTimeout(() => setSaveError(false), 3000)
+      return
+    }
+    const newMinutes = Math.round((endMs - startMs) / 60000)
+
+    setIsEditingTime(false)
     try {
       setSaveError(false)
-      await api.updateMatter(selectedMatter.id, { name: matterNameValue.trim() })
-      onDataRefresh?.()
+      const updated = await api.updateActivity(activity.id, {
+        start_time: newStart,
+        end_time: newEnd,
+        minutes: newMinutes,
+      })
+      onActivityUpdated?.(updated)
     } catch {
       setSaveError(true)
-      setMatterNameValue(selectedMatter.name)
+      setStartTimeValue(origStart)
+      setEndTimeValue(origEnd)
       setTimeout(() => setSaveError(false), 3000)
     }
   }
 
-  async function handleClientNameSave() {
-    setIsEditingClientName(false)
-    if (!selectedClient || clientNameValue.trim() === selectedClient.name) return
-    if (!clientNameValue.trim()) { setClientNameValue(selectedClient.name); return }
-    try {
-      setSaveError(false)
-      await api.updateClient(selectedClient.id, { name: clientNameValue.trim() })
-      onDataRefresh?.()
-    } catch {
-      setSaveError(true)
-      setClientNameValue(selectedClient.name)
-      setTimeout(() => setSaveError(false), 3000)
-    }
-  }
+  const activeMatters = useMemo(
+    () => (matters || []).filter(m => m.status === 'active'),
+    [matters],
+  )
+  const visibleMatters = useMemo(
+    () => (clientFilter ? activeMatters.filter(m => m.client_id === clientFilter) : activeMatters),
+    [activeMatters, clientFilter],
+  )
+  const billableMatters = visibleMatters.filter(m => m.billing_type !== 'non-billable')
+  const nonBillableMatters = visibleMatters.filter(m => m.billing_type === 'non-billable')
+  const billableClients = (clients || []).filter(c => !c.is_internal)
+  const timeLabel = activity.start_time && activity.end_time
+    ? formatTimeRange(activity.start_time, activity.end_time)
+    : null
+
+  const matterOptions: SelectOption[] = useMemo(() => {
+    const opts: SelectOption[] = [{ value: '', label: 'Unassigned' }]
+    for (const m of billableMatters) opts.push({ value: m.id, label: m.name, group: 'Client Matters' })
+    for (const m of nonBillableMatters) opts.push({ value: m.id, label: m.name, group: 'Non-Billable' })
+    return opts
+  }, [billableMatters, nonBillableMatters])
+
+  const clientOptions: SelectOption[] = useMemo(() => {
+    const opts: SelectOption[] = [{ value: '', label: 'No client' }]
+    for (const c of billableClients) opts.push({ value: c.id, label: c.name })
+    return opts
+  }, [billableClients])
 
   return (
     <div
-      className={`grid grid-cols-[24px_1fr_80px_1.2fr] gap-4 py-3 text-[13px] items-start ${
+      className={`grid grid-cols-[24px_1fr_200px_80px_1.2fr] gap-4 py-3 text-[13px] items-start ${
         !isLast ? 'border-b border-border-subtle' : ''
       }`}
     >
@@ -150,114 +232,113 @@ export function ActivityRow({ activity, isLast, matters, clients, selected, onSe
         <div />
       )}
 
-      <div>
-        <div className="flex items-center gap-2 font-semibold text-text-primary">
+      <div className="min-w-0 flex items-start gap-3">
+        {/* App badge with custom tooltip */}
+        <div className="relative group mt-0.5 shrink-0">
           <div
-            className="w-5 h-5 rounded flex items-center justify-center text-[9px] font-bold text-white shrink-0"
+            className="w-5 h-5 rounded-[var(--radius-sm)] flex items-center justify-center text-[9px] font-bold text-white cursor-help"
             style={{ backgroundColor: color }}
           >
             {getAppAbbrev(activity.app)}
           </div>
-          {activity.app}
-          {activity.activity_code && (
-            <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-bg-inset text-text-muted">
-              {activity.activity_code}
-            </span>
-          )}
+          <span className="pointer-events-none absolute left-0 top-full mt-1 z-20 whitespace-nowrap rounded-[var(--radius-sm)] px-2 py-1 text-[11px] font-medium bg-text-primary text-text-inverse opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">
+            {activity.app}
+          </span>
         </div>
 
-        {/* Matter dropdown + client name */}
-        {matters && matters.length > 0 && (() => {
-          const active = matters.filter(m => m.status === 'active')
-          const billableMatters = active.filter(m => m.billing_type !== 'non-billable')
-          const nonBillableMatters = active.filter(m => m.billing_type === 'non-billable')
-          return (
-            <div className="mt-1 pl-7">
-              <div className="flex items-center gap-1.5">
-                <select
-                  className="text-xs bg-transparent border border-border-subtle rounded px-1.5 py-0.5 text-text-muted cursor-pointer hover:border-border-default transition-colors"
-                  value={activity.matter_id || ''}
-                  onChange={(e) => handleMatterChange(e.target.value)}
-                >
-                  <option value="">Unassigned</option>
-                  {billableMatters.length > 0 && (
-                    <optgroup label="Client Matters">
-                      {billableMatters.map(m => {
-                        const c = clientMap.get(m.client_id)
-                        return (
-                          <option key={m.id} value={m.id}>
-                            {m.name}{c ? ` (${c.name})` : ''}
-                          </option>
-                        )
-                      })}
-                    </optgroup>
-                  )}
-                  {nonBillableMatters.length > 0 && (
-                    <optgroup label="Non-Billable">
-                      {nonBillableMatters.map(m => (
-                        <option key={m.id} value={m.id}>{m.name}</option>
-                      ))}
-                    </optgroup>
-                  )}
-                </select>
-                {selectedMatter && (
-                  <span title="Rename matter">
-                    <Pencil
-                      size={11}
-                      className="shrink-0 text-text-faint hover:text-text-muted cursor-pointer transition-colors"
-                      onClick={() => { setMatterNameValue(selectedMatter.name); setIsEditingMatterName(true) }}
-                    />
-                  </span>
-                )}
-              </div>
-              {isEditingMatterName && selectedMatter && (
-                <input
-                  className="mt-1 w-full max-w-[240px] text-xs bg-bg-surface border border-border-default rounded px-1.5 py-0.5 text-text-secondary focus:outline-none focus:ring-1 focus:ring-text-faint"
-                  value={matterNameValue}
-                  onChange={(e) => setMatterNameValue(e.target.value)}
-                  onBlur={handleMatterNameSave}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Escape') { setMatterNameValue(selectedMatter.name); setIsEditingMatterName(false) }
-                    if (e.key === 'Enter') { e.preventDefault(); handleMatterNameSave() }
-                  }}
-                  autoFocus
-                  placeholder="Matter name"
-                />
-              )}
-              {selectedClient && !isEditingClientName && (
-                <div
-                  className="mt-0.5 text-xs text-text-muted cursor-pointer hover:bg-bg-surface-hover rounded px-1 -mx-1 transition-colors inline-flex items-center gap-1 group"
-                  onClick={() => { setClientNameValue(selectedClient.name); setIsEditingClientName(true) }}
-                  title="Click to rename client"
-                >
-                  {selectedClient.name}
-                  <Pencil size={10} className="shrink-0 text-text-faint opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-              )}
-              {isEditingClientName && selectedClient && (
-                <input
-                  className="mt-0.5 w-full max-w-[200px] text-xs bg-bg-surface border border-border-default rounded px-1.5 py-0.5 text-text-muted focus:outline-none focus:ring-1 focus:ring-text-faint"
-                  value={clientNameValue}
-                  onChange={(e) => setClientNameValue(e.target.value)}
-                  onBlur={handleClientNameSave}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Escape') { setClientNameValue(selectedClient.name); setIsEditingClientName(false) }
-                    if (e.key === 'Enter') { e.preventDefault(); handleClientNameSave() }
-                  }}
-                  autoFocus
-                  placeholder="Client name"
-                />
-              )}
-            </div>
-          )
-        })()}
+        <div className="min-w-0 flex-1">
+          {/* Matter — primary label */}
+          {matters && matters.length > 0 ? (
+            <Select
+              ariaLabel="Matter"
+              value={activity.matter_id || ''}
+              options={matterOptions}
+              onChange={handleMatterChange}
+              onCreateNew={() => setShowMatterModal(true)}
+              createNewLabel="New matter…"
+              className="font-body font-medium text-sm text-text-primary bg-transparent hover:bg-surface-hover focus:bg-surface-hover focus:outline-none rounded-[var(--radius-sm)] px-1.5 py-0.5 -mx-1.5 max-w-full"
+            />
+          ) : null}
+
+          {/* Secondary line: client */}
+          <div className="mt-0.5 flex items-center gap-1.5 text-xs text-text-muted">
+            {selectedMatter?.billing_type === 'non-billable' ? (
+              <span className="text-text-muted">Non-billable</span>
+            ) : (
+              <Select
+                ariaLabel="Client"
+                value={clientFilter}
+                options={clientOptions}
+                onChange={handleClientChange}
+                className="bg-transparent hover:bg-surface-hover focus:bg-surface-hover focus:outline-none rounded-[var(--radius-sm)] px-1 py-0.5 -mx-1 max-w-[220px] text-xs text-text-muted"
+              />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Time column — editable start – end range */}
+      <div className="font-mono text-[13px] text-text-muted tabular-nums pt-0.5">
+        {isEditingTime ? (
+          <div
+            className="flex items-center gap-1.5"
+            onBlur={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget as Node)) handleTimeSave()
+            }}
+          >
+            <input
+              type="time"
+              value={startTimeValue}
+              onChange={(e) => setStartTimeValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  setStartTimeValue(extractHHMM(activity.start_time))
+                  setEndTimeValue(extractHHMM(activity.end_time))
+                  setIsEditingTime(false)
+                }
+                if (e.key === 'Enter') { e.preventDefault(); handleTimeSave() }
+              }}
+              className="w-[90px] bg-surface border border-border rounded-[var(--radius-sm)] px-2 py-1 text-[12px] font-mono tabular-nums text-text-secondary focus:outline-none focus:ring-1 focus:ring-border-default"
+              autoFocus
+            />
+            <span className="text-text-faint">–</span>
+            <input
+              type="time"
+              value={endTimeValue}
+              onChange={(e) => setEndTimeValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  setStartTimeValue(extractHHMM(activity.start_time))
+                  setEndTimeValue(extractHHMM(activity.end_time))
+                  setIsEditingTime(false)
+                }
+                if (e.key === 'Enter') { e.preventDefault(); handleTimeSave() }
+              }}
+              className="w-[90px] bg-surface border border-border rounded-[var(--radius-sm)] px-2 py-1 text-[12px] font-mono tabular-nums text-text-secondary focus:outline-none focus:ring-1 focus:ring-border-default"
+            />
+          </div>
+        ) : timeLabel ? (
+          <div
+            className="cursor-pointer hover:bg-surface-hover rounded-[var(--radius-sm)] px-1 -mx-1 transition-colors"
+            onClick={() => {
+              setStartTimeValue(extractHHMM(activity.start_time))
+              setEndTimeValue(extractHHMM(activity.end_time))
+              setIsEditingTime(true)
+            }}
+            title="Click to edit times"
+          >
+            {timeLabel}
+          </div>
+        ) : (
+          <span className="text-text-faint">—</span>
+        )}
       </div>
 
       <div className="font-mono text-[13px] text-text-muted tabular-nums">
         {isEditingHours ? (
           <input
             type="number"
-            className="w-16 bg-bg-surface border border-border-default rounded px-2 py-0.5 text-[13px] font-mono tabular-nums text-text-secondary focus:outline-none focus:ring-1 focus:ring-text-faint"
+            className="w-16 bg-surface border border-border rounded-[var(--radius-sm)] px-2 py-0.5 text-[13px] font-mono tabular-nums text-text-secondary focus:outline-none focus:ring-1 focus:ring-border-default"
             value={hoursValue}
             onChange={(e) => setHoursValue(e.target.value)}
             onBlur={handleHoursSave}
@@ -271,7 +352,7 @@ export function ActivityRow({ activity, isLast, matters, clients, selected, onSe
           />
         ) : (
           <div
-            className="cursor-pointer hover:bg-bg-surface-hover rounded px-1 -mx-1 transition-colors"
+            className="cursor-pointer hover:bg-surface-hover rounded-[var(--radius-sm)] px-1 -mx-1 transition-colors"
             onClick={() => { setHoursValue(formatDuration(activity.minutes)); setIsEditingHours(true) }}
             title="Click to edit hours"
           >
@@ -284,7 +365,7 @@ export function ActivityRow({ activity, isLast, matters, clients, selected, onSe
         {isEditingNarrative ? (
           <textarea
             ref={inputRef}
-            className="w-full bg-bg-surface border border-border-default rounded px-2 py-1 text-[13px] text-text-secondary resize-none focus:outline-none focus:ring-1 focus:ring-text-faint"
+            className="w-full bg-surface border border-border rounded-[var(--radius-sm)] px-2 py-1 text-[13px] text-text-secondary resize-none focus:outline-none focus:ring-1 focus:ring-border-default"
             value={narrativeValue}
             onChange={(e) => setNarrativeValue(e.target.value)}
             onBlur={handleNarrativeSave}
@@ -297,7 +378,7 @@ export function ActivityRow({ activity, isLast, matters, clients, selected, onSe
           />
         ) : (
           <div
-            className="cursor-pointer hover:bg-bg-surface-hover rounded px-1 -mx-1 transition-colors"
+            className="cursor-pointer hover:bg-surface-hover rounded-[var(--radius-sm)] px-1 -mx-1 transition-colors"
             onClick={() => setIsEditingNarrative(true)}
             title="Click to edit"
           >
@@ -308,6 +389,25 @@ export function ActivityRow({ activity, isLast, matters, clients, selected, onSe
           <div className="text-xs text-error mt-0.5">Failed to save. Please try again.</div>
         )}
       </div>
+
+      {showMatterModal && (
+        <MatterModal
+          matter={null}
+          clients={clients}
+          clientId={selectedClientId || undefined}
+          onClose={() => setShowMatterModal(false)}
+          onSaved={async (newMatter) => {
+            setShowMatterModal(false)
+            if (activity.id) {
+              try {
+                const updated = await api.updateActivity(activity.id, { matter_id: newMatter.id })
+                onActivityUpdated?.(updated)
+              } catch {}
+            }
+            onDataRefresh?.()
+          }}
+        />
+      )}
     </div>
   )
 }

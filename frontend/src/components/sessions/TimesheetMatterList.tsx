@@ -3,8 +3,7 @@ import type { Session, Matter, Client, Activity } from '@/lib/types'
 import { formatDuration } from '@/lib/format'
 import { TimesheetMatterCard } from './TimesheetMatterCard'
 import { TimesheetAddEntryForm } from './TimesheetAddEntryForm'
-import { Button } from '@/components/ui/Button'
-import { Plus } from 'lucide-react'
+import { Plus, CalendarClock } from 'lucide-react'
 
 interface TimesheetMatterListProps {
   sessions: Session[]
@@ -16,6 +15,13 @@ interface TimesheetMatterListProps {
   onActivityDeleted: (activityId: string) => void
   onEntryAdded: () => void
   onDataRefresh?: () => void
+  onRetroactive?: () => void
+  periodTotals?: {
+    totalHours: number
+    billableMinutes: number
+    nonBillableMinutes: number
+    revenue: number
+  }
 }
 
 interface MatterGroup {
@@ -26,7 +32,7 @@ interface MatterGroup {
   totalMinutes: number
 }
 
-export function TimesheetMatterList({ sessions, matters, clients, startDate, endDate, onActivityUpdated, onActivityDeleted, onEntryAdded, onDataRefresh }: TimesheetMatterListProps) {
+export function TimesheetMatterList({ sessions, matters, clients, startDate, endDate, onActivityUpdated, onActivityDeleted, onEntryAdded, onDataRefresh, onRetroactive, periodTotals }: TimesheetMatterListProps) {
   const [isAddingEntry, setIsAddingEntry] = useState(false)
   const clientMap = useMemo(
     () => new Map(clients.map(c => [c.id, c])),
@@ -81,22 +87,52 @@ export function TimesheetMatterList({ sessions, matters, clients, startDate, end
 
   return (
     <div className="bg-surface border border-border rounded-[var(--radius-md)] overflow-hidden">
-      {/* Header with Add Entry CTA */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-border-subtle">
-        <span className="text-sm text-text-muted">
-          {matterGroups.length > 0
-            ? `${matterGroups.length} ${matterGroups.length === 1 ? 'matter' : 'matters'} · ${totalEntries} ${totalEntries === 1 ? 'entry' : 'entries'}`
-            : 'No entries yet'}
-        </span>
+      {/* Header with totals + Add Entry CTA */}
+      <div className="flex items-center justify-between px-5 py-3 border-b border-border-subtle gap-4">
+        <div className="flex flex-col gap-0.5 min-w-0">
+          {periodTotals ? (
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-sm text-text-secondary">
+              <span>
+                <span className="font-display font-semibold text-text-primary tabular-nums">{periodTotals.totalHours.toFixed(1)}</span>
+                <span className="ml-1">hrs total</span>
+              </span>
+              <span className="text-text-faint">·</span>
+              <span>
+                <span className="tabular-nums text-text-primary">{(periodTotals.billableMinutes / 60).toFixed(1)}</span>
+                <span className="ml-1">billable</span>
+              </span>
+              <span className="text-text-faint">·</span>
+              <span>
+                <span className="tabular-nums">{(periodTotals.nonBillableMinutes / 60).toFixed(1)}</span>
+                <span className="ml-1">non-billable</span>
+              </span>
+            </div>
+          ) : null}
+          <span className="text-xs text-text-muted">
+            {matterGroups.length > 0
+              ? `${matterGroups.length} ${matterGroups.length === 1 ? 'matter' : 'matters'} · ${totalEntries} ${totalEntries === 1 ? 'entry' : 'entries'}`
+              : 'No entries yet'}
+          </span>
+        </div>
         {!isAddingEntry && (
-          <Button
-            variant="primary"
-            onClick={() => setIsAddingEntry(true)}
-            className="px-3 py-1.5 text-xs"
-          >
-            <Plus size={14} />
-            Add Entry
-          </Button>
+          <div className="flex items-center gap-2">
+            {onRetroactive && (
+              <button
+                onClick={onRetroactive}
+                className="h-9 inline-flex items-center gap-1.5 px-3 text-sm font-medium text-text-secondary bg-surface border border-border rounded-[var(--radius-sm)] hover:text-text-primary hover:bg-surface-hover transition-colors cursor-pointer"
+              >
+                <CalendarClock size={14} />
+                Retroactive
+              </button>
+            )}
+            <button
+              onClick={() => setIsAddingEntry(true)}
+              className="h-9 inline-flex items-center gap-1.5 px-3 text-sm font-medium text-text-inverse bg-accent hover:bg-accent-hover rounded-[var(--radius-sm)] transition-colors cursor-pointer"
+            >
+              <Plus size={14} />
+              Add Entry
+            </button>
+          </div>
         )}
       </div>
 

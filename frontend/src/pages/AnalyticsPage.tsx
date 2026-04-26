@@ -4,7 +4,6 @@ import { PeriodSelector } from '@/components/analytics/PeriodSelector'
 import { SummaryCards } from '@/components/analytics/SummaryCards'
 import { BillableHourTrend } from '@/components/analytics/BillableHourTrend'
 import { RevenueForecast } from '@/components/analytics/RevenueForecast'
-import { CategoryBreakdown } from '@/components/analytics/CategoryBreakdown'
 import { MatterRanking } from '@/components/analytics/MatterRanking'
 
 function getThisMonthRange(): { start: string; end: string } {
@@ -21,7 +20,7 @@ export function AnalyticsPage() {
   const [startDate, setStartDate] = useState(defaultRange.start)
   const [endDate, setEndDate] = useState(defaultRange.end)
 
-  const { summary, trend, byMatter, byCategory, loading, error } = useAnalytics(startDate, endDate)
+  const { summary, trend, byMatter, loading, error } = useAnalytics(startDate, endDate)
 
   const handlePeriodChange = (start: string, end: string) => {
     setStartDate(start)
@@ -69,10 +68,7 @@ export function AnalyticsPage() {
           </div>
 
           {/* Breakdown row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <CategoryBreakdown data={byCategory} />
-            <MatterRanking data={byMatter} />
-          </div>
+          <MatterRanking data={byMatter} />
         </div>
       )}
     </div>

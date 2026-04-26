@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { Header } from '@/components/layout/Header'
 import { SessionTable } from '@/components/sessions/SessionTable'
 import { SummaryStats } from '@/components/sessions/SummaryStats'
+import { TimesheetAddEntryForm } from '@/components/sessions/TimesheetAddEntryForm'
 import { useTracking } from '@/hooks/useTrackingContext'
 import { useSessionData } from '@/hooks/useSessionData'
-import { Trash2, Search, Clock, FolderOpen } from 'lucide-react'
+import { Trash2, Search, Clock, FolderOpen, Plus } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useSettings } from '@/hooks/useSettings'
 import { cn } from '@/lib/utils'
@@ -12,7 +13,7 @@ import { cn } from '@/lib/utils'
 type ViewMode = 'chronological' | 'by-matter'
 
 export function TimelinePage() {
-  const { selectedDate, isToday, goBack, goForward, goToDate, status, elapsed, handleStart, handleStop, workHoursBlocked, refreshMatters } = useTracking()
+  const { selectedDate, isToday, goBack, goForward, goToDate, status, elapsed, handleStart, handleStop, workHoursBlocked, refreshMatters, refreshSessions } = useTracking()
   const { settings } = useSettings()
   const {
     sessions, setSessions, matters, clients,
@@ -22,6 +23,9 @@ export function TimelinePage() {
   const [selectedActivities, setSelectedActivities] = useState<Set<string>>(new Set())
   const [viewMode, setViewMode] = useState<ViewMode>('chronological')
   const [searchQuery, setSearchQuery] = useState('')
+  const [isAddingEntry, setIsAddingEntry] = useState(false)
+
+  const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
 
   function handleSelectToggle(activityId: string) {
     setSelectedActivities(prev => {
@@ -85,33 +89,56 @@ export function TimelinePage() {
             className="w-full pl-9 pr-3 py-2 text-sm bg-surface border border-border rounded-[var(--radius-sm)] text-text-primary placeholder:text-text-faint focus:outline-none focus:border-border-default focus:ring-1 focus:ring-border-default"
           />
         </div>
-        <div className="inline-flex items-center rounded-[var(--radius-sm)] border border-border bg-surface p-0.5 text-sm">
+        <div className="flex items-center gap-2">
+          <div className="inline-flex items-center rounded-[var(--radius-sm)] border border-border bg-surface p-0.5 text-sm">
+            <button
+              onClick={() => setViewMode('chronological')}
+              className={cn(
+                'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] transition-colors cursor-pointer',
+                viewMode === 'chronological'
+                  ? 'bg-inset text-text-primary font-medium'
+                  : 'text-text-muted hover:text-text-primary',
+              )}
+            >
+              <Clock size={13} />
+              Chronological
+            </button>
+            <button
+              onClick={() => setViewMode('by-matter')}
+              className={cn(
+                'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] transition-colors cursor-pointer',
+                viewMode === 'by-matter'
+                  ? 'bg-inset text-text-primary font-medium'
+                  : 'text-text-muted hover:text-text-primary',
+              )}
+            >
+              <FolderOpen size={13} />
+              By matter
+            </button>
+          </div>
           <button
-            onClick={() => setViewMode('chronological')}
-            className={cn(
-              'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] transition-colors cursor-pointer',
-              viewMode === 'chronological'
-                ? 'bg-inset text-text-primary font-medium'
-                : 'text-text-muted hover:text-text-primary',
-            )}
+            onClick={() => setIsAddingEntry(true)}
+            className="h-9 inline-flex items-center gap-1.5 px-3 text-sm font-medium text-text-inverse bg-accent hover:bg-accent-hover rounded-[var(--radius-sm)] transition-colors cursor-pointer"
           >
-            <Clock size={13} />
-            Chronological
-          </button>
-          <button
-            onClick={() => setViewMode('by-matter')}
-            className={cn(
-              'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] transition-colors cursor-pointer',
-              viewMode === 'by-matter'
-                ? 'bg-inset text-text-primary font-medium'
-                : 'text-text-muted hover:text-text-primary',
-            )}
-          >
-            <FolderOpen size={13} />
-            By matter
+            <Plus size={14} />
+            Add Entry
           </button>
         </div>
       </div>
+
+      {isAddingEntry && (
+        <div className="bg-surface border border-border rounded-[var(--radius-md)] overflow-hidden">
+          <TimesheetAddEntryForm
+            dateStr={dateStr}
+            matters={matters}
+            onEntryAdded={() => {
+              setIsAddingEntry(false)
+              refreshSessions?.()
+            }}
+            onCancel={() => setIsAddingEntry(false)}
+          />
+        </div>
+      )}
 
       {/* Bulk delete bar */}
       {selectedActivities.size > 0 && (

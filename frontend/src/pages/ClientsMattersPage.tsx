@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
-import { ChevronDown, Plus, Pencil, Trash2, Briefcase } from 'lucide-react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { ChevronDown, Plus, Pencil, Trash2, Briefcase, Search } from 'lucide-react'
 import { api } from '@/lib/api'
 import type { Client, Matter } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -9,6 +9,7 @@ import { MatterModal } from '@/components/clients/MatterModal'
 
 export function ClientsMattersPage() {
   const [clients, setClients] = useState<Client[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
   const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set())
   const [showClientModal, setShowClientModal] = useState(false)
   const [showMatterModal, setShowMatterModal] = useState(false)
@@ -80,15 +81,46 @@ export function ClientsMattersPage() {
     }
   }
 
+  const filteredClients = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase()
+    if (!q) return clients
+    return clients
+      .map(c => {
+        const clientMatch = c.name.toLowerCase().includes(q)
+        const matchedMatters = (c.matters || []).filter(m =>
+          m.name.toLowerCase().includes(q) ||
+          (m.matter_number || '').toLowerCase().includes(q) ||
+          (m.practice_area || '').toLowerCase().includes(q),
+        )
+        if (clientMatch) return c
+        if (matchedMatters.length > 0) return { ...c, matters: matchedMatters }
+        return null
+      })
+      .filter((c): c is Client => c !== null)
+  }, [clients, searchQuery])
+
   return (
     <div className="flex flex-col gap-6 p-6 flex-1 min-h-0">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <h1 className="font-display font-bold text-xl text-text-primary">Clients & Matters</h1>
-        <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => { setEditingClient(null); setShowClientModal(true) }}>
-            <Plus size={14} className="mr-1" />
+        <div className="flex items-center gap-2 flex-1 justify-end">
+          <div className="relative flex-1 min-w-[220px] max-w-md">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-faint pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search clients and matters…"
+              className="w-full h-9 pl-9 pr-3 text-sm bg-surface border border-border rounded-[var(--radius-sm)] text-text-primary placeholder:text-text-faint focus:outline-none focus:border-border-default focus:ring-1 focus:ring-border-default"
+            />
+          </div>
+          <button
+            onClick={() => { setEditingClient(null); setShowClientModal(true) }}
+            className="h-9 inline-flex items-center gap-1.5 px-3 text-sm font-medium text-text-primary bg-surface border border-border rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer shrink-0"
+          >
+            <Plus size={14} />
             Add Client
-          </Button>
+          </button>
         </div>
       </div>
 
@@ -102,9 +134,13 @@ export function ClientsMattersPage() {
             Add Your First Client
           </Button>
         </div>
+      ) : filteredClients.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-text-muted bg-surface border border-border rounded-[var(--radius-md)]">
+          <p className="text-sm">No clients or matters match "{searchQuery}"</p>
+        </div>
       ) : (
         <div className="bg-surface border border-border rounded-[var(--radius-md)] overflow-hidden">
-          {clients.map((client) => {
+          {filteredClients.map((client) => {
             const isExpanded = expandedClients.has(client.id)
             const activeMatters = (client.matters || []).filter(m => m.status === 'active')
             const closedMatters = (client.matters || []).filter(m => m.status === 'closed')
@@ -127,11 +163,6 @@ export function ClientsMattersPage() {
                     <div>
                       <div className="font-display font-semibold text-sm text-text-primary">
                         {client.name}
-                        {client.is_internal && (
-                          <span className="ml-2 text-[10px] font-medium text-text-faint bg-bg-inset px-1.5 py-0.5 rounded">
-                            INTERNAL
-                          </span>
-                        )}
                       </div>
                       <div className="text-xs text-text-muted">
                         {activeMatters.length} active {activeMatters.length === 1 ? 'matter' : 'matters'}

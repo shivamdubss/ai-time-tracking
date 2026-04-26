@@ -18,6 +18,16 @@ import { isSupabaseConfigured } from '@/lib/supabase'
 import { Agentation } from 'agentation'
 import { DemoBanner } from '@/components/ui/DemoBanner'
 
+const isDemoUrl = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('demo')
+
+if (isDemoUrl) {
+  try {
+    const raw = localStorage.getItem('timetrack-settings')
+    const parsed = raw ? JSON.parse(raw) : {}
+    localStorage.setItem('timetrack-settings', JSON.stringify({ ...parsed, demoMode: true }))
+  } catch {}
+}
+
 function AppContent() {
   const [ready, setReady] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -33,8 +43,8 @@ function AppContent() {
 
   if (loading || !ready) return null
 
-  // If Supabase is configured and user isn't logged in, show login
-  if (isSupabaseConfigured() && !user) {
+  // If Supabase is configured and user isn't logged in, show login (unless demo mode)
+  if (isSupabaseConfigured() && !user && !isDemoUrl) {
     return <LoginPage />
   }
 

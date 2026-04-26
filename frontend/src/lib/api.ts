@@ -8,6 +8,15 @@ import {
   initAuth as webInitAuth,
   TimeTrackWebSocket as WebTimeTrackWebSocket,
 } from './api-web'
+import { demoApi } from './api-web-demo'
+
+const isDemoMode = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('demo')
+
+class NoopWebSocket {
+  connect() {}
+  on(_type: string, _handler: (data: any) => void) { return () => {} }
+  disconnect() {}
+}
 
 // ─── Desktop implementation (local FastAPI backend) ───────────────────────
 
@@ -233,7 +242,7 @@ class DesktopTimeTrackWebSocket {
 
 // ─── Route exports based on deploy target ─────────────────────────────────
 
-export const api = isWebMode ? webApi : desktopApi
-export const initAuth = isWebMode ? webInitAuth : desktopInitAuth
-export const TimeTrackWebSocket = isWebMode ? WebTimeTrackWebSocket : DesktopTimeTrackWebSocket
-export const notifySync = isWebMode ? async (_userId: string, _accessToken: string) => {} : notifyDesktopSync
+export const api = isDemoMode ? (demoApi as any) : (isWebMode ? webApi : desktopApi)
+export const initAuth = isDemoMode ? (async () => '') : (isWebMode ? webInitAuth : desktopInitAuth)
+export const TimeTrackWebSocket = isDemoMode ? NoopWebSocket : (isWebMode ? WebTimeTrackWebSocket : DesktopTimeTrackWebSocket)
+export const notifySync = (isDemoMode || isWebMode) ? async (_userId: string, _accessToken: string) => {} : notifyDesktopSync

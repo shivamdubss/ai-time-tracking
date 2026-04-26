@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { isSupabaseConfigured } from '@/lib/supabase'
 import { isWebMode } from '@/lib/platform'
 import { Toggle } from '@/components/ui/Toggle'
-import { Calendar, Mail, CheckCircle2 } from 'lucide-react'
+import { CheckCircle2 } from 'lucide-react'
 import { useIntegrations } from '@/hooks/useIntegrations'
 
 export function SettingsPage() {
@@ -124,8 +124,8 @@ export function SettingsPage() {
           {/* Google Calendar */}
           <div className="flex items-center justify-between gap-4 py-2">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-[var(--radius-sm)] bg-inset border border-border flex items-center justify-center shrink-0">
-                <Calendar size={16} style={{ color: '#15803D' }} />
+              <div className="w-8 h-8 rounded-[var(--radius-sm)] bg-inset border border-border flex items-center justify-center shrink-0 overflow-hidden">
+                <img src="/integrations/google.png" alt="Google logo" className="w-6 h-6 object-contain" />
               </div>
               <div>
                 <p className="text-sm font-medium text-text-primary">Google Calendar</p>
@@ -153,8 +153,8 @@ export function SettingsPage() {
           {/* Microsoft 365 */}
           <div className="flex items-center justify-between gap-4 py-2">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-[var(--radius-sm)] bg-inset border border-border flex items-center justify-center shrink-0">
-                <Mail size={16} style={{ color: '#2563EB' }} />
+              <div className="w-8 h-8 rounded-[var(--radius-sm)] bg-inset border border-border flex items-center justify-center shrink-0 overflow-hidden">
+                <img src="/integrations/microsoft.png" alt="Microsoft logo" className="w-6 h-6 object-contain" />
               </div>
               <div>
                 <p className="text-sm font-medium text-text-primary">Microsoft 365</p>
@@ -176,6 +176,50 @@ export function SettingsPage() {
               </button>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Practice Management Systems */}
+      <div className="bg-surface border border-border rounded-[var(--radius-md)] overflow-hidden max-w-lg">
+        <div className="px-5 py-4 border-b border-border-subtle">
+          <h2 className="font-display font-semibold text-sm text-text-primary">Practice Management</h2>
+          <p className="text-xs text-text-muted mt-0.5">
+            Submit timesheets directly to your firm's practice management system
+          </p>
+        </div>
+        <div className="px-5 py-4 flex flex-col gap-3">
+          {[
+            { id: 'clio',       name: 'Clio',       desc: 'Sync time entries and matters with Clio Manage',           comingSoon: false },
+            { id: 'cosmolex',   name: 'CosmoLex',   desc: 'Push billable hours into CosmoLex billing',                comingSoon: false },
+            { id: 'mycase',     name: 'MyCase',     desc: 'Send time entries to MyCase invoicing',                    comingSoon: true  },
+            { id: 'filevine',   name: 'Filevine',   desc: 'Connect Filevine matters and sync narratives',             comingSoon: true  },
+            { id: 'smokeball',  name: 'Smokeball',  desc: 'Submit timesheets to Smokeball Bill',                      comingSoon: true  },
+            { id: 'leap',       name: 'LEAP',       desc: 'Sync time entries with LEAP Legal',                        comingSoon: true  },
+          ].map((pms, i, arr) => (
+            <div key={pms.id}>
+              <div className="flex items-center justify-between gap-4 py-2">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-8 h-8 rounded-[var(--radius-sm)] bg-inset border border-border flex items-center justify-center shrink-0 overflow-hidden">
+                    <img src={`/integrations/${pms.id}.png`} alt={`${pms.name} logo`} className="w-6 h-6 object-contain" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-text-primary">{pms.name}</p>
+                    <p className="text-xs text-text-muted truncate">{pms.desc}</p>
+                  </div>
+                </div>
+                {pms.comingSoon ? (
+                  <span className="px-2 py-1 text-[11px] font-medium text-text-muted bg-inset border border-border-subtle rounded-[var(--radius-sm)] shrink-0">
+                    Coming soon
+                  </span>
+                ) : (
+                  <button className="px-3 py-1.5 text-xs font-medium text-text-secondary border border-border rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer shrink-0">
+                    Connect
+                  </button>
+                )}
+              </div>
+              {i < arr.length - 1 && <div className="border-t border-border-subtle" />}
+            </div>
+          ))}
         </div>
       </div>
 

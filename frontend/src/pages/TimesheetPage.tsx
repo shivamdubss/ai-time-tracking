@@ -1,23 +1,22 @@
 import { useState } from 'react'
 import { TimesheetToolbar, getTimesheetPresetDates } from '@/components/sessions/TimesheetToolbar'
 import { TimesheetMatterList } from '@/components/sessions/TimesheetMatterList'
-import { SummaryStats } from '@/components/sessions/SummaryStats'
 import { useTracking } from '@/hooks/useTrackingContext'
 import { useTimesheetData } from '@/hooks/useTimesheetData'
 import { useTimesheetStatus } from '@/hooks/useTimesheetStatus'
 import { api } from '@/lib/api'
 import type { TimesheetPreset } from '@/lib/types'
-import { Download, CheckCircle2, Undo2, Loader2, ArrowDownToLine } from 'lucide-react'
+import { CheckCircle2, Undo2 } from 'lucide-react'
 import { ImportModal } from '@/components/integrations/ImportModal'
 
 export function TimesheetPage() {
   const { matters, clients, refreshMatters } = useTracking()
 
-  // Period state — default to today
-  const todayStr = new Date().toISOString().slice(0, 10)
-  const [startDate, setStartDate] = useState(todayStr)
-  const [endDate, setEndDate] = useState(todayStr)
-  const [activePreset, setActivePreset] = useState<TimesheetPreset>('today')
+  // Period state — default to this week
+  const initialRange = getTimesheetPresetDates('this_week')
+  const [startDate, setStartDate] = useState(initialRange.start)
+  const [endDate, setEndDate] = useState(initialRange.end)
+  const [activePreset, setActivePreset] = useState<TimesheetPreset>('this_week')
 
   // Filter state
   const [clientFilter, setClientFilter] = useState<string[]>([])
@@ -25,7 +24,7 @@ export function TimesheetPage() {
 
   // Data
   const {
-    sessions, stats, loading, refresh,
+    sessions, stats, refresh,
     handleActivityUpdated, handleActivityDeleted,
   } = useTimesheetData(startDate, endDate, { clientIds: clientFilter, matterIds: matterFilter }, matters, clients)
 
@@ -58,64 +57,27 @@ export function TimesheetPage() {
         matterFilter={matterFilter}
         onClientFilterChange={setClientFilter}
         onMatterFilterChange={setMatterFilter}
-      />
-
-      <SummaryStats
-        totalHours={stats.totalHours}
-        totalBillableMinutes={stats.totalBillableMinutes}
-        totalNonBillableMinutes={stats.totalNonBillableMinutes}
-      />
-
-      {/* Action bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          {isReleased && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-[var(--radius-sm)]">
-              <CheckCircle2 size={13} />
-              Released
-            </span>
-          )}
-          {loading && (
-            <span className="inline-flex items-center gap-1.5 text-xs text-text-muted">
-              <Loader2 size={13} className="animate-spin" />
-              Loading...
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setImportOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-secondary bg-surface border border-border rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer"
-          >
-            <ArrowDownToLine size={14} />
-            Import
-          </button>
-          <button
-            onClick={handleExport}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-secondary bg-surface border border-border rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer"
-          >
-            <Download size={14} />
-            Export CSV
-          </button>
-          {isReleased ? (
+        onExport={handleExport}
+        rightSlot={
+          isReleased ? (
             <button
               onClick={unrelease}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-secondary bg-surface border border-border rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer"
+              className="h-9 inline-flex items-center gap-1.5 px-3 text-sm font-medium text-text-secondary bg-surface border border-border rounded-[var(--radius-sm)] hover:bg-surface-hover transition-colors cursor-pointer"
             >
               <Undo2 size={14} />
-              Unrelease
+              Recall
             </button>
           ) : (
             <button
               onClick={release}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-surface bg-accent hover:bg-accent/90 rounded-[var(--radius-sm)] transition-colors cursor-pointer"
+              className="h-9 inline-flex items-center gap-1.5 px-3 text-sm font-medium text-surface bg-accent hover:bg-accent/90 rounded-[var(--radius-sm)] transition-colors cursor-pointer"
             >
               <CheckCircle2 size={14} />
-              Release Timesheet
+              Submit
             </button>
-          )}
-        </div>
-      </div>
+          )
+        }
+      />
 
       <TimesheetMatterList
         sessions={sessions}
@@ -127,6 +89,13 @@ export function TimesheetPage() {
         onActivityDeleted={handleActivityDeleted}
         onEntryAdded={refresh}
         onDataRefresh={refreshMatters}
+        onRetroactive={() => setImportOpen(true)}
+        periodTotals={{
+          totalHours: stats.totalHours,
+          billableMinutes: stats.totalBillableMinutes,
+          nonBillableMinutes: stats.totalNonBillableMinutes,
+          revenue: stats.totalBillableValue,
+        }}
       />
 
       <ImportModal open={importOpen} onClose={() => setImportOpen(false)} onImported={refresh} />

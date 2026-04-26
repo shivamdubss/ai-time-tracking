@@ -1,29 +1,22 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { cn } from '@/lib/utils'
-import { ChevronDown, X } from 'lucide-react'
+import { ChevronDown, X, Download, FileText, FileSpreadsheet, FileType2 } from 'lucide-react'
 import type { TimesheetPreset, Client, Matter } from '@/lib/types'
 
 interface TimesheetToolbarProps {
   startDate: string
   endDate: string
   onPeriodChange: (start: string, end: string, preset: TimesheetPreset) => void
-  activePreset: TimesheetPreset
+  activePreset?: TimesheetPreset
   clients: Client[]
   matters: Matter[]
   clientFilter: string[]
   matterFilter: string[]
   onClientFilterChange: (ids: string[]) => void
   onMatterFilterChange: (ids: string[]) => void
+  onExport?: () => void
+  rightSlot?: React.ReactNode
 }
-
-const PRESETS: { key: TimesheetPreset; label: string }[] = [
-  { key: 'today', label: 'Today' },
-  { key: 'yesterday', label: 'Yesterday' },
-  { key: 'this_week', label: 'This Week' },
-  { key: 'last_week', label: 'Last Week' },
-  { key: 'this_month', label: 'This Month' },
-  { key: 'last_month', label: 'Last Month' },
-]
 
 export function getTimesheetPresetDates(preset: TimesheetPreset): { start: string; end: string } {
   const now = new Date()
@@ -65,16 +58,6 @@ export function getTimesheetPresetDates(preset: TimesheetPreset): { start: strin
     case 'custom':
       return { start: fmt(now), end: fmt(now) }
   }
-}
-
-function formatDateLabel(start: string, end: string): string {
-  const s = new Date(start + 'T12:00:00')
-  const e = new Date(end + 'T12:00:00')
-  const opts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' }
-  if (start === end) {
-    return s.toLocaleDateString('en-US', { weekday: 'short', ...opts })
-  }
-  return `${s.toLocaleDateString('en-US', opts)} – ${e.toLocaleDateString('en-US', opts)}`
 }
 
 // ─── Filter Dropdown ─────────────────────────────────────────────────────
@@ -131,7 +114,7 @@ function FilterDropdown({ label, items, selected, onChange }: FilterDropdownProp
       <button
         onClick={() => setOpen(!open)}
         className={cn(
-          'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[var(--radius-sm)] transition-colors cursor-pointer',
+          'h-9 min-w-[140px] inline-flex items-center justify-between gap-1.5 px-3 text-sm font-medium rounded-[var(--radius-sm)] transition-colors cursor-pointer',
           hasFilter
             ? 'bg-accent-link/10 text-accent-link border border-accent-link/20'
             : 'bg-surface border border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover',
@@ -200,18 +183,10 @@ function FilterDropdown({ label, items, selected, onChange }: FilterDropdownProp
 // ─── Main Toolbar ────────────────────────────────────────────────────────
 
 export function TimesheetToolbar({
-  startDate, endDate, onPeriodChange, activePreset,
+  startDate, endDate, onPeriodChange,
   clients, matters, clientFilter, matterFilter,
-  onClientFilterChange, onMatterFilterChange,
+  onClientFilterChange, onMatterFilterChange, onExport, rightSlot,
 }: TimesheetToolbarProps) {
-  const [showCustom, setShowCustom] = useState(false)
-
-  const handlePreset = (preset: TimesheetPreset) => {
-    setShowCustom(false)
-    const { start, end } = getTimesheetPresetDates(preset)
-    onPeriodChange(start, end, preset)
-  }
-
   // Client filter items
   const clientItems = useMemo(() =>
     clients
@@ -251,76 +226,118 @@ export function TimesheetToolbar({
     }
   }
 
+  const dateInputClass = 'h-9 px-3 text-sm bg-surface border border-border rounded-[var(--radius-sm)] text-text-primary focus:outline-none focus:border-accent-link'
+
   return (
-    <div className="flex flex-col gap-3">
-      {/* Period + date label */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          {PRESETS.map((p) => (
-            <button
-              key={p.key}
-              onClick={() => handlePreset(p.key)}
-              className={cn(
-                'px-3 py-1.5 text-xs font-medium rounded-[var(--radius-sm)] transition-colors cursor-pointer',
-                activePreset === p.key
-                  ? 'bg-text-primary text-white dark:bg-white dark:text-black'
-                  : 'bg-surface border border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover',
-              )}
-            >
-              {p.label}
-            </button>
-          ))}
-          <div className="relative">
-            <button
-              onClick={() => { setShowCustom(!showCustom); if (!showCustom) onPeriodChange(startDate, endDate, 'custom') }}
-              className={cn(
-                'px-3 py-1.5 text-xs font-medium rounded-[var(--radius-sm)] transition-colors cursor-pointer',
-                activePreset === 'custom'
-                  ? 'bg-text-primary text-white dark:bg-white dark:text-black'
-                  : 'bg-surface border border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover',
-              )}
-            >
-              Custom
-            </button>
-            {showCustom && (
-              <div className="absolute top-full left-0 mt-1 z-10 flex items-center gap-2 px-3 py-2 bg-surface border border-border rounded-[var(--radius-sm)] shadow-md">
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => onPeriodChange(e.target.value, endDate, 'custom')}
-                  className="px-2 py-1 text-xs border border-border rounded-[var(--radius-sm)] bg-surface text-text-primary"
-                />
-                <span className="text-xs text-text-muted">to</span>
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => onPeriodChange(startDate, e.target.value, 'custom')}
-                  className="px-2 py-1 text-xs border border-border rounded-[var(--radius-sm)] bg-surface text-text-primary"
-                />
-              </div>
-            )}
-          </div>
-        </div>
-        {/* Filters */}
-        <div className="flex items-center gap-2">
-          <FilterDropdown
-            label="All Clients"
-            items={clientItems}
-            selected={clientFilter}
-            onChange={handleClientFilterChange}
-          />
-          <FilterDropdown
-            label="All Matters"
-            items={matterItems}
-            selected={matterFilter}
-            onChange={onMatterFilterChange}
-          />
-        </div>
-      </div>
-      {/* Date range label */}
-      <div className="text-lg font-display font-bold text-text-primary tracking-tight">
-        {formatDateLabel(startDate, endDate)}
+    <div className="flex flex-wrap items-end gap-3">
+      <FieldGroup label="From">
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => onPeriodChange(e.target.value, endDate, 'custom')}
+          className={dateInputClass}
+        />
+      </FieldGroup>
+
+      <FieldGroup label="To">
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => onPeriodChange(startDate, e.target.value, 'custom')}
+          className={dateInputClass}
+        />
+      </FieldGroup>
+
+      <FieldGroup label="Client">
+        <FilterDropdown
+          label="All Clients"
+          items={clientItems}
+          selected={clientFilter}
+          onChange={handleClientFilterChange}
+        />
+      </FieldGroup>
+
+      <FieldGroup label="Matter">
+        <FilterDropdown
+          label="All Matters"
+          items={matterItems}
+          selected={matterFilter}
+          onChange={onMatterFilterChange}
+        />
+      </FieldGroup>
+
+      <div className="ml-auto flex items-center gap-2">
+        <ExportMenu onExport={onExport} />
+        {rightSlot}
       </div>
     </div>
   )
 }
+
+// ─── Export Menu ──────────────────────────────────────────────────────────
+
+function ExportMenu({ onExport }: { onExport?: () => void }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    if (open) document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [open])
+
+  const items: { label: string; icon: React.ReactNode }[] = [
+    { label: 'PDF', icon: <FileText size={14} className="text-text-muted" /> },
+    { label: 'Excel', icon: <FileSpreadsheet size={14} className="text-text-muted" /> },
+    { label: 'Word', icon: <FileType2 size={14} className="text-text-muted" /> },
+  ]
+
+  function pick() {
+    setOpen(false)
+    onExport?.()
+  }
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen(!open)}
+        className={cn(
+          'h-9 inline-flex items-center gap-1.5 px-3 text-sm font-medium rounded-[var(--radius-sm)] transition-colors cursor-pointer',
+          'bg-surface border border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover',
+        )}
+      >
+        <Download size={14} />
+        Export
+        <ChevronDown size={14} className="text-text-muted" />
+      </button>
+      {open && (
+        <div className="absolute top-full right-0 mt-1 z-20 min-w-[160px] bg-surface border border-border rounded-[var(--radius-sm)] shadow-md py-1">
+          {items.map(item => (
+            <button
+              key={item.label}
+              onClick={pick}
+              className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-text-primary hover:bg-surface-hover cursor-pointer"
+            >
+              {item.icon}
+              {item.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Field Group (label above control) ───────────────────────────────────
+
+function FieldGroup({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-xs text-text-muted">{label}</span>
+      {children}
+    </div>
+  )
+}
+

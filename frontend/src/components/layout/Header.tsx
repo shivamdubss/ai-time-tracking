@@ -1,6 +1,5 @@
 import { useRef } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { Toggle } from '@/components/ui/Toggle'
+import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react'
 import { formatDateLabel, formatTime } from '@/lib/utils'
 import { isWebMode } from '@/lib/platform'
 import type { TrackingStatus } from '@/lib/types'
@@ -99,44 +98,95 @@ export function Header({
 
       {(!isWebMode || demoMode) && (
         <div className="flex items-center gap-3">
-          {status === 'tracking' && (
-            <div className="flex items-center gap-2 px-2.5 py-1.5 bg-error-bg border border-error/20 rounded-[var(--radius-sm)]">
-              <span className="w-[7px] h-[7px] rounded-full bg-error animate-pulse-dot" />
-              <span className="font-mono text-[13px] font-medium text-error tabular-nums">
-                {formatTime(elapsed)}
-              </span>
-            </div>
-          )}
-
-          {status === 'paused' && (
-            <div className="flex items-center gap-2 px-2.5 py-1.5 bg-warning-bg border border-warning/20 rounded-[var(--radius-sm)]">
-              <span className="w-[7px] h-[7px] rounded-full bg-warning" />
-              <span className="font-mono text-[13px] font-medium text-warning tabular-nums">
-                {formatTime(elapsed)}
-              </span>
-              <span className="text-xs font-medium text-warning/70 ml-0.5">PAUSED</span>
-            </div>
-          )}
-
-          {status === 'processing' && (
-            <div className="flex items-center gap-2 px-2.5 py-1.5 bg-info-bg border border-info/20 rounded-[var(--radius-sm)]">
-              <div className="w-3.5 h-3.5 border-2 border-info/30 border-t-info rounded-full animate-spin" />
-              <span className="text-[13px] font-medium text-info">Processing...</span>
-            </div>
-          )}
-
           {workHoursBlocked && (
             <span className="text-xs text-warning font-medium">Outside work hours</span>
           )}
-
-          <Toggle
-            checked={status === 'tracking' || status === 'paused'}
-            onChange={(checked) => checked ? onStartTracking() : onStopTracking()}
-            label="Auto Capture"
-            disabled={status === 'processing'}
+          <AutoLogPill
+            status={status}
+            elapsed={elapsed}
+            onStart={onStartTracking}
+            onStop={onStopTracking}
           />
         </div>
       )}
     </header>
+  )
+}
+
+interface AutoLogPillProps {
+  status: TrackingStatus
+  elapsed: number
+  onStart: () => void
+  onStop: () => void
+}
+
+function AutoLogPill({ status, elapsed, onStart, onStop }: AutoLogPillProps) {
+  const isOn = status === 'tracking' || status === 'paused'
+  const isProcessing = status === 'processing'
+
+  function handleToggle() {
+    if (isProcessing) return
+    if (isOn) onStop()
+    else onStart()
+  }
+
+  if (isProcessing) {
+    return (
+      <div
+        className="flex items-center gap-2 px-2.5 py-1.5 bg-info-bg border border-info/20 rounded-[var(--radius-sm)]"
+        aria-busy="true"
+      >
+        <div className="w-3.5 h-3.5 border-2 border-info/30 border-t-info rounded-full animate-spin" />
+        <span className="text-[13px] font-medium text-info">Processing…</span>
+      </div>
+    )
+  }
+
+  const containerClass = isOn
+    ? 'h-9 flex items-center gap-3 pl-3.5 pr-4 bg-success-bg border border-success/20 rounded-[var(--radius-sm)] transition-colors'
+    : 'h-9 flex items-center gap-3 pl-3.5 pr-4 bg-surface border border-border rounded-[var(--radius-sm)] transition-colors'
+
+  return (
+    <div className={containerClass}>
+      <Sparkles
+        size={14}
+        className={isOn ? 'text-success' : 'text-text-muted'}
+        strokeWidth={2}
+      />
+      {status === 'paused' ? (
+        <span className="font-mono text-[13px] font-medium text-warning tabular-nums">
+          {formatTime(elapsed)}
+        </span>
+      ) : (
+        <span
+          className={
+            isOn
+              ? 'text-[13px] font-medium text-success'
+              : 'text-[13px] font-medium text-text-muted'
+          }
+        >
+          Capture Time
+        </span>
+      )}
+      <button
+        role="switch"
+        aria-checked={isOn}
+        aria-label="Capture Time"
+        onClick={handleToggle}
+        className={
+          isOn
+            ? 'relative inline-flex h-5 w-9 shrink-0 rounded-full bg-success transition-colors duration-150 ease-out cursor-pointer'
+            : 'relative inline-flex h-5 w-9 shrink-0 rounded-full bg-border transition-colors duration-150 ease-out cursor-pointer'
+        }
+      >
+        <span
+          className={
+            isOn
+              ? 'pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-150 ease-out absolute top-0.5 translate-x-4'
+              : 'pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-150 ease-out absolute top-0.5 translate-x-0.5'
+          }
+        />
+      </button>
+    </div>
   )
 }

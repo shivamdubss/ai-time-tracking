@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Header } from '@/components/layout/Header'
 import { SessionTable } from '@/components/sessions/SessionTable'
 import { SummaryStats } from '@/components/sessions/SummaryStats'
@@ -26,6 +26,16 @@ export function TimelinePage() {
   const [isAddingEntry, setIsAddingEntry] = useState(false)
 
   const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
+
+  const lastUpdated = useMemo(() => {
+    let latest: Date | null = null
+    for (const s of sessions) {
+      if (!s.endTime) continue
+      const d = new Date(s.endTime)
+      if (!latest || d > latest) latest = d
+    }
+    return latest
+  }, [sessions])
 
   function handleSelectToggle(activityId: string) {
     setSelectedActivities(prev => {
@@ -89,7 +99,7 @@ export function TimelinePage() {
             className="w-full pl-9 pr-3 py-2 text-sm bg-surface border border-border rounded-[var(--radius-sm)] text-text-primary placeholder:text-text-faint focus:outline-none focus:border-border-default focus:ring-1 focus:ring-border-default"
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <div className="inline-flex items-center rounded-[var(--radius-sm)] border border-border bg-surface p-0.5 text-sm">
             <button
               onClick={() => setViewMode('chronological')}
@@ -172,6 +182,8 @@ export function TimelinePage() {
         onSelectToggle={handleSelectToggle}
         onSessionUpdated={handleSessionUpdated}
         onDataRefresh={refreshMatters}
+        onRefreshTimeline={refreshSessions}
+        lastUpdated={lastUpdated}
         isProcessing={status === 'processing'}
         viewMode={viewMode}
         searchQuery={searchQuery}

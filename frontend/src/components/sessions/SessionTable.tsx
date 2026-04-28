@@ -1,8 +1,10 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import { RefreshCw } from 'lucide-react'
 import type { Session, Matter, Client, Activity } from '@/lib/types'
 import { ActivityRow } from './ActivityRow'
 import { EmptyState } from './EmptyState'
 import { InlineProcessingRow } from './InlineProcessingRow'
+import { Tooltip } from '@/components/ui/Tooltip'
 
 interface SessionTableProps {
   sessions: Session[]
@@ -12,16 +14,43 @@ interface SessionTableProps {
   onSelectToggle?: (activityId: string) => void
   onSessionUpdated?: (session: Session) => void
   onDataRefresh?: () => void
+  onRefreshTimeline?: () => void
+  lastUpdated?: Date | null
   isProcessing?: boolean
   viewMode?: 'chronological' | 'by-matter'
   searchQuery?: string
+}
+
+function formatRelative(ts: Date): string {
+  const seconds = Math.floor((Date.now() - ts.getTime()) / 1000)
+  if (seconds < 60) return 'just now'
+  const minutes = Math.floor(seconds / 60)
+  if (minutes < 60) return `${minutes} min ago`
+  const hours = Math.floor(minutes / 60)
+  return `${hours}h ago`
 }
 
 const UNASSIGNED_KEY = '__unassigned__'
 
 type ActivityEntry = { session: Session; activity: Activity }
 
-export function SessionTable({ sessions, matters, clients, selectedActivities, onSelectToggle, onSessionUpdated, onDataRefresh, isProcessing, viewMode = 'chronological', searchQuery = '' }: SessionTableProps) {
+export function SessionTable({ sessions, matters, clients, selectedActivities, onSelectToggle, onSessionUpdated, onDataRefresh, onRefreshTimeline, lastUpdated, isProcessing, viewMode = 'chronological', searchQuery = '' }: SessionTableProps) {
+  const [isSpinning, setIsSpinning] = useState(false)
+
+  function handleRefresh() {
+    if (isSpinning || isProcessing) return
+    setIsSpinning(true)
+    onRefreshTimeline?.()
+    setTimeout(() => setIsSpinning(false), 1200)
+  }
+
+  const refreshTooltip = isProcessing ? 'Updating…' : 'Click to refresh'
+
+  const lastUpdatedLabel = isProcessing
+    ? 'Updating…'
+    : lastUpdated
+      ? `Updated ${formatRelative(lastUpdated)}`
+      : null
   const matterMap = useMemo(() => new Map((matters || []).map(m => [m.id, m])), [matters])
   const clientMap = useMemo(() => new Map((clients || []).map(c => [c.id, c])), [clients])
 
@@ -130,12 +159,34 @@ export function SessionTable({ sessions, matters, clients, selectedActivities, o
   return (
     <div className="bg-surface border border-border rounded-[var(--radius-md)]">
       {/* Header */}
-      <div className="hidden md:grid grid-cols-[24px_1fr_200px_80px_1.2fr] gap-4 px-5 py-2.5 border-b border-border text-xs font-bold tracking-wider uppercase text-text-muted">
+      <div className="hidden md:grid grid-cols-[24px_1fr_200px_80px_1.2fr] gap-4 px-5 py-2.5 border-b border-border text-xs font-bold tracking-wider uppercase text-text-muted items-center">
         <div />
         <div>Matter</div>
         <div>Time</div>
         <div>Hours</div>
-        <div>Narrative</div>
+        <div className="flex items-center justify-between gap-2">
+          <span>Narrative</span>
+          {onRefreshTimeline && (
+            <div className="flex items-center gap-1.5 normal-case">
+              {lastUpdatedLabel && (
+                <span className="text-[11px] font-normal tracking-normal text-text-faint">
+                  {lastUpdatedLabel}
+                </span>
+              )}
+              <Tooltip content={refreshTooltip}>
+                <button
+                  type="button"
+                  onClick={handleRefresh}
+                  disabled={isSpinning || isProcessing}
+                  aria-label={refreshTooltip}
+                  className="w-7 h-7 flex items-center justify-center rounded-[var(--radius-sm)] text-text-muted hover:text-text-primary hover:bg-surface-hover disabled:pointer-events-none transition-colors cursor-pointer"
+                >
+                  <RefreshCw size={16} className={isSpinning || isProcessing ? 'animate-spin' : ''} />
+                </button>
+              </Tooltip>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Processing row (inline, at top) */}
